@@ -1,0 +1,16 @@
+# IDE / editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Claude Code local instructions
+.claude/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local environment
+.env
+.env.*
