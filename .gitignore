@@ -3,8 +3,6 @@
 .idea/
 *.code-workspace
 
-# Claude Code local instructions
-.claude/
 
 # OS files
 Thumbs.db

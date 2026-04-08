@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "c:\\Users\\dac12\\Dropbox\\video\\.claude\\skills"
+    ],
+    "allow": [
+      "Edit(/.claude/skills/download-scores/**)"
+    ]
+  }
+}
