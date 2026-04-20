@@ -39,14 +39,6 @@ PC_TO_STEP_ALTER_FLAT = {
     11: ("B", None),
 }
 
-DURATION_TO_TYPE = {
-    3: "16th",
-    6: "eighth",
-    12: "quarter",
-    24: "half",
-    48: "whole",
-}
-
 SUPPORTED_INSTRUMENTS = {"violin", "cello", "strings_pad", "bass", "drumset"}
 RANGE_BANDS = {
     "violin": (62, 88),
@@ -235,9 +227,28 @@ def set_pitch_from_midi(pitch: ET.Element, midi: int) -> None:
     ET.SubElement(pitch, "octave").text = str(octave)
 
 
-def duration_chunks(duration: int) -> list[int]:
+def duration_type(duration: int, divisions: int) -> str:
+    if duration == 4 * divisions:
+        return "whole"
+    if duration == 2 * divisions:
+        return "half"
+    if duration == divisions:
+        return "quarter"
+    if duration * 2 == divisions:
+        return "eighth"
+    if duration * 4 == divisions:
+        return "16th"
+    raise ValueError(f"Unsupported duration/type combination duration={duration} divisions={divisions}")
+
+
+def duration_chunks(duration: int, divisions: int) -> list[int]:
     chunks: list[int] = []
-    for unit in (48, 24, 12, 6, 3):
+    base_units = [4 * divisions, 2 * divisions, divisions]
+    if divisions % 2 == 0:
+        base_units.append(divisions // 2)
+    if divisions % 4 == 0:
+        base_units.append(divisions // 4)
+    for unit in base_units:
         while duration >= unit:
             chunks.append(unit)
             duration -= unit
@@ -246,16 +257,16 @@ def duration_chunks(duration: int) -> list[int]:
     return chunks
 
 
-def make_rest(duration: int) -> ET.Element:
+def make_rest(duration: int, divisions: int) -> ET.Element:
     note = ET.Element("note")
     ET.SubElement(note, "rest")
     ET.SubElement(note, "duration").text = str(duration)
     ET.SubElement(note, "voice").text = "1"
-    ET.SubElement(note, "type").text = DURATION_TO_TYPE[duration]
+    ET.SubElement(note, "type").text = duration_type(duration, divisions)
     return note
 
 
-def make_pitch_note(midi: int, duration: int, stem: str = "up") -> ET.Element:
+def make_pitch_note(midi: int, duration: int, divisions: int, stem: str = "up") -> ET.Element:
     note = ET.Element("note")
     pitch = ET.SubElement(note, "pitch")
     step, alter, octave = midi_to_pitch(midi)
@@ -265,12 +276,12 @@ def make_pitch_note(midi: int, duration: int, stem: str = "up") -> ET.Element:
     ET.SubElement(pitch, "octave").text = str(octave)
     ET.SubElement(note, "duration").text = str(duration)
     ET.SubElement(note, "voice").text = "1"
-    ET.SubElement(note, "type").text = DURATION_TO_TYPE[duration]
+    ET.SubElement(note, "type").text = duration_type(duration, divisions)
     ET.SubElement(note, "stem").text = stem
     return note
 
 
-def make_percussion_note(kind: str, duration: int) -> ET.Element:
+def make_percussion_note(kind: str, duration: int, divisions: int) -> ET.Element:
     note = ET.Element("note")
     unpitched = ET.SubElement(note, "unpitched")
     step, octave = DRUM_DISPLAY[kind]
@@ -278,7 +289,7 @@ def make_percussion_note(kind: str, duration: int) -> ET.Element:
     ET.SubElement(unpitched, "display-octave").text = str(octave)
     ET.SubElement(note, "duration").text = str(duration)
     ET.SubElement(note, "voice").text = "1"
-    ET.SubElement(note, "type").text = DURATION_TO_TYPE[duration]
+    ET.SubElement(note, "type").text = duration_type(duration, divisions)
     ET.SubElement(note, "instrument", {"id": f"P4-{kind}"})
     ET.SubElement(note, "stem").text = "up"
     if kind == "hat":
@@ -817,8 +828,8 @@ def add_upper_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSp
         beat_duration = state["divisions"] * 4 // state["beat_type"]
         segment = segment_name(index, len(source_part.findall("measure")))
         if not should_play(index, entry_after_bars):
-            for chunk in duration_chunks(state["measure_duration"]):
-                measure.append(make_rest(chunk))
+            for chunk in duration_chunks(state["measure_duration"], state["divisions"]):
+                measure.append(make_rest(chunk, state["divisions"]))
         else:
             if spec.density == "sparse" or instrument == "strings_pad":
                 anchors = [
@@ -845,11 +856,11 @@ def add_upper_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSp
                 else:
                     merged.append((pitch, duration))
             for pitch, duration in merged:
-                for chunk in duration_chunks(duration):
+                for chunk in duration_chunks(duration, state["divisions"]):
                     if pitch is None:
-                        measure.append(make_rest(chunk))
+                        measure.append(make_rest(chunk, state["divisions"]))
                     else:
-                        note = make_pitch_note(pitch, chunk, stem=stem)
+                        note = make_pitch_note(pitch, chunk, state["divisions"], stem=stem)
                         if spec.expression == "assertive" and chunk <= beat_duration:
                             notations = ET.SubElement(note, "notations")
                             articulations = ET.SubElement(notations, "articulations")
@@ -893,21 +904,33 @@ def add_bass_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSpe
         if root_pitch is not None:
             previous = root_pitch
 
+        half_beat = max(1, beat_duration // 2)
+
         if not should_play(index, entry_after_bars):
             pattern = [(None, state["measure_duration"])]
         elif spec.groove == "halftime":
-            pattern = [(root_pitch, 12), (None, 12), (alt_pitch, 12), (root_pitch, 12)]
+            pattern = [(root_pitch, 2 * beat_duration), (None, beat_duration), (alt_pitch, beat_duration)]
         elif spec.groove == "syncopated":
-            pattern = [(root_pitch, 12), (None, 6), (root_pitch, 6), (alt_pitch, 12), (root_pitch, 12)]
+            pattern = [
+                (root_pitch, beat_duration),
+                (None, half_beat),
+                (root_pitch, half_beat),
+                (alt_pitch, beat_duration),
+                (root_pitch, beat_duration),
+            ]
         else:
-            pattern = [(root_pitch, 12), (root_pitch, 12), (alt_pitch, 12), (root_pitch, 12)]
+            pattern = [(root_pitch, beat_duration), (root_pitch, beat_duration), (alt_pitch, beat_duration), (root_pitch, beat_duration)]
 
         if spec.bass == "light":
-            pattern = [(root_pitch, 12), (None, 12), (alt_pitch, 12), (None, 12)]
+            pattern = [(root_pitch, beat_duration), (None, beat_duration), (alt_pitch, beat_duration), (None, beat_duration)]
 
         for pitch, duration in pattern:
-            for chunk in duration_chunks(duration):
-                measure.append(make_rest(chunk) if pitch is None else make_pitch_note(pitch, chunk, stem="down"))
+            for chunk in duration_chunks(duration, state["divisions"]):
+                measure.append(
+                    make_rest(chunk, state["divisions"])
+                    if pitch is None
+                    else make_pitch_note(pitch, chunk, state["divisions"], stem="down")
+                )
 
         for barline in source_measure.findall("barline"):
             measure.append(copy.deepcopy(barline))
@@ -917,24 +940,65 @@ def add_bass_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSpe
     return "Bass"
 
 
-def drum_pattern(segment: str, spec: PreferenceSpec, measure_index: int) -> list[tuple[int, str]]:
+def drum_pattern(segment: str, spec: PreferenceSpec, measure_index: int, beat_duration: int, measure_duration: int) -> list[tuple[int, str]]:
+    half_beat = max(1, beat_duration // 2)
     cycle8 = (measure_index - 1) % 8
     cycle4 = (measure_index - 1) % 4
     if segment == "intro":
         return []
     if spec.drums == "restrained":
-        return [(0, "subkick"), (24, "clap"), (42, "hat")]
-    if spec.groove == "halftime":
+        events = [(0, "subkick"), (2 * beat_duration, "clap"), (3 * beat_duration + half_beat, "hat")]
+    elif spec.groove == "halftime":
         if cycle4 == 3:
-            return [(0, "subkick"), (18, "kick"), (24, "clap"), (39, "hat"), (45, "tom")]
-        return [(0, "subkick"), (12, "hat"), (18, "kick"), (24, "clap"), (39, "kick"), (45, "subkick")]
-    if spec.groove == "syncopated":
+            events = [
+                (0, "subkick"),
+                (beat_duration + half_beat, "kick"),
+                (2 * beat_duration, "clap"),
+                (3 * beat_duration + half_beat, "hat"),
+            ]
+            if measure_duration >= 4 * beat_duration:
+                events.append((measure_duration - half_beat, "tom"))
+        else:
+            events = [
+                (0, "subkick"),
+                (beat_duration, "hat"),
+                (beat_duration + half_beat, "kick"),
+                (2 * beat_duration, "clap"),
+                (3 * beat_duration + half_beat, "kick"),
+            ]
+            if measure_duration >= 4 * beat_duration:
+                events.append((measure_duration - half_beat, "subkick"))
+    elif spec.groove == "syncopated":
         if cycle8 in {3, 7}:
-            return [(0, "subkick"), (9, "hat"), (18, "kick"), (24, "clap"), (33, "hat"), (39, "kick"), (45, "tom")]
-        return [(0, "subkick"), (9, "hat"), (18, "kick"), (24, "clap"), (39, "kick")]
-    if spec.groove == "swung":
-        return [(0, "kick"), (15, "hat"), (24, "clap"), (36, "kick"), (42, "hat")]
-    return [(0, "kick"), (12, "hat"), (24, "clap"), (36, "kick"), (42, "hat")]
+            events = [
+                (0, "subkick"),
+                (half_beat + beat_duration // 3, "hat"),
+                (beat_duration + half_beat, "kick"),
+                (2 * beat_duration, "clap"),
+                (2 * beat_duration + half_beat, "hat"),
+                (3 * beat_duration, "kick"),
+            ]
+            if measure_duration >= 4 * beat_duration:
+                events.append((measure_duration - half_beat, "tom"))
+        else:
+            events = [
+                (0, "subkick"),
+                (half_beat + beat_duration // 3, "hat"),
+                (beat_duration + half_beat, "kick"),
+                (2 * beat_duration, "clap"),
+                (3 * beat_duration, "kick"),
+            ]
+    elif spec.groove == "swung":
+        events = [(0, "kick"), (beat_duration + half_beat, "hat"), (2 * beat_duration, "clap"), (3 * beat_duration, "kick"), (3 * beat_duration + half_beat, "hat")]
+    if spec.groove == "halftime":
+        pass
+    elif spec.groove == "syncopated":
+        pass
+    elif spec.groove == "swung":
+        pass
+    else:
+        events = [(0, "kick"), (beat_duration, "hat"), (2 * beat_duration, "clap"), (3 * beat_duration, "kick"), (3 * beat_duration + half_beat, "hat")]
+    return [(onset, kind) for onset, kind in events if 0 <= onset < measure_duration]
 
 
 def add_drum_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSpec) -> str:
@@ -959,17 +1023,25 @@ def add_drum_part(root: ET.Element, source_part: ET.Element, spec: PreferenceSpe
                 measure.append(direction)
 
         current = 0
+        pulse = max(1, state["divisions"] * 4 // state["beat_type"] // 2)
         segment = segment_name(index, len(source_part.findall("measure")))
-        events = [] if not should_play(index, entry_after_bars) else drum_pattern(segment, spec, index)
-        for onset, kind in events:
+        events = [] if not should_play(index, entry_after_bars) else drum_pattern(segment, spec, index, state["divisions"] * 4 // state["beat_type"], state["measure_duration"])
+        filtered_events: list[tuple[int, str]] = []
+        occupied_until = 0
+        for onset, kind in sorted(events, key=lambda event: event[0]):
+            if onset < occupied_until:
+                continue
+            filtered_events.append((onset, kind))
+            occupied_until = onset + pulse
+        for onset, kind in filtered_events:
             if onset > current:
-                for chunk in duration_chunks(onset - current):
-                    measure.append(make_rest(chunk))
-            measure.append(make_percussion_note(kind, 3))
-            current = onset + 3
+                for chunk in duration_chunks(onset - current, state["divisions"]):
+                    measure.append(make_rest(chunk, state["divisions"]))
+            measure.append(make_percussion_note(kind, pulse, state["divisions"]))
+            current = onset + pulse
         if current < state["measure_duration"]:
-            for chunk in duration_chunks(state["measure_duration"] - current):
-                measure.append(make_rest(chunk))
+            for chunk in duration_chunks(state["measure_duration"] - current, state["divisions"]):
+                measure.append(make_rest(chunk, state["divisions"]))
         for barline in source_measure.findall("barline"):
             measure.append(copy.deepcopy(barline))
         drum_part.append(measure)
@@ -991,7 +1063,7 @@ def apply_expression(root: ET.Element, spec: PreferenceSpec) -> None:
                 first_measure.insert(1, direction)
 
 
-def validate_score(root: ET.Element) -> None:
+def validate_score(root: ET.Element, strict_duration_part_ids: set[str] | None = None) -> None:
     part_list = root.find("part-list")
     score_parts = part_list.findall("score-part")
     score_part_ids = [score_part.attrib["id"] for score_part in score_parts]
@@ -1012,6 +1084,7 @@ def validate_score(root: ET.Element) -> None:
         beats = 4
         beat_type = 4
         expected = None
+        check_durations = strict_duration_part_ids is None or part.attrib["id"] in strict_duration_part_ids
         for measure in part.findall("measure"):
             attrs = measure.find("attributes")
             if attrs is not None:
@@ -1035,7 +1108,7 @@ def validate_score(root: ET.Element) -> None:
                     time_pos -= int(child.findtext("duration", "0"))
                 elif child.tag == "forward":
                     time_pos += int(child.findtext("duration", "0"))
-            if time_pos != expected:
+            if check_durations and time_pos != expected:
                 raise ValueError(f"Measure duration mismatch in part {part.attrib['id']} measure {measure.attrib.get('number')}: expected {expected}, got {time_pos}")
 
 
@@ -1043,13 +1116,14 @@ def build_output_path(source_score: Path, goal: str, preset: str, explicit_outpu
     if explicit_output:
         return Path(explicit_output)
     tag = slugify(preset if preset != "none" else goal)
-    return Path("_build/arranged") / f"{source_score.stem}.{tag}.musicxml"
+    return Path("_build/xml") / f"{source_score.stem}.{tag}.musicxml"
 
 
 def arrange_score(spec: PreferenceSpec, output_path: Path) -> dict[str, object]:
     source_path = Path(spec.source_score)
     root = load_xml_root(source_path)
     source_info = detect_source_info(root)
+    original_part_ids = {part.attrib["id"] for part in root.findall("part")}
 
     removed = remove_parts(root, spec.remove_instruments)
     source_part = first_part(root)
@@ -1073,7 +1147,8 @@ def arrange_score(spec: PreferenceSpec, output_path: Path) -> dict[str, object]:
         added.append(add_drum_part(root, source_part, spec))
 
     apply_expression(root, spec)
-    validate_score(root)
+    generated_part_ids = {part.attrib["id"] for part in root.findall("part")} - original_part_ids
+    validate_score(root, strict_duration_part_ids=generated_part_ids)
     ET.indent(root, space="  ")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     ET.ElementTree(root).write(output_path, encoding="UTF-8", xml_declaration=True)

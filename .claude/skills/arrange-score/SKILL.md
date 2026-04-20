@@ -24,13 +24,13 @@ Use this skill when the user wants to:
 Write the arranged score under:
 
 ```text
-_build/arranged/
+_build/xml/
 ```
 
 Use a deterministic filename:
 
 ```text
-_build/arranged/<basename>.<tag>.musicxml
+_build/xml/<basename>.<tag>.musicxml
 ```
 
 ## Input model
@@ -47,6 +47,16 @@ Required concepts:
 
 - `source_score`
 - `goal`
+
+If the user only names a source score and does not give arrangement preferences, ask one concise follow-up before running the skill.
+
+Good fallback question shape:
+
+- desired vibe or preset
+- added instruments, if any
+- whether to keep or change key and tempo
+
+Do not silently assume a genre restyle when the user has not said what kind of arrangement they want.
 
 Optional preferences:
 
@@ -79,10 +89,11 @@ Supported added instruments in v1:
 
 1. Resolve the input score path from `$ARGUMENTS`.
 2. Read the user goal and preference hints.
-3. Normalize the request into arranger flags.
-4. Run `scripts/arrange_score.py`.
-5. Validate that the output MusicXML exists and is parseable.
-6. Report:
+3. If the user gave only a source path or an underspecified request like `use the skill on X`, ask one concise follow-up for arrangement preferences before continuing.
+4. Normalize the request into arranger flags.
+5. Run `scripts/arrange_score.py`.
+6. Validate that the output MusicXML exists and is parseable.
+7. Report:
    - input score
    - output score
    - resolved preferences

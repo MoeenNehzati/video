@@ -75,6 +75,7 @@ The input path is provided as `$ARGUMENTS`.
 If no argument is given:
 
 - look first in `_build/xml/`
+- then look in `songs/xml/`
 - otherwise search the current working directory for `.musicxml` and `.mxl`
 
 ## Output

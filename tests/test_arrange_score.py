@@ -11,6 +11,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "arrange_score.py"
 FIXTURE = REPO / "songs" / "xml" / "G_Minor_Bach_Original.mxl"
+OLD_MAC_FIXTURE = REPO / "_build" / "xml" / "Old-MacDonald.safe.mxl"
 
 
 class ArrangeScoreTests(unittest.TestCase):
@@ -32,6 +33,32 @@ class ArrangeScoreTests(unittest.TestCase):
             tree = ET.parse(output)
             summary = json.loads(proc.stdout)
             return output, tree.getroot(), summary
+
+    def test_default_output_goes_to_build_xml(self):
+        expected = REPO / "_build" / "xml" / "G_Minor_Bach_Original.hiphop-dark.musicxml"
+        if expected.exists():
+            expected.unlink()
+        try:
+            proc = subprocess.run(
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(FIXTURE),
+                    "--goal",
+                    "dark hiphop remix with swagger",
+                    "--print-summary",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+                cwd=REPO,
+            )
+            summary = json.loads(proc.stdout)
+            self.assertEqual(Path(summary["output_path"]), expected.resolve())
+            self.assertTrue(expected.exists())
+        finally:
+            if expected.exists():
+                expected.unlink()
 
     def test_add_violin_only(self):
         _, root, summary = self.run_arranger(
@@ -100,6 +127,77 @@ class ArrangeScoreTests(unittest.TestCase):
         names = [score_part.findtext("part-name") for score_part in root.find("part-list").findall("score-part")]
         self.assertEqual(names, ["Piano"])
         self.assertEqual(summary["parts_added"], [])
+
+    def test_preserve_only_accepts_underfull_source_measure(self):
+        if not OLD_MAC_FIXTURE.exists():
+            self.skipTest("Old MacDonald fixture not available")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = Path(tmpdir) / "oldmac.musicxml"
+            subprocess.run(
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(OLD_MAC_FIXTURE),
+                    "--goal",
+                    "preserve only",
+                    "--preset",
+                    "none",
+                    "--tempo",
+                    "keep",
+                    "--target-key",
+                    "keep",
+                    "--output",
+                    str(output),
+                ],
+                check=True,
+                cwd=REPO,
+            )
+            root = ET.parse(output).getroot()
+            self.assertTrue(root.findall("part"))
+
+    def test_old_mac_with_children_arrangement_and_drums(self):
+        if not OLD_MAC_FIXTURE.exists():
+            self.skipTest("Old MacDonald fixture not available")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = Path(tmpdir) / "oldmac-kids.musicxml"
+            subprocess.run(
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(OLD_MAC_FIXTURE),
+                    "--goal",
+                    "happy lighthearted kids music with bright instruments, decorated melody, simple beat, add chords",
+                    "--preset",
+                    "none",
+                    "--add-instruments",
+                    "violin,strings_pad,drumset",
+                    "--density",
+                    "sparse",
+                    "--groove",
+                    "straight",
+                    "--drums",
+                    "restrained",
+                    "--bass",
+                    "none",
+                    "--melody-treatment",
+                    "decorate",
+                    "--harmony-treatment",
+                    "color",
+                    "--expression",
+                    "shaped",
+                    "--output",
+                    str(output),
+                ],
+                check=True,
+                cwd=REPO,
+            )
+            names = [
+                score_part.findtext("part-name")
+                for score_part in ET.parse(output).getroot().find("part-list").findall("score-part")
+            ]
+            self.assertIn("Violin", names)
+            self.assertIn("Strings Pad", names)
+            self.assertIn("Drumset", names)
 
     def test_musescore_export_interop(self):
         musescore = next(
