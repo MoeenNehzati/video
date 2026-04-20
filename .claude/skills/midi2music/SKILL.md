@@ -94,6 +94,7 @@ Unless the user asks otherwise, use this default FluidSynth render profile:
 - gain: `0.5`
 - no MIDI input: `-n`
 - no interactive shell: `-i`
+- prefer explicit file rendering when supported by the environment
 - fast render to file: `-F`
 - explicit audio file type: `-T wav`
 - dry render by default:
@@ -106,17 +107,47 @@ This corresponds to a command pattern like:
 fluidsynth -ni -F /abs/path/output.wav -T wav -r 44100 -g 0.5 -R 0 -C 0 /abs/path/soundfont.sf3 /abs/path/input.mid
 ```
 
+In restricted or headless environments, prefer an explicit file-audio driver when it works:
+
+```bash
+fluidsynth -ni -a file -F /abs/path/output.wav -T wav -r 44100 -g 0.5 -R 0 -C 0 /abs/path/soundfont.sf3 /abs/path/input.mid
+```
+
+Do not assume that `-F` alone guarantees a pure offline render on every build.
+
 ## Workflow
 
 1. Resolve MIDI inputs.
 2. Resolve a SoundFont.
 3. Resolve a FluidSynth executable.
 4. Create `_build/audio/logs/` if needed.
-5. Render each MIDI file to WAV in `_build/audio/` using the default render profile unless the user asked otherwise.
-6. Capture the full FluidSynth output into a per-file log under `_build/audio/logs/`.
-7. If the user wants MP3 or another delivery format, convert from WAV with ffmpeg.
-8. Verify that output files exist and are non-empty.
-9. Read the render log and summarize whether the run succeeded cleanly or with warnings.
+5. Run a short test render first on one MIDI file before launching a batch job.
+6. If the test render touches a blocked realtime audio path or hangs, switch to a stricter offline invocation or rerun outside the sandbox.
+7. Render each MIDI file to WAV in `_build/audio/` using the validated render profile unless the user asked otherwise.
+8. Capture the full FluidSynth output into a per-file log under `_build/audio/logs/`.
+9. If the user wants MP3 or another delivery format, convert from WAV with ffmpeg.
+10. Verify that output files exist and are non-empty.
+11. Read the render log and summarize whether the run succeeded cleanly or with warnings.
+
+## Restricted environment fallback
+
+Some FluidSynth builds still try to talk to the host audio stack even when rendering to a file.
+
+Typical symptoms:
+
+- `pa_write() failed while trying to wake up the mainloop: Operation not permitted`
+- the process hangs instead of finishing a file render
+- no output WAV is produced, or the log stops after initialization
+
+If this happens:
+
+1. Do not describe the run as a score or MIDI problem yet.
+2. Treat it as an environment or sandbox issue first.
+3. Retry with a stricter offline invocation such as `-a file` if that is supported and actually works in the current environment.
+4. If the same permission error persists in a restricted sandbox, rerun outside the sandbox with the same validated command.
+5. Only after that fails should you conclude that local rendering is blocked for other reasons.
+
+Do not leave a long batch render running after this failure mode appears on the first file.
 
 ## Validation
 
@@ -162,6 +193,13 @@ If FluidSynth is unavailable:
 If the SoundFont is missing:
 
 - mark that as the primary blocker
+
+If rendering fails with audio-mainloop or PulseAudio permission errors:
+
+- identify it as an environment restriction, not as a bad MIDI file
+- mention the exact log message
+- retry with an explicitly offline render path if available
+- if needed, ask to rerun the render outside the sandbox
 
 ## Installation help
 
