@@ -20,6 +20,8 @@ This skill combines backend-specific input generation and rendering.
 vocal_events.json
 ```
 
+Input format: [vocal events](../../../references/schemas/vocal_events.schema.json).
+
 Config:
 
 ```json
@@ -87,7 +89,7 @@ From backend-independent events:
 }
 ```
 
-To DiffSinger-style input:
+To DiffSinger-style input (see the [payload schema](references/diffsinger_input.schema.json); the selected backend may require a different format):
 
 ```json
 {
@@ -126,6 +128,8 @@ synthesis_log.json
 - bad held syllables → inspect slur flags
 
 ## Suggested CLI
+
+Implementation: [scripts/synthesize_vocal_with_diffsinger.py](scripts/synthesize_vocal_with_diffsinger.py), invoked by repo-root `bin/synthesize_vocal_with_diffsinger`.
 
 ```bash
 ./bin/synthesize_vocal_with_diffsinger vocal_events.json \

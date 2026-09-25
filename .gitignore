@@ -10,8 +10,10 @@ Desktop.ini
 .DS_Store
 
 # Local environment
+/env/
 .env
 .env.*
+/config.local.toml
 
 .github/
 .claude/settings.json

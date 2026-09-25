@@ -2,11 +2,11 @@
 set -euo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-VENV_PY="$ROOT/.venv/bin/python"
+VENV_PY="$ROOT/env/bin/python"
 
-if [[ -x "$VENV_PY" ]]; then
-  exec "$VENV_PY" "$ROOT/scripts/download_scores.py" "$@"
+if [[ ! -x "$VENV_PY" ]]; then
+  echo "Missing env/ virtual environment. Follow requirements/README.md to create it and install dependencies." >&2
+  exit 1
 fi
 
-exec python3 "$ROOT/scripts/download_scores.py" "$@"
-
+exec "$VENV_PY" "$ROOT/.agents/skills/download-scores/scripts/download_scores.py" "$@"

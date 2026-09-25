@@ -1,28 +1,27 @@
 # Requirements
 
 This directory contains pinned dependency snapshots for the pipeline.
-There are three separate environments to set up.
+Repo scripts use `env/`. External inference backends and system tools have separate setup requirements.
 
 ---
 
 ## 1. Python virtual environment (repo scripts)
 
-Create a local venv and install Python dependencies:
+Use Python 3.11+ to create the local venv and install Python dependencies:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -U pip
-.venv/bin/python -m pip install -r requirements/requirements-python.txt
+python3 -m venv env
+env/bin/python -m pip install -r requirements/requirements-python.txt
 ```
 
-The `bin/` wrappers automatically prefer `.venv/bin/python` when it exists.
+Run Python commands with `env/bin/python`. The `bin/` wrappers require this interpreter; they do not fall back to system Python.
 
 ---
 
 ## 2. DiffSinger conda environment (vocal synthesis)
 
-The DiffSinger vocal synthesis backend runs in a separate conda environment
-to isolate its dependencies from the rest of the project:
+The optional OpenVPI DiffSinger backend has a separate conda environment
+for its external inference tools:
 
 ```bash
 conda env create -f requirements/conda-diffsinger.yml
@@ -34,7 +33,11 @@ Activate it when running DiffSinger inference directly:
 conda activate diffsinger
 ```
 
-The `synthesize-vocal-with-diffsinger` skill handles this automatically.
+The repo wrappers do not activate conda automatically. Run external OpenVPI
+inference explicitly in its environment. The repo’s Nishiren ONNX backend uses
+`env/`; its voicebank must be supplied separately. English phonemization with
+`g2p-en` also requires NLTK language data; installing the Python package alone
+does not install that data.
 
 ---
 

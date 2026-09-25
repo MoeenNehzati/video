@@ -1,32 +1,35 @@
 # Portability requirements (lock)
 
-Generated: 2026-05-22
+Python environment updated: 2026-09-25. System-tool versions below retain the
+2026-05-22 reference snapshot.
 
-This repository currently has **no** local Python virtual environment at `.venv/`.
-The wrapper entrypoints under `bin/` prefer `.venv/bin/python` if present, otherwise they fall back to `python3` (which may not have the required packages).
+Repo scripts use the ignored `env/` virtual environment. The `bin/` wrappers
+require `env/bin/python`; they do not fall back to system Python.
 
 ## Python runtimes
 
-- System Python: `/home/moeen/anaconda3/bin/python3` (Python `3.13.5`, pip `25.1`)
-- Conda: `conda 25.5.1`
-- DiffSinger env (`conda run -n diffsinger python`): Python `3.11.15`
+- Repo venv: `env/bin/python` (Python `3.13.5`, pip `25.1.1`)
+- Minimum supported Python: 3.11 (the config reader uses stdlib `tomllib`).
+- Optional OpenVPI backend: separate environment described by `conda-diffsinger.yml`.
 
 ## Python libraries used by repo scripts
 
-Detected by scanning `scripts/*.py` imports.
+Installed in `env/` from `requirements-python.txt`:
 
-- `numpy==2.3.4` (installed)
-- `pillow==11.1.0` (installed; imported as `PIL`)
-- `music21` (missing in system Python; required by `scripts/analyze_music.py`, `scripts/plan_and_align_vocals.py`, etc.)
+- `numpy==2.3.4`
+- `pillow==11.1.0`
+- `music21==10.5.0`
+- `PyYAML==6.0.2`
+- `onnxruntime==1.26.0`
+- `soundfile==0.13.1`
+- `g2p-en==2.1.0`
 
 ## Python libraries mentioned in skill docs (optional / future)
 
-These are referenced in `.claude/skills/*/SKILL.md` but are not necessarily imported by current repo scripts.
+These are referenced in `.agents/skills/*/SKILL.md` but are not necessarily imported by current repo scripts.
 
-- `soundfile==0.13.1` (installed)
-- `librosa` (missing in system Python)
-- `pydub` (missing in system Python)
-- `g2p-en` (not checked)
+- `librosa` (optional; not installed by the repo requirements)
+- `pydub` (optional; not installed by the repo requirements)
 - `phonemizer` (not checked)
 - `pronouncing` (not checked)
 
@@ -44,7 +47,8 @@ These are referenced in `.claude/skills/*/SKILL.md` but are not necessarily impo
 
 ## External source checkouts
 
-- DiffSinger: `third_party/DiffSinger` at commit `ebc3805f941a14490a8e8817d0a4553fb94c7945` (remote `https://github.com/openvpi/DiffSinger.git`)
+- OpenVPI DiffSinger and Nishiren/RVC voice models require separate installation.
+  The Python requirements do not install model files or external source checkouts.
 
 ## Conda environment lockfiles
 
@@ -53,8 +57,7 @@ These are referenced in `.claude/skills/*/SKILL.md` but are not necessarily impo
 ## Recreate (suggested)
 
 - Create a repo-local venv and install Python deps:
-  - `python3 -m venv .venv`
-  - `.venv/bin/python -m pip install -U pip`
-  - `.venv/bin/python -m pip install -r requirements/requirements-python.txt`
+  - `python3 -m venv env`
+  - `env/bin/python -m pip install -r requirements/requirements-python.txt`
 - Recreate the DiffSinger conda env:
   - `conda env create -f requirements/conda-diffsinger.yml`

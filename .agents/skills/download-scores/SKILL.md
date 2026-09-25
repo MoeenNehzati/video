@@ -8,6 +8,8 @@ effort: max
 
 # Download Music Scores for Swedish Children's Songs
 
+Implementation: [scripts/download_scores.py](scripts/download_scores.py), invoked by repo-root `bin/download_scores`.
+
 You are a research agent. Your task is to systematically find and download music scores (sheet music, noter) for Swedish children's songs from the provided CSV file.
 
 ## Input

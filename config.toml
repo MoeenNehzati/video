@@ -1,0 +1,5 @@
+# Shared defaults. config.local.toml overrides matching keys within each section.
+
+[paths]
+# Required locally: set an existing project-data directory in config.local.toml.
+data_root = ""

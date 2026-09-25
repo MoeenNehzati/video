@@ -173,7 +173,7 @@ def _word_to_phones(word: str, lex: dict[str, list[str]]) -> list[str]:
         # Keep g2p_en offline by default by pointing NLTK at a repo-local cache
         # (created once via nltk.download(...)).
         if "NLTK_DATA" not in os.environ:
-            repo_root = Path(__file__).resolve().parents[1]
+            repo_root = Path(__file__).resolve().parents[4]
             os.environ["NLTK_DATA"] = str(repo_root / "_build" / "nltk_data")
         from g2p_en import G2p  # type: ignore[import-not-found]
 

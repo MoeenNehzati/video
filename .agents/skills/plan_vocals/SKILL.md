@@ -21,6 +21,8 @@ music_analysis.json
 lyrics.json
 ```
 
+Input formats: [music analysis](../../../references/schemas/music_analysis.schema.json) and [lyrics](../../../references/schemas/lyrics.schema.json).
+
 Optional cue:
 
 ```text
@@ -146,7 +148,7 @@ Then deterministic code builds the final event list.
 
 ## Output
 
-Write `vocal_events.json` matching `schemas/vocal_events.schema.json`.
+Write `vocal_events.json` matching [the shared schema](../../../references/schemas/vocal_events.schema.json).
 
 ## Why this output is useful
 
@@ -161,8 +163,11 @@ If the result sounds wrong, the fix should usually happen here:
 
 ## Suggested CLI
 
+Implementation: [scripts/plan_and_align_vocals.py](scripts/plan_and_align_vocals.py), invoked by repo-root `bin/plan_and_align_vocals`.
+
 ```bash
 ./bin/plan_and_align_vocals music_analysis.json lyrics.json \
+  --score arranged_music.xml \
   --cue "gentle children's song, clear lyrics, no complex melismas" \
   --out vocal_events.json
 ```

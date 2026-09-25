@@ -38,9 +38,11 @@ Optional config:
 
 ## Output
 
-Write `lyrics.json` matching `schemas/lyrics.schema.json`.
+Write `lyrics.json` matching [the shared schema](../../../references/schemas/lyrics.schema.json).
 
 ## Suggested CLI
+
+Implementation: [scripts/syllabify_lyrics.py](scripts/syllabify_lyrics.py), invoked by repo-root `bin/syllabify_lyrics`.
 
 ```bash
 ./bin/syllabify_lyrics lyrics.txt --language English --out lyrics.json

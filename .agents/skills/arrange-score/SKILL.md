@@ -91,7 +91,7 @@ Supported added instruments in v1:
 2. Read the user goal and preference hints.
 3. If the user gave only a source path or an underspecified request like `use the skill on X`, ask one concise follow-up for arrangement preferences before continuing.
 4. Normalize the request into arranger flags.
-5. Run `scripts/arrange_score.py`.
+5. Run [scripts/arrange_score.py](scripts/arrange_score.py).
 6. Validate that the output MusicXML exists and is parseable.
 7. Report:
    - input score
@@ -124,7 +124,7 @@ If the user requests unsupported instruments, say so briefly and map to the near
 Typical invocation shape:
 
 ```bash
-python3 scripts/arrange_score.py /abs/path/input.mxl \
+env/bin/python .agents/skills/arrange-score/scripts/arrange_score.py /abs/path/input.mxl \
   --goal "dark hiphop remix with swagger" \
   --preset hiphop_dark \
   --density sparse \

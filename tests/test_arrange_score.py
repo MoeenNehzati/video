@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -9,7 +10,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "scripts" / "arrange_score.py"
+SCRIPT = REPO / ".agents" / "skills" / "arrange-score" / "scripts" / "arrange_score.py"
 FIXTURE = REPO / "assets" / "xml" / "G_Minor_Bach_Original.mxl"
 OLD_MAC_FIXTURE = REPO / "assets" / "_build" / "xml" / "Old-MacDonald.safe.mxl"
 
@@ -19,7 +20,7 @@ class ArrangeScoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "out.musicxml"
             cmd = [
-                "python3",
+                sys.executable,
                 str(SCRIPT),
                 str(FIXTURE),
                 "--goal",
@@ -41,7 +42,7 @@ class ArrangeScoreTests(unittest.TestCase):
         try:
             proc = subprocess.run(
                 [
-                    "python3",
+                    sys.executable,
                     str(SCRIPT),
                     str(FIXTURE),
                     "--goal",
@@ -135,7 +136,7 @@ class ArrangeScoreTests(unittest.TestCase):
             output = Path(tmpdir) / "oldmac.musicxml"
             subprocess.run(
                 [
-                    "python3",
+                    sys.executable,
                     str(SCRIPT),
                     str(OLD_MAC_FIXTURE),
                     "--goal",
@@ -162,7 +163,7 @@ class ArrangeScoreTests(unittest.TestCase):
             output = Path(tmpdir) / "oldmac-kids.musicxml"
             subprocess.run(
                 [
-                    "python3",
+                    sys.executable,
                     str(SCRIPT),
                     str(OLD_MAC_FIXTURE),
                     "--goal",
@@ -212,7 +213,7 @@ class ArrangeScoreTests(unittest.TestCase):
             midi = Path(tmpdir) / "interop.mid"
             subprocess.run(
                 [
-                    "python3",
+                    sys.executable,
                     str(SCRIPT),
                     str(FIXTURE),
                     "--goal",

@@ -3,9 +3,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from music21 import converter
+
+# Reuse the two skills that implement this legacy combined command.
+skills_root = Path(__file__).resolve().parents[1] / ".agents" / "skills"
+sys.path[:0] = [str(skills_root / skill / "scripts") for skill in ("analyze_music", "syllabify_lyrics")]
 
 from lyrics_syllabify import syllabify_lyrics
 from music_analysis import analyze_score

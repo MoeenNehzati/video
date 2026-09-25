@@ -87,6 +87,8 @@ final_song.wav
 mix_report.json
 ```
 
+Report format: [mix report schema](references/mix_report.schema.json).
+
 Example report:
 
 ```json
@@ -133,10 +135,10 @@ This skill closes the loop. The next LLM pass can use `mix_report.json` to decid
 
 ## Suggested CLI
 
+Implementation: [scripts/mix_and_validate.py](scripts/mix_and_validate.py), invoked by repo-root `bin/mix_and_validate`.
+
 ```bash
 ./bin/mix_and_validate arranged_music.xml refined_vocal.wav \
-  --instrument-renderer fluidsynth \
-  --soundfont soundfonts/default.sf2 \
   --out final_song.wav \
   --report mix_report.json
 ```

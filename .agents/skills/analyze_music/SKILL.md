@@ -57,7 +57,7 @@ Use `music21` to:
 
 ## Output
 
-Write `music_analysis.json` matching `schemas/music_analysis.schema.json`.
+Write `music_analysis.json` matching [the shared schema](../../../references/schemas/music_analysis.schema.json).
 
 Example:
 
@@ -124,6 +124,8 @@ The next skill needs to decide where and how to sing. It needs compact facts:
 - whether accompaniment conflicts with the vocal register
 
 ## Suggested CLI
+
+Implementation: [scripts/analyze_music.py](scripts/analyze_music.py), invoked by repo-root `bin/analyze_music`.
 
 ```bash
 ./bin/analyze_music arranged_music.xml --out music_analysis.json

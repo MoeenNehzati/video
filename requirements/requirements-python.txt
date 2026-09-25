@@ -1,11 +1,13 @@
-# Python deps for repo scripts (pip)
-#
-# Note: this repo currently does not include `.venv/`.
-# These pins reflect what is installed in the current system Python where available.
-
+# Python 3.11+; install with env/bin/python -m pip install -r this-file.
+# Score analysis, arrangement helpers, and sheet preprocessing.
 numpy==2.3.4
 pillow==11.1.0
+music21==10.5.0
 
-# Required by multiple scripts but not installed in the current system Python:
-music21
+# Singing adapter configuration and the Nishiren CPU ONNX backend.
+PyYAML==6.0.2
+onnxruntime==1.26.0
+soundfile==0.13.1
 
+# English phonemization beyond the bundled demo lexicon (NLTK data also needed).
+g2p-en==2.1.0
