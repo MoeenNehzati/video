@@ -646,9 +646,9 @@
       "source": "jjazzlab/README_SETUP.md",
       "source_sha256": "56844f30ca5c86d0b697af6e852e756f7dd9f5f175e96b8d6e7bdf0c0a75a1af",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": "tools/jjazzlab/README_SETUP.md",
-      "current_sha256": "4ee8d34a2e9448cd8215ef192414de627c253a775147e8b97c16228ac092cd7b"
+      "reason": "JJazzLab setup retained within the consolidated non-Python requirements/installations guide; verified paths belong in local TOML.",
+      "destination": "requirements/requirements.md",
+      "current_sha256": "f3a330c730f7241fd584a17d0b10757d602dcb0964878f486ba0ab3e5a0e31c1"
     },
     {
       "source": "jjazzlab/library_metadata/bass/download.json",

@@ -42,7 +42,7 @@ container; remove orphan code rather than preserving it for possible future use.
 | `tools/jjazzlab/toolkit_docs/` | Exclude vendored toolkit source, demo and build files. Reference the external toolkit instead. |
 | `tools/jjazzlab/{licenses,library_metadata}/`, `CREDITS.md`, `release.json`, `sha256_local_files.txt` | Keep resource/run provenance with the external resources or original bundle. Retain any attribution legally required by code that remains. |
 | `tools/jjazzlab/trial_code/` and historical experiment scripts | Exclude run records and unused one-off programs. Extract only project code on verified skill usage paths; Java itself is not platform-specific. |
-| `tools/jjazzlab/README_SETUP.md` | Replace with portable installation/configuration instructions; remove historical machine layout assumptions. |
+| Imported JJazzLab setup guide | Maintain portable installation/configuration instructions in `requirements/requirements.md`; remove `tools/`. |
 | Imported `requirements.txt` environment freeze; `requirements/{conda-diffsinger.yml,requirements-tools.txt,requirements.lock.md}` | Replace machine inventories with maintained dependency requirements/setup instructions. Preserve useful version constraints, not installed-host state. |
 | Root `scripts/` | Remove all seven current scripts: none has a retained-skill usage path. `analyze_inputs.py` only combines analysis/lyrics helpers that remain in their owning skills. |
 | Retired `sheet2xml`, `arrange-score`, `xml2midi`, `midi2music`, `mix_validate`; obsolete mixer/arranger tests | Include the existing deletions and remove remaining live references. |

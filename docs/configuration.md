@@ -6,7 +6,8 @@ It never edits either file. The shared defaults contain no machine paths.
 
 ## Set up a new checkout
 
-1. Install Python 3.11+, create `env/`, and install
+1. Find and reuse compatible Python 3.11+ and `env/`; create them only if missing.
+   Satisfy the default
    [requirements-python.txt](../requirements/requirements-python.txt). Use
    `env/bin/python` on POSIX or `env/Scripts/python.exe` on Windows. No Bash
    launchers, shell activation or discovery symlinks are needed to run scripts.
@@ -18,9 +19,11 @@ It never edits either file. The shared defaults contain no machine paths.
 3. Run the environment's Python with `-m bin.read_config` from the repo root.
    Correct the named setting if validation fails. The printed JSON is the resolved
    configuration; do not commit it as an artifact.
-4. Read the selected skill. Install only its external prerequisites, outside the
-   checkout, and add their settings below. Check executable versions and resource
-   existence. Missing model/sample choices require an explicit selection; do not
+4. Read the selected skill and [installation instructions](../requirements/README.md).
+   Check configured paths and existing installations before installing anything.
+   Reuse compatible dependencies; install only what that operation needs and lacks,
+   outside the checkout. Record verified paths and observed versions in local TOML.
+   Missing model/sample choices require an explicit selection; do not
    substitute arbitrary ones. API credentials come from environment variables.
 5. Invoke the skill's canonical Python script with explicit inputs and outputs.
    Its preflight checks the settings it uses. `--config-root DIR` selects another
@@ -49,6 +52,11 @@ repair a host. Do not replace an existing configuration wholesale.
 - `[resources]` contains absolute external file/directory paths. Resource-internal
   paths follow that resource's documented format. Keep models, sample banks,
   license/credit records and third-party implementations outside the checkout.
+- `tools.NAME.version` and `resource_versions.NAME` record verified installed
+  versions (or a resource release/commit/SHA-256 identity). Match resource names to
+  `[resources]`. `tools.NAME.bundled_versions` can record bundled runtimes/engines;
+  `tools.audiveris.ocr_data_version` identifies installed OCR data. These are setup
+  metadata, not automatically enforced pins; recheck after changing installations.
 - Requirements are conditional on the selected stage; unused tools need no local
   entry. Run-only options belong in explicit artifact inputs/CLI arguments.
   Secrets do not belong in TOML examples, committed files or run logs.
@@ -56,26 +64,13 @@ repair a host. Do not replace an existing configuration wholesale.
   bundle location for import audits. Shared provenance uses relative source paths
   and hashes, never this machine-specific location.
 
-## Required keys by stage
+## Dependency requirements
 
-| Stage | Local settings |
-| --- | --- |
-| All automated artifact scripts | `paths.data_root` |
-| Score geometry/verification; analysis/lyrics/planning | Python requirements only |
-| Score engraving / download conversion | `tools.musescore.command`; acquisition PDF OMR additionally uses `tools.audiveris.command` |
-| Arrangement execution | `tools.java.command`, `tools.javac.command`; `resources.jjazzlab_toolkit` (JAR), `jjazzlab_rhythms` (directory), `midi_audit` (Python file) |
-| Arrangement rendering | `tools.ffmpeg.command`; `resources.midi_audit`, `fluidsynth_library` (native library), `soundfont_manifest` (JSON) |
-| Arrangement rendering credits | `resources.soundfont_credits` (source/license text copied with renders) |
-| Arrangement delivery playback checks | `tools.browser.command` (installed Chromium-family executable; Python Playwright comes from requirements) |
-| Video assembly | `tools.ffmpeg.command`, `tools.ffprobe.command` |
-| Image generation/editing | `OPENAI_API_KEY` environment variable; explicit model/options in CLI |
-| Nishiren vocal synthesis | `resources.nishiren_root` (directory); optional `pronunciation_lexicon` (JSON) when events do not supply phonemes |
-| Manual RVC refinement | `tools.rvc.command`, `resources.rvc_model`; optional `resources.rvc_index` |
-
-[JJazzLab setup](../tools/jjazzlab/README_SETUP.md) describes sample-bank and missing
-MIDI-verifier requirements. The [synthesis skill](../.agents/skills/synthesize_vocal_with_diffsinger/SKILL.md)
-describes voicebank files and supported timing. A successful config read verifies
-the data root, not installation of every optional tool or musical quality.
+The canonical [non-Python requirements and installation list](../requirements/requirements.md)
+maps each dependency to its configuration keys and owning workflow. Follow it
+when installing or repairing missing prerequisites. That guide includes toolkit/sample requirements; the synthesis skill defines compatible
+voicebank files. A successful config read verifies the data root, not every
+optional installation or musical quality.
 
 Run `env/bin/python -m unittest discover -s tests -v` for synthetic checks.
 Those tests create their own TOML and data fixtures; they must not depend on this

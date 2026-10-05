@@ -20,7 +20,11 @@ Read resolved configuration with `env/bin/python -m bin.read_config` (Windows:
 `env/Scripts/python.exe`). Set `[resources].nishiren_root` in `config.local.toml`
 to the absolute directory of a complete, separately obtained voicebank. It needs
 `dsdur`, `dsmain` and `dsvocoder`; optional `dspitch`/`dsvariance` model groups
-must be complete if present. Install the repository's declared Python dependencies.
+must be complete if present. Only for this selected workflow, satisfy
+[requirements-vocals.txt](../../../requirements/requirements-vocals.txt) with the
+repo environment's pip; it includes the default packages and ONNX Runtime. Reuse
+compatible existing installations and record verified resource versions following
+[the setup guide](../../../requirements/requirements.md).
 
 Every sung event needs either a nonempty `phonemes` list or an entry in the
 optional `[resources].pronunciation_lexicon` JSON file. That external file maps

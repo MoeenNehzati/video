@@ -40,7 +40,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_local_markdown_links_and_toml_example(self):
         files = [REPO / 'AGENTS.md', REPO / 'README.md', REPO / '.claude/README.md']
-        for folder in ('docs', 'requirements', 'tools', '.agents/skills'):
+        for folder in ('docs', 'requirements', '.agents/skills'):
             files.extend((REPO / folder).rglob('*.md'))
         for path in files:
             for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', path.read_text()):

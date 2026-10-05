@@ -13,10 +13,12 @@ This project turns sheet music into children's music videos.
 
 ## Python and configuration
 
-- Use the repo-root `env/` environment (Python 3.11+). Create it with
+- Reuse the repo-root `env/` environment (Python 3.11+) when compatible. If absent,
+  create it with
   `python3 -m venv env` (Windows: `py -3 -m venv env`), then install
   `requirements/requirements-python.txt` with that environment's Python.
-  Reinstall after requirements change.
+  Rerun pip after requirements change; reuse satisfied packages. Install
+  `requirements/requirements-vocals.txt` only for requested Nishiren synthesis.
 - Invoke Python directly: `env/bin/python` on POSIX or `env/Scripts/python.exe`
   on Windows. Use canonical `.agents/skills/` script paths, not shell launchers
   or host-discovery symlinks. Child project scripts use `sys.executable`.
@@ -34,8 +36,16 @@ This project turns sheet music into children's music videos.
   the configured paths/commands and rerun the reader. Do not guess a model, sample
   library or musical preset, install software in the repo, or change shared defaults
   to make one computer work.
-- Configure external tools/resources as documented in `docs/configuration.md`.
-  Missing prerequisites must be reported before producing artifacts.
+- Use `requirements/requirements-python.txt` for Python packages and
+  `requirements/requirements.md` for non-Python requirements/installations;
+  keep any new installation guidance under `requirements/`. First identify the
+  selected operation's actual dependencies and discover existing installations;
+  reuse compatible ones, and install only missing or demonstrably incompatible
+  requirements. Skip unused optional backends. Verify each command/resource and
+  record its path plus observed version in `config.local.toml` (`tools.NAME.version`
+  or `resource_versions.NAME`), preserving other settings. Follow
+  `docs/configuration.md` for TOML conventions, rerun the reader, and test the selected
+  skill's operation. Report missing prerequisites before producing artifacts.
 
 ## Repository and data boundary
 

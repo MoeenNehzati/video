@@ -39,7 +39,7 @@ Source: [score-to-musicxml](../.agents/skills/score-to-musicxml/SKILL.md).
 Sources: [song-arrangement-research](../.agents/skills/song-arrangement-research/SKILL.md),
 [brief contract](../.agents/skills/song-arrangement-research/references/brief-contract.md),
 [adapter](../.agents/skills/song-arrangement-research/references/barnsang-adapter.md),
-and [JJazzLab setup](../tools/jjazzlab/README_SETUP.md).
+and [external requirements](../requirements/requirements.md).
 
 - **Inputs:** exact approved XML, melody MIDI and chord timing; research evidence;
   arrangement decisions; and, for controlled variations, a named baseline and its

@@ -1,4 +1,7 @@
 # Copy to config.local.toml and edit locally. This example is not loaded.
+# Follow requirements/requirements.md: find/reuse compatible installations first.
+# Install only missing requirements for the selected operation; record paths/versions
+# in config.local.toml, preserving other settings. Never put them in this example.
 # Paths must be absolute and outside this checkout. On Windows use forward slashes
 # (C:/Users/...) or TOML literal strings ('C:\Users\...'). Do not use ~ or $VARS.
 [paths]
@@ -8,6 +11,7 @@ data_root = "/absolute/path/to/Dropbox/project-data"
 # never shell strings; use an absolute executable path or a name already on PATH.
 # [tools.musescore]
 # command = ["/absolute/path/to/MuseScore"]
+# version = "<observed version>"
 # [tools.audiveris]
 # command = ["java", "-jar", "/absolute/path/to/Audiveris.jar"]
 # [tools.java]
@@ -16,6 +20,7 @@ data_root = "/absolute/path/to/Dropbox/project-data"
 # command = ["javac"]
 # [tools.ffmpeg]
 # command = ["ffmpeg"]
+# version = "<observed version including build suffix>"
 # [tools.ffprobe]
 # command = ["ffprobe"]
 # [tools.browser]
@@ -35,6 +40,13 @@ data_root = "/absolute/path/to/Dropbox/project-data"
 # pronunciation_lexicon = "/absolute/path/to/pronunciation.json"
 # rvc_model = "/absolute/path/to/voice-model.pth"
 # rvc_index = "/absolute/path/to/voice-model.index"
+
+# Add tools.NAME.version for every configured tool. Resource versions/identities
+# use the same names as [resources]; omit resources not selected for this workflow.
+# [resource_versions]
+# fluidsynth_library = "<observed native library version>"
+# jjazzlab_toolkit = "<verified release or sha256:digest>"
+# soundfont_manifest = "sha256:<digest of manifest recording all bank hashes>"
 
 # Optional pointer used when auditing/updating the original collaborator bundle.
 # [provenance]
