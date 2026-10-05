@@ -4,19 +4,22 @@ Skills and reusable code for turning sheet music into children's music videos.
 Song artifacts live in the configured Dropbox directory; external software and
 models are installed separately.
 
-| Workflow | Skill |
-| --- | --- |
-| Reviewed sheet transcription | [score-to-musicxml](.agents/skills/score-to-musicxml/SKILL.md) |
-| Research and baseline arrangement variations | [song-arrangement-research](.agents/skills/song-arrangement-research/SKILL.md) |
-| Storyboards, image generation, manual Flow handoff and assembly | [barnsang-video](.agents/skills/barnsang-video/SKILL.md) |
+## Skills
 
-The collaborator's musical and visual methods are retained. Optional skills cover
-[acquisition](.agents/skills/download-scores/SKILL.md),
-[analysis](.agents/skills/analyze_music/SKILL.md),
-[lyrics](.agents/skills/syllabify_lyrics/SKILL.md),
-[vocal planning](.agents/skills/plan_vocals/SKILL.md),
-[DiffSinger](.agents/skills/synthesize_vocal_with_diffsinger/SKILL.md) and
-[manual RVC refinement](.agents/skills/refine_vocal_with_rvc/SKILL.md).
+Default workflow: `score-to-musicxml` → `song-arrangement-research` → `barnsang-video`.
+Score acquisition and the analysis/vocal steps are optional.
+
+| Skill | What it does | Tools / pipeline |
+| --- | --- | --- |
+| [score-to-musicxml](.agents/skills/score-to-musicxml/SKILL.md) | Transcribes scanned sheet music into reviewed MusicXML. | Visual transcription + OpenCV staff geometry → schema checks, independent source review and MuseScore engraving. |
+| [song-arrangement-research](.agents/skills/song-arrangement-research/SKILL.md) | Researches a song and varies an approved arrangement. | Research brief → JJazzLab Toolkit/MIDI percussion variants → FluidSynth + FFmpeg audio. |
+| [barnsang-video](.agents/skills/barnsang-video/SKILL.md) | Creates an animated music video. | Storyboard → OpenAI images/edits → manual Google Flow clips → FFmpeg assembly. |
+| [download-scores](.agents/skills/download-scores/SKILL.md) | Finds and downloads scores, MIDI and lyrics. | Web search/direct URLs; MuseScore format conversion and optional Audiveris score recognition. |
+| [analyze-music](.agents/skills/analyze_music/SKILL.md) | Extracts melody, harmony, rhythm and phrase information. | Python/music21 parses MusicXML → `music_analysis.json`. |
+| [syllabify-lyrics](.agents/skills/syllabify_lyrics/SKILL.md) | Splits lyric text into words and syllables. | Explicit hyphens + Python syllable heuristics → `lyrics.json`. |
+| [plan-vocals](.agents/skills/plan_vocals/SKILL.md) | Aligns lyric syllables to melody notes. | music21 note extraction + Python alignment heuristics → musical review of `vocal_events.json`. |
+| [synthesize-vocal-with-diffsinger](.agents/skills/synthesize_vocal_with_diffsinger/SKILL.md) | Renders planned notes and lyrics as a sung WAV. | Reviewed vocal events + phonemes → Nishiren DiffSinger models via ONNX Runtime. |
+| [refine-vocal-with-rvc](.agents/skills/refine_vocal_with_rvc/SKILL.md) | Changes an existing vocal's timbre. | External RVC/SVC tool and voice model → timing and intelligibility review. |
 
 ## Setup
 
