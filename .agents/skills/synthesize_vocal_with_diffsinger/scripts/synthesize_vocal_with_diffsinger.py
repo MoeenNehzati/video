@@ -5,16 +5,15 @@ import argparse
 import json
 import math
 import os
-import subprocess
-import sys
-import wave
 from pathlib import Path
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from bin.project_runtime import add_config_argument, data_path, load_project
+from bin.project_runtime import resource_path
+
 import numpy as np
-import yaml
-
-
-NOTE_TO_PC = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 
 
 def _load_json(path: Path) -> dict:
@@ -22,48 +21,39 @@ def _load_json(path: Path) -> dict:
 
 
 def _pitch_to_hz(pitch: str) -> float:
-    # Supports e.g. C4, F#3, Bb5.
-    pitch = pitch.strip()
-    if pitch.upper() in {"R", "REST"}:
+    from music21.pitch import Pitch
+
+    if pitch.strip().upper() in {"R", "REST"}:
         return 0.0
-    m = None
-    for i, ch in enumerate(pitch):
-        if ch.isdigit() or ch == "-":
-            m = i
-            break
-    if m is None:
-        raise ValueError(f"Unparseable pitch {pitch!r}")
-    name = pitch[:m]
-    octave = int(pitch[m:])
-    step = name[0].upper()
-    acc = name[1:]
-    alter = 0
-    if acc == "#":
-        alter = 1
-    elif acc.lower() == "b":
-        alter = -1
-    midi = 12 * (octave + 1) + NOTE_TO_PC[step] + alter
-    return 440.0 * (2.0 ** ((midi - 69) / 12.0))
+    # The planner emits music21's B-4 flat spelling; accept it as well as Bb4.
+    return float(Pitch(pitch.strip()).frequency)
 
 
-def _dbfs_from_int16_peak(peak: int) -> float:
-    if peak <= 0:
-        return float("-inf")
-    return 20.0 * math.log10(peak / 32767.0)
-
-
-def _write_wav(path: Path, samples: np.ndarray, sr: int) -> None:
-    samples = np.clip(samples, -1.0, 1.0)
-    pcm = (samples * 32767.0).astype(np.int16)
-    with wave.open(str(path), "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(sr)
-        wf.writeframes(pcm.tobytes())
-
-
-def _load_yaml(path: Path) -> dict:
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+def _validate_event_timing(events: list[dict], meter: str) -> None:
+    """Reject timing the existing concatenating backend cannot represent."""
+    try:
+        numerator, denominator = (int(part) for part in meter.split("/"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("A simple constant meter such as 3/4 is required") from exc
+    if numerator <= 0 or denominator <= 0:
+        raise ValueError("Meter components must be positive")
+    measure_beats = numerator * 4.0 / denominator
+    cursor = 0.0
+    for event in events:
+        if event.get("is_slur") or not str(event.get("lyric", "")).strip():
+            raise ValueError("Nishiren adapter does not yet support slurs or blank-lyric events")
+        if _pitch_to_hz(str(event["pitch"])) <= 0:
+            raise ValueError("Nishiren adapter does not yet support rests")
+        measure = int(event["measure"])
+        beat = float(event["start_beat"])
+        start = (measure - 1) * measure_beats + beat - 1
+        duration = float(event["duration_beats"])
+        if (measure < 1 or not 1 <= beat < measure_beats + 1
+                or not math.isfinite(start) or not math.isfinite(duration) or duration <= 0):
+            raise ValueError("Invalid event measure, beat or duration")
+        if not math.isclose(start, cursor, abs_tol=1e-6):
+            raise ValueError("Nishiren adapter requires contiguous events starting at measure 1 beat 1")
+        cursor += duration
 
 
 def _load_nishiren_phoneme_map(nishiren_root: Path) -> dict[str, int]:
@@ -103,18 +93,6 @@ def _load_nishiren_embedding(path: Path, hidden: int) -> np.ndarray:
     raise ValueError(f"Could not load speaker embedding from {path}; expected {hidden} floats, got {arr.size}.")
 
 
-def _arpabet_to_nishiren(phones: list[str]) -> list[str]:
-    out = []
-    for p in phones:
-        p = p.strip()
-        if not p:
-            continue
-        while p and p[-1].isdigit():
-            p = p[:-1]
-        out.append(f"en/{p.lower()}")
-    return out
-
-
 def _normalize_nishiren_phonemes(phonemes: list[str], language_prefix: str) -> list[str]:
     out: list[str] = []
     for ph in phonemes:
@@ -132,61 +110,30 @@ def _normalize_nishiren_phonemes(phonemes: list[str], language_prefix: str) -> l
     return out
 
 
-def _old_macdonald_arpabet_lexicon() -> dict[str, list[str]]:
-    return {
-        "old": ["OW", "L", "D"],
-        "macdonald": ["M", "AE", "K", "D", "AA", "N", "AH", "L", "D"],
-        "mac": ["M", "AE", "K"],
-        "don": ["D", "AA", "N"],
-        "ald": ["AH", "L", "D"],
-        "had": ["HH", "AE", "D"],
-        "a": ["AH"],
-        "farm": ["F", "AA", "R", "M"],
-        "e": ["IY"],
-        "i": ["AY"],
-        "o": ["OW"],
-        "and": ["AE", "N", "D"],
-        "on": ["AA", "N"],
-        "that": ["DH", "AE", "T"],
-        "he": ["HH", "IY"],
-        "cow": ["K", "AW"],
-        "with": ["W", "IH", "TH"],
-        "moo": ["M", "UW"],
-        "here": ["HH", "IY", "R"],
-        "there": ["DH", "EH", "R"],
-        "everywhere": ["EH", "V", "R", "IY", "W", "EH", "R"],
-        "ev": ["EH", "V"],
-        "ry": ["R", "IY"],
-        "where": ["W", "EH", "R"],
-        "his": ["HH", "IH", "Z"],
-    }
-
-
 def _word_to_phones(word: str, lex: dict[str, list[str]]) -> list[str]:
-    w = "".join([c.lower() for c in word if c.isalpha() or c in {"'", "-"}]).strip("-'")
-    if not w:
-        return []
-    if w in lex:
-        return lex[w]
-    # Try g2p_en if available (preferred for prototyping English lyrics).
-    try:
-        # Keep g2p_en offline by default by pointing NLTK at a repo-local cache
-        # (created once via nltk.download(...)).
-        if "NLTK_DATA" not in os.environ:
-            repo_root = Path(__file__).resolve().parents[4]
-            os.environ["NLTK_DATA"] = str(repo_root / "_build" / "nltk_data")
-        from g2p_en import G2p  # type: ignore[import-not-found]
+    normalized = "".join(c.lower() for c in word if c.isalpha() or c in {"'", "-"}).strip("-'")
+    phones = lex.get(normalized)
+    if not isinstance(phones, list) or not phones or not all(isinstance(p, str) and p.strip() for p in phones):
+        raise ValueError(f"No pronunciation for {word!r}; supply event phonemes or a pronunciation_lexicon entry")
+    return phones
 
-        g2p = G2p()
-        phones = [p for p in g2p(w) if p and p != " "]
-        # Drop punctuation-like tokens, keep ARPABET phones.
-        phones = [p for p in phones if any(ch.isalpha() for ch in p)]
-        if phones:
-            return phones
-    except Exception:
-        pass
 
-    raise KeyError(f"No ARPABET phones for word {word!r} (normalized {w!r}).")
+def _preflight_models(root: Path, style: str) -> None:
+    required = [
+        "dsdur/linguistic.onnx", "dsdur/dur.onnx", "dsdur/phonemes.json", "dsdur/languages.json",
+        "dsmain/acoustic.onnx", "dsmain/phonemes.json", "dsmain/languages.json", f"dsmain/{style}.emb",
+    ]
+    for group, model in (("dspitch", "pitch"), ("dsvariance", "variance")):
+        # Optional model groups may be absent, but partial installations fail.
+        folder = root / group
+        if folder.exists():
+            required += [f"{group}/linguistic.onnx", f"{group}/{model}.onnx",
+                         f"{group}/phonemes.json", f"{group}/languages.json"]
+    missing = [str(root / name) for name in required if not (root / name).is_file()]
+    if not list((root / "dsvocoder").glob("*.onnx")):
+        missing.append(str(root / "dsvocoder/*.onnx"))
+    if missing:
+        raise ValueError("Missing Nishiren resources: " + ", ".join(missing))
 
 
 def _run_nishiren_onnx(
@@ -203,6 +150,7 @@ def _run_nishiren_onnx(
     vel: float,
     gender: float,
     steps: int,
+    lexicon: dict[str, list[str]],
 ) -> dict:
     os.environ.setdefault("ORT_LOG_SEVERITY_LEVEL", "3")
     import onnxruntime as ort  # type: ignore[import-not-found]
@@ -224,7 +172,6 @@ def _run_nishiren_onnx(
     ling = ort.InferenceSession(str(dsdur_root / "linguistic.onnx"), providers=["CPUExecutionProvider"])
     dur_sess = ort.InferenceSession(str(dsdur_root / "dur.onnx"), providers=["CPUExecutionProvider"])
 
-    lex = _old_macdonald_arpabet_lexicon()
     seconds_per_beat = 60.0 / tempo_bpm
 
     word_div: list[int] = []
@@ -243,7 +190,7 @@ def _run_nishiren_onnx(
         if isinstance(explicit_ph, list) and explicit_ph:
             phones = _normalize_nishiren_phonemes(explicit_ph, language)
         else:
-            phones = _arpabet_to_nishiren(_word_to_phones(lyric, lex))
+            phones = _normalize_nishiren_phonemes(_word_to_phones(lyric, lexicon), language)
         if not phones:
             continue
 
@@ -479,7 +426,8 @@ def _run_nishiren_onnx(
         "duration_seconds": float(waveform.size) / float(sr) if sr else None,
         "peak": peak,
         "warnings": [
-            "Uses a minimal hand-built ARPABET lexicon for Old MacDonald; extend lexicon or add real G2P for general lyrics."
+            f"Optional {group} models absent; note-derived defaults used."
+            for group in ("dspitch", "dsvariance") if not (nishiren_root / group).exists()
         ],
     }
     if log_path is not None:
@@ -493,7 +441,7 @@ def _run_nishiren_onnx(
                 {
                     "text": " ".join([str(ev.get("lyric", "")).strip() for ev in events if str(ev.get("lyric", "")).strip()]),
                     "ph_seq": " ".join(ph_seq),
-                    "note_seq": " ".join(["x"] * len(ph_seq)),
+                    "note_seq": " ".join(str(events[index]["pitch"]) for index in ph_to_event),
                     "note_dur_seq": " ".join([str(int(x)) for x in ph_frames]),
                     "is_slur_seq": " ".join(["0"] * len(ph_seq)),
                     "input_type": "phoneme",
@@ -514,246 +462,56 @@ def _run_nishiren_onnx(
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="Render vocal events using a configured Nishiren ONNX voicebank")
     ap.add_argument("vocal_events_json", type=Path)
-    ap.add_argument("--model", type=str, default=None)
-    ap.add_argument("--language", default="English")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--debug-out", type=Path, required=True)
-    ap.add_argument("--log", type=Path, default=None)
-    ap.add_argument("--backend", choices=["auto", "simple_synth", "openvpi_diffsinger", "nishiren_onnx"], default="auto")
-    ap.add_argument("--diffsinger-root", type=Path, default=Path("third_party/DiffSinger"))
-    ap.add_argument("--nishiren-root", type=Path, default=Path("third_party/Nishiren Diffsinger v2.0"))
-    ap.add_argument("--nishiren-lang", type=str, default="en")
-    ap.add_argument("--nishiren-style", type=str, default="Standard")
+    ap.add_argument("--log", type=Path, required=True)
+    ap.add_argument("--nishiren-lang", default="en")
+    ap.add_argument("--nishiren-style", default="Standard")
     ap.add_argument("--nishiren-vel", type=float, default=1.25)
     ap.add_argument("--nishiren-gender", type=float, default=0.0)
     ap.add_argument("--nishiren-steps", type=int, default=30)
-    ap.add_argument("--variance-exp", type=str, default=None)
-    ap.add_argument("--acoustic-exp", type=str, default=None)
-    ap.add_argument("--diffsinger-lang", type=str, default=None)
-    ap.add_argument("--diffsinger-spk", type=str, default=None)
     ap.add_argument("--sample-rate", type=int, default=44100)
+    add_config_argument(ap)
     args = ap.parse_args()
-
-    ve = _load_json(args.vocal_events_json)
-    tempo_bpm = float(ve["global"]["tempo_bpm"])
-    events = ve["vocal_events"]
-
-    # Build a DS-like debug object from backend-independent vocal_events.
-    sr = int(args.sample_rate)
-
-    starts_sec = []
-    durs_sec = []
-    freqs = []
-    is_slur = []
-    lyrics = []
-    for ev in events:
-        start = (float(ev["measure"]) - 1.0) * 4.0 + (float(ev["start_beat"]) - 1.0)
-        dur_beats = float(ev["duration_beats"])
-        start_sec = start * 60.0 / tempo_bpm
-        dur_sec = dur_beats * 60.0 / tempo_bpm
-        starts_sec.append(start_sec)
-        durs_sec.append(dur_sec)
-        freqs.append(_pitch_to_hz(ev["pitch"]))
-        is_slur.append(bool(ev["is_slur"]))
-        lyrics.append(str(ev["lyric"]))
-
-    ds_param = {
-        # Minimal DS fields needed by DiffSinger inference.
-        # We do not attempt true G2P here yet; we provide a trivial phoneme sequence.
-        "ph_seq": " ".join(["a"] * len(events)),
-        "ph_num": " ".join(["1"] * len(events)),
-        "note_seq": " ".join([ev["pitch"] for ev in events]),
-        "note_dur": " ".join([f"{float(ev['duration_beats']) * 60.0 / tempo_bpm:.3f}" for ev in events]),
-        "note_slur": " ".join(["1" if ev["is_slur"] else "0" for ev in events]),
-    }
-    if args.diffsinger_lang:
-        ds_param["lang"] = args.diffsinger_lang
-
-    args.debug_out.parent.mkdir(parents=True, exist_ok=True)
-    args.debug_out.write_text(
-        json.dumps(
-            {
-                "text": " ".join([w for w in lyrics if w]),
-                "ph_seq": ds_param["ph_seq"],
-                "note_seq": ds_param["note_seq"],
-                "note_dur_seq": ds_param["note_dur"],
-                "is_slur_seq": ds_param["note_slur"],
-                "input_type": "phoneme",
-                "metadata": {
-                    "backend": args.backend,
-                    "note": "DS adapter fields generated from vocal_events.json",
-                },
-            },
-            indent=2,
-            ensure_ascii=False,
-        )
-        + "\n",
-        encoding="utf-8",
+    config = load_project(args.config_root)
+    source = data_path(config, args.vocal_events_json, must_exist=True)
+    output = data_path(config, args.out)
+    debug = data_path(config, args.debug_out)
+    log = data_path(config, args.log)
+    if len({source, output, debug, log}) != 4:
+        raise ValueError("Input, WAV, debug, and log paths must be distinct")
+    nishiren_root = resource_path(config, "nishiren_root", directory=True)
+    if Path(args.nishiren_style).name != args.nishiren_style or "\\" in args.nishiren_style:
+        raise ValueError("Nishiren style must be a single embedding name")
+    _preflight_models(nishiren_root, args.nishiren_style)
+    lexicon = {}
+    if config.get("resources", {}).get("pronunciation_lexicon"):
+        lexicon = _load_json(resource_path(config, "pronunciation_lexicon"))
+        if not isinstance(lexicon, dict):
+            raise ValueError("pronunciation_lexicon must be a JSON object of word to phoneme list")
+    payload = _load_json(source)
+    tempo = float(payload["global"]["tempo_bpm"])
+    events = payload["vocal_events"]
+    if not math.isfinite(tempo) or tempo <= 0 or args.sample_rate <= 0 or args.nishiren_steps <= 0:
+        raise ValueError("Tempo, sample rate, and inference steps must be positive")
+    if not events:
+        raise ValueError("vocal_events must not be empty")
+    _validate_event_timing(events, payload["global"]["meter"])
+    for event in events:
+        duration = float(event["duration_beats"])
+        if not math.isfinite(duration) or duration <= 0:
+            raise ValueError("Every event must have a finite positive duration")
+        _pitch_to_hz(str(event["pitch"]))
+        if str(event.get("lyric", "")).strip() and not event.get("phonemes"):
+            _word_to_phones(str(event["lyric"]), lexicon)
+    _run_nishiren_onnx(
+        nishiren_root=nishiren_root, language=args.nishiren_lang, style=args.nishiren_style,
+        events=events, tempo_bpm=tempo, sr=args.sample_rate, out_wav=output,
+        log_path=log, debug_out=debug, vel=args.nishiren_vel, gender=args.nishiren_gender,
+        steps=args.nishiren_steps, lexicon=lexicon,
     )
-
-    have_nishiren = (args.nishiren_root / "dsmain" / "acoustic.onnx").exists()
-    requested_nishiren = args.backend in {"auto", "nishiren_onnx"}
-    if requested_nishiren and have_nishiren:
-        _run_nishiren_onnx(
-            nishiren_root=args.nishiren_root,
-            language=args.nishiren_lang,
-            style=args.nishiren_style,
-            events=events,
-            tempo_bpm=tempo_bpm,
-            sr=sr,
-            out_wav=args.out,
-            log_path=args.log,
-            debug_out=args.debug_out,
-            vel=float(args.nishiren_vel),
-            gender=float(args.nishiren_gender),
-            steps=int(args.nishiren_steps),
-        )
-        return
-
-    diffsinger_root = args.diffsinger_root
-    diffsinger_infer = diffsinger_root / "scripts" / "infer.py"
-    checkpoints_dir = diffsinger_root / "checkpoints"
-    have_openvpi = diffsinger_infer.exists() and checkpoints_dir.exists()
-
-    requested_openvpi = args.backend in {"auto", "openvpi_diffsinger"}
-    can_try_openvpi = (
-        requested_openvpi
-        and have_openvpi
-        and args.variance_exp
-        and args.acoustic_exp
-        and (checkpoints_dir / args.variance_exp).exists()
-        and (checkpoints_dir / args.acoustic_exp).exists()
-    )
-
-    # If auto: try OpenVPI DiffSinger only when exps exist; otherwise fall back.
-    if args.backend == "openvpi_diffsinger" and not can_try_openvpi:
-        raise SystemExit(
-            "OpenVPI DiffSinger backend requested, but required checkpoints are missing.\n"
-            f"- diffsinger_root: {diffsinger_root}\n"
-            f"- expected variance exp dir: {checkpoints_dir / str(args.variance_exp)}\n"
-            f"- expected acoustic exp dir: {checkpoints_dir / str(args.acoustic_exp)}\n"
-            "Provide `--variance-exp` and `--acoustic-exp` that exist under the checkpoints directory."
-        )
-
-    if can_try_openvpi:
-        # Run variance then acoustic inference on the generated DS file.
-        ds_path = args.out.with_suffix(".ds.json")
-        ds_path.parent.mkdir(parents=True, exist_ok=True)
-        ds_path.write_text(json.dumps(ds_param, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-        env = os.environ.copy()
-        env["PYTHONPATH"] = str(diffsinger_root)
-        infer_base = [str(diffsinger_infer)]
-
-        var_cmd = [infer_base[0], "variance", str(ds_path), "--exp", args.variance_exp, "--out", str(ds_path.parent)]
-        if args.diffsinger_spk:
-            var_cmd += ["--spk", args.diffsinger_spk]
-        if args.diffsinger_lang:
-            var_cmd += ["--lang", args.diffsinger_lang]
-
-        subprocess.run([sys.executable, *var_cmd], check=True, env=env)  # type: ignore[name-defined]
-
-        variance_out = ds_path.parent / (ds_path.stem + "_variance.json")
-        if not variance_out.exists():
-            # Fallback to original if naming differs.
-            variance_out = ds_path
-
-        ac_cmd = [infer_base[0], "acoustic", str(variance_out), "--exp", args.acoustic_exp, "--out", str(args.out.parent)]
-        if args.diffsinger_spk:
-            ac_cmd += ["--spk", args.diffsinger_spk]
-        if args.diffsinger_lang:
-            ac_cmd += ["--lang", args.diffsinger_lang]
-        ac_cmd += ["--title", args.out.stem]
-
-        subprocess.run([sys.executable, *ac_cmd], check=True, env=env)  # type: ignore[name-defined]
-
-        produced = args.out.parent / f"{args.out.stem}.wav"
-        if not produced.exists():
-            raise SystemExit(f"DiffSinger acoustic inference did not produce expected wav: {produced}")
-        if produced != args.out:
-            produced.replace(args.out)
-
-        log = {
-            "backend": "openvpi_diffsinger",
-            "output": str(args.out),
-            "sample_rate": sr,
-            "duration_seconds": float(total_dur),
-            "warnings": ["Used placeholder phoneme sequence ('a' per note); add real G2P/phonemization next."],
-        }
-        if args.log is not None:
-            args.log.parent.mkdir(parents=True, exist_ok=True)
-            args.log.write_text(json.dumps(log, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        return
-
-    # Placeholder backend to keep the pipeline runnable without checkpoints.
-    # It produces a vowel-like harmonic tone that follows the melody, not true lyric-conditioned singing.
-    total_dur = 0.0
-    if starts_sec:
-        total_dur = max(s + d for s, d in zip(starts_sec, durs_sec))
-    total_samples = int(math.ceil(total_dur * sr)) + 1
-    audio = np.zeros(total_samples, dtype=np.float32)
-
-    for s, d, f, slur in zip(starts_sec, durs_sec, freqs, is_slur):
-        if f <= 0.0 or d <= 0.0:
-            continue
-        i0 = max(0, int(round(s * sr)))
-        i1 = min(total_samples, int(round((s + d) * sr)))
-        n = max(0, i1 - i0)
-        if n <= 1:
-            continue
-        t = np.arange(n, dtype=np.float32) / sr
-
-        # Harmonic stack (very rough voice-like tone).
-        sig = np.zeros(n, dtype=np.float32)
-        for h in range(1, 8):
-            sig += (1.0 / h) * np.sin(2 * math.pi * (h * f) * t)
-
-        # Envelope.
-        attack = int(0.01 * sr)
-        release = int(0.02 * sr)
-        env = np.ones(n, dtype=np.float32)
-        if attack > 0:
-            env[: min(attack, n)] = np.linspace(0.0, 1.0, min(attack, n), dtype=np.float32)
-        if release > 0:
-            r = min(release, n)
-            env[n - r :] *= np.linspace(1.0, 0.0, r, dtype=np.float32)
-
-        # Slurred notes slightly softer to de-emphasize repeated syllables.
-        amp = 0.22 if slur else 0.28
-        audio[i0:i1] += amp * sig * env
-
-    # Soft clip.
-    audio = np.tanh(audio)
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    _write_wav(args.out, audio, sr)
-
-    # "Debug out" shaped like diffsinger_input.json, but with placeholder phonemes.
-    dbg = {
-        "text": " ".join([w for w in lyrics if w]),
-        "ph_seq": " ".join(["a"] * len(events)),
-        "note_seq": " ".join([ev["pitch"] for ev in events]),
-        "note_dur_seq": " ".join([f"{float(ev['duration_beats']) * 60.0 / tempo_bpm:.3f}" for ev in events]),
-        "is_slur_seq": " ".join(["1" if ev["is_slur"] else "0" for ev in events]),
-        "input_type": "phoneme",
-        "metadata": {"backend": "simple_synth", "note": "placeholder; not DiffSinger inference"},
-    }
-    peak = int(np.max(np.abs(audio)) * 32767.0) if audio.size else 0
-    log = {
-        "backend": "simple_synth",
-        "output": str(args.out),
-        "sample_rate": sr,
-        "duration_seconds": float(total_dur),
-        "peak_dbfs": _dbfs_from_int16_peak(peak),
-        "warnings": [
-            "No usable DiffSinger checkpoints found; generated placeholder vocal tone (not lyric-conditioned singing).",
-            f"To enable DiffSinger inference, place checkpoints under `{diffsinger_root}/checkpoints/` and pass `--variance-exp` + `--acoustic-exp`.",
-        ],
-    }
-    if args.log is not None:
-        args.log.parent.mkdir(parents=True, exist_ok=True)
-        args.log.write_text(json.dumps(log, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -141,8 +141,8 @@ rule and update every skill's instructions and command examples.
 3. Agent-written files, GUI edits, API generations and downloaded external results
    use the same prepare/import/finalize boundary. Read-only inspection needs no
    write event; persisted reports and review decisions do.
-4. Cover `bin/*`, direct scripts, `.claude/skills` aliases, nested adapters and tool
-   launchers. A wrapper is not covered until its callees are. Unavailable routes
+4. Cover canonical Python entrypoints, shared helpers, nested adapters and configured
+   external tools. A caller is not covered until its callees are. Unavailable routes
    stop before writes or external generation calls.
 5. Adapt or explicitly disable legacy writers in `scripts/`, `adapter_code/` and
    JJazzLab trials. Include the combined `analyze_inputs` command; exclude raw

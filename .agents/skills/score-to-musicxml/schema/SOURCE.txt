@@ -1,0 +1,2 @@
+W3C MusicXML 4.0 schema, downloaded 2026-09-11 from https://raw.githubusercontent.com/w3c/musicxml/v4.0/schema/
+Import schemaLocation URLs localized to sibling files for offline validation.

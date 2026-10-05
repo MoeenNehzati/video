@@ -1,175 +1,68 @@
 ---
 name: synthesize-vocal-with-diffsinger
-description: Use when vocal_events.json is ready and a sung vocal WAV needs to be generated via a DiffSinger backend. Handles phonemization and produces rough_vocal.wav. Prefers the vendored Nishiren DiffSinger v2.0 ONNX voicebank.
+description: Render reviewed vocal_events.json as a sung WAV using an externally configured Nishiren DiffSinger ONNX voicebank and explicit phonemes or a pronunciation lexicon.
 allowed-tools: Read Bash Grep Glob Write
-argument-hint: [vocal-events-json]
-effort: high
+metadata:
+  argument-hint: "[vocal-events-json]"
+  effort: "high"
 ---
 
-# Skill 3: `synthesize_vocal_with_diffsinger`
+# Synthesize a vocal with Nishiren
 
-## Purpose
+This optional workflow converts [vocal events](../../../references/schemas/vocal_events.schema.json)
+into Nishiren phoneme/duration/pitch inputs and runs the external voicebank's
+ONNX models. It preserves the duration, embedding, acoustic and vocoder method
+of the existing adapter. No model or external application is stored in Git.
 
-Convert `vocal_events.json` into the input format expected by the chosen singing backend, then run inference to produce `rough_vocal.wav`.
+## Inputs and configuration
 
-This skill combines backend-specific input generation and rendering.
+Read resolved configuration with `env/bin/python -m bin.read_config` (Windows:
+`env/Scripts/python.exe`). Set `[resources].nishiren_root` in `config.local.toml`
+to the absolute directory of a complete, separately obtained voicebank. It needs
+`dsdur`, `dsmain` and `dsvocoder`; optional `dspitch`/`dsvariance` model groups
+must be complete if present. Install the repository's declared Python dependencies.
 
-## Inputs
+Every sung event needs either a nonempty `phonemes` list or an entry in the
+optional `[resources].pronunciation_lexicon` JSON file. That external file maps
+normalized lowercase lyric tokens to phoneme lists. Explicit tokens can be
+voicebank-prefixed (`en/aa`) or unprefixed ARPABET-style (`AA1`); the adapter
+normalizes stress suffixes and uses `--nishiren-lang` as the prefix. All resulting
+tokens must exist in the voicebank's maps. Review pronunciation for the song's
+language before rendering. There is no automatic download or demo-song lexicon.
 
-```text
-vocal_events.json
-```
+## Python invocation
 
-Input format: [vocal events](../../../references/schemas/vocal_events.schema.json).
-
-Config:
-
-```json
-{
-  "backend": "diffsinger",
-  "model_path": "models/diffsinger/singer_a",
-  "language": "English",
-  "output": "rough_vocal.wav",
-  "debug_output": "diffsinger_input.json"
-}
-```
-
-## Tools
-
-### Phonemizer / G2P
-
-Use language-specific tools to convert lyrics/syllables to phonemes.
-
-For English, possible tools:
-
-- `g2p-en`
-- `phonemizer`
-- `pronouncing`
-- fallback LLM correction for sung pronunciation
-
-### Nishiren DiffSinger v2.0 (preferred in this repo)
-
-This repo vendors a self-contained ONNX voicebank under:
-
-```text
-third_party/Nishiren Diffsinger v2.0/
-```
-
-Use it via:
+Implementation: [scripts/synthesize_vocal_with_diffsinger.py](scripts/synthesize_vocal_with_diffsinger.py).
+Run from the repository root; on Windows replace the interpreter as above.
+Artifact paths must be under `paths.data_root`; relative paths resolve from
+that directory. `--config-root` optionally selects the configuration directory.
 
 ```bash
-./bin/synthesize_vocal_with_diffsinger vocal_events.json \
-  --backend nishiren_onnx \
-  --nishiren-root "third_party/Nishiren Diffsinger v2.0" \
-  --nishiren-lang en \
-  --nishiren-style Standard \
-  --out rough_vocal.wav \
-  --debug-out diffsinger_input.json \
-  --log synthesis_log.json
+env/bin/python .agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py vocal_events.json \
+  --nishiren-lang en --nishiren-style Standard \
+  --out rough_vocal.wav --debug-out diffsinger_input.json --log synthesis_log.json
 ```
 
-This backend requires real phonemes; in the current implementation it uses a minimal built-in lexicon for the Old MacDonald demo and should be extended (or replaced by a real G2P) for general lyrics.
+Choose the embedding, velocity, gender and inference steps deliberately; retain
+the reviewed settings with the synthesis output. The WAV, debug input and log
+must have distinct paths. Debug output follows the
+[payload schema](references/diffsinger_input.schema.json); duration values are
+frames, with sample rate and hop size recorded in metadata.
 
-### DiffSinger (OpenVPI-style)
+## Validation and limits
 
-Use a DiffSinger inference script/checkpoint. DiffSinger is score-conditioned; practical inference inputs usually include text/phoneme sequence, note sequence, note durations, and slur flags.
+Missing resources, invalid paths, unknown pronunciation and unavailable Python
+backends fail before output files are written. Inference failure is an error;
+there is no placeholder-tone fallback and no advertised OpenVPI execution route.
+Optional pitch/variance model omissions are reported in the synthesis log.
 
-The exact schema is fork/checkpoint-specific. This skill should hide that backend messiness.
+The existing inference method concatenates voiced syllables. It supports only
+contiguous, nonslurred sung events beginning at measure 1 beat 1 in a constant
+meter. Slurs, rests, blank lyrics, gaps and delayed entry are rejected before
+writing outputs; extending their timing is separate work. Do not alter a reviewed
+score merely to bypass this limitation.
 
-## Internal conversion
-
-From backend-independent events:
-
-```json
-{
-  "pitch": "C4",
-  "duration_beats": 1.0,
-  "lyric": "Twin",
-  "is_slur": false
-}
-```
-
-To DiffSinger-style input (see the [payload schema](references/diffsinger_input.schema.json); the selected backend may require a different format):
-
-```json
-{
-  "text": "twinkle twinkle little star",
-  "ph_seq": "t w ih n k ax l t w ih n k ax l l ih t ax l s t aa r",
-  "note_seq": "C4 C4 D4 D4 E4 E4 G4",
-  "note_dur_seq": "0.50 0.50 0.50 0.50 0.50 0.50 1.00",
-  "is_slur_seq": "0 1 0 1 0 1 0",
-  "input_type": "phoneme"
-}
-```
-
-Duration conversion:
-
-```text
-duration_seconds = duration_beats * 60 / tempo_bpm
-```
-
-## Outputs
-
-```text
-rough_vocal.wav
-diffsinger_input.json
-synthesis_log.json
-```
-
-## Why this output is useful
-
-`rough_vocal.wav` is the first actual sung audio.
-
-`diffsinger_input.json` is required for debugging:
-
-- pronunciation problems → inspect phonemes
-- rhythm problems → inspect durations
-- melody problems → inspect notes
-- bad held syllables → inspect slur flags
-
-## Suggested CLI
-
-Implementation: [scripts/synthesize_vocal_with_diffsinger.py](scripts/synthesize_vocal_with_diffsinger.py), invoked by repo-root `bin/synthesize_vocal_with_diffsinger`.
-
-```bash
-./bin/synthesize_vocal_with_diffsinger vocal_events.json \
-  --model models/diffsinger/singer_a \
-  --language English \
-  --out rough_vocal.wav \
-  --debug-out diffsinger_input.json \
-  --log synthesis_log.json
-```
-
-## Implementation notes
-
-The first implementation can support one DiffSinger fork/checkpoint. Later, add adapter classes:
-
-```text
-DiffSingerAdapterBase
-├── MoonInTheRiverAdapter
-├── OpenVPIAdapter
-└── CustomCheckpointAdapter
-```
-
-Each adapter should implement:
-
-```python
-build_input(vocal_events) -> backend_input
-run_inference(backend_input, model_path, output_wav) -> synthesis_log
-```
-
-## Failure modes
-
-Fail if:
-
-- model path is missing
-- phonemizer cannot process the language
-- note and duration sequence lengths do not match
-- DiffSinger inference exits nonzero
-- output WAV is not produced
-
-Warn if:
-
-- unknown words required fallback phonemization
-- phoneme count and note count required aggressive slur insertion
-- output is clipped or silent
+Listen for intelligibility, pitch, timing, silence and clipping
+against the approved events. This adapter is an optional existing implementation,
+not a validated general-purpose singing system; do not approve output based only
+on a successful ONNX call. Keep the original rough vocal if later using RVC.

@@ -1,0 +1,1356 @@
+{
+  "source_bundle": "Collaborator Dropbox Skills",
+  "bundle_date": "2026-09-29",
+  "verified_on": "2026-10-05",
+  "local_location_key": "provenance.skill_source_bundle",
+  "note": "All original import hashes verified before cleanup; original bundle untouched. Current hashes cover retained/adapted imports and extracted destinations. Maintain ownership when code changes. Runtime song artifacts are external; this is source provenance, not an artifact ledger.",
+  "source_files": [
+    {
+      "source": "score-to-musicxml/SKILL.md",
+      "source_sha256": "c46d26cd17a0d64269d951ac0d31e9e5dc80f867b283eb8662706c618a62e9a3",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/score-to-musicxml/SKILL.md",
+      "current_sha256": "2f40ecf9371e78c9d1809f8a10f4ad990a6553ca148fe41e9836e3a5afb042fb"
+    },
+    {
+      "source": "score-to-musicxml/agents/openai.yaml",
+      "source_sha256": "7b42259a0fb6e1369e005019045244d0fc61778c1c69ff574165d57feec3aab7",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/agents/openai.yaml",
+      "current_sha256": "4ce866958b8fa572544757122cfb66d805ae55061a586d2257ad8a6396a2f7b0"
+    },
+    {
+      "source": "score-to-musicxml/references/barnsang.md",
+      "source_sha256": "ce2004fa74720ec308af5785b1cc89b700eb5b5c1181a7ae500dc4c9a4dc3fb5",
+      "status": "extracted",
+      "reason": "Only referenced generic logic retained; original container excluded.",
+      "extractions": [
+        {
+          "destination": ".agents/skills/score-to-musicxml/SKILL.md",
+          "usage": "General review/hash/editorial-scope instructions, with collection state excluded",
+          "current_sha256": "2f40ecf9371e78c9d1809f8a10f4ad990a6553ca148fe41e9836e3a5afb042fb"
+        }
+      ]
+    },
+    {
+      "source": "score-to-musicxml/references/tools.md",
+      "source_sha256": "95880a7dc37281b528159a5ed7b639713ac74ed12f5d2667550c38862bc612fe",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/score-to-musicxml/references/tools.md",
+      "current_sha256": "7d88b3290f0c3cb54391a8d06a712ab22692f3557ca618440e7b5b11f41edfbd"
+    },
+    {
+      "source": "score-to-musicxml/references/workflow.md",
+      "source_sha256": "c636d778e17b33d4e60d967b6b081e9bfacd27ceaada97a297e2030b0787a112",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/references/workflow.md",
+      "current_sha256": "65ec08b21f9bb947d204e2bd56eff6fc39ecb70fb725ba6d66fe0548c71ab41a"
+    },
+    {
+      "source": "score-to-musicxml/schema/SOURCE.txt",
+      "source_sha256": "ed3580f323f5e7d4a9b001ab1c3d558143390b46533971e5de27a73dfd4a7613",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/schema/SOURCE.txt",
+      "current_sha256": "bdab08401e2a9b9ed82d40d12b79afb9f7cf3ba52e2d5ba1589516cf8f0bfc54"
+    },
+    {
+      "source": "score-to-musicxml/schema/musicxml.xsd",
+      "source_sha256": "6c4c9382dc3789cb594650214d5295aa6cadb19764019d12948f6655bc711f20",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/schema/musicxml.xsd",
+      "current_sha256": "bf808596d7df7296bf1ab21657808098a167218885a4620e5fe8eb0290c78c46"
+    },
+    {
+      "source": "score-to-musicxml/schema/xlink.xsd",
+      "source_sha256": "5eb852729b6f60b33d39ccabf7b269520c13988f5f7232f6e52afe55cb9281c7",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/schema/xlink.xsd",
+      "current_sha256": "54c4d513c96c9e084679d458cc325a0c58558e94010477597c71e0adf846202e"
+    },
+    {
+      "source": "score-to-musicxml/schema/xml.xsd",
+      "source_sha256": "21cef563c940a24164a3952e252565e7ad55ea9450e98c93a17ad568ffce8491",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/score-to-musicxml/schema/xml.xsd",
+      "current_sha256": "1461ed020b0dd13f7dc9a238944bdecb5d18576775019fd36d55e3b45a7f7211"
+    },
+    {
+      "source": "score-to-musicxml/scripts/requirements.txt",
+      "source_sha256": "c1acaa09f2ebc9fe46309c07ee7795f07c53a6acce9d48949e5282f6ff649f20",
+      "status": "excluded",
+      "reason": "Installed environment snapshot replaced by maintained root requirements."
+    },
+    {
+      "source": "score-to-musicxml/scripts/slope_grid.py",
+      "source_sha256": "5a098cbcc03934ff19ff9e27b107cd413d2c641f849f2feee161656ef9784099",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/score-to-musicxml/scripts/slope_grid.py",
+      "current_sha256": "caed59a7d2829999cff29db69fd881149fc9d47f88ac850bac8057b1831ef217"
+    },
+    {
+      "source": "score-to-musicxml/scripts/validate.py",
+      "source_sha256": "0d6e7e02f63697c96f422e2fe63c0b50519fdc771cc5c4a4c230ad740f2caed9",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/score-to-musicxml/scripts/validate.py",
+      "current_sha256": "1764ca9abd8bcd1c555e94f8fa774441e3ad404f08e22a425f59d44d03835d0d"
+    },
+    {
+      "source": "score-to-musicxml/scripts/verify_score.py",
+      "source_sha256": "bf47ad9f1d0e13e778711ded40987cee0ee79dc9bbb89ff961e41fad4a6b5e8f",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/score-to-musicxml/scripts/verify_score.py",
+      "current_sha256": "1179c95bfbe2e84144d4e92220ecc5c01538d0fe4a1301dad9cdc36a5bf5d5f8"
+    },
+    {
+      "source": "song-arrangement-research/SKILL.md",
+      "source_sha256": "1f53fab1764956fe191dc30e3de1e388496581f85ca22c6b2f64ae8771705351",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/SKILL.md",
+      "current_sha256": "c96bb3f2ae2efa9f23b3026e3ea762db5cb1e7a5ab554e7abfd81cdd63c9f5c4"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/README.md",
+      "source_sha256": "50dda30c70ba328dca54c4abc4ae4c4be84663db5e718cf93281dc41a2f82a69",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/README.md",
+      "current_sha256": "18374ab4751ddf65f9ee1f78627705a46e0653e6bf9b6dc9153410808016bd2c"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/SkillExperiment.java",
+      "source_sha256": "c2ac846de0b502e557215471d8472f99081ae35f62d9c8335eabbdaaec01d514",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/check_balance.py",
+      "source_sha256": "a581788714f16bddbbe4ba99e9db4c182569dffa16c82e6fc28431718e11a2d6",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/check_balance_ekorrn.py",
+      "source_sha256": "8a73145d0788733653c34eb4533722ea8743187b068a5f9eb97dc0f6854dd91d",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/check_delivery.py",
+      "source_sha256": "781202e1eabeea50f0f33dee1ede10d5d990ee6f9930fc0473a2da45c87a8136",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/ekorrn_folders.json",
+      "source_sha256": "20999e21af157ad3e17236f92b503d217fd67ada451e2bc4530f3b5238c1f462",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/finish.py",
+      "source_sha256": "1ad108033d0a84c6739998ec3cd72932e56d170dae3e60d5b13dec6c7e48e465",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/finish_ekorrn.py",
+      "source_sha256": "1e694f96ca61b371dce7e57cd0e302ec53f36aefd0c9f7efc58316de7dd36e75",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/folders.json",
+      "source_sha256": "d862908064d8c7577ff782dc478e87f844f989d7072fb2b920d3c30145462850",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/make_joyful_piano.py",
+      "source_sha256": "b73471e7b2c2a2dc845d492c534feb52e46016b3504a8c49ad94b1949f703ee4",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/prepare.py",
+      "source_sha256": "3299698dc19b5499b4a0d47b95ebff59209d8126c78c8ab8ed4cff60204f0c6e",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/prepare_ekorrn.py",
+      "source_sha256": "fbebe9c85f1291dbd4def7e40d6511821375e19ef0294e4767884a84720e35de",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/publish.py",
+      "source_sha256": "129ddf804e8fd3c26b6664e05eaefc44a99c16f2ce7755768d7b09ca771fc868",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/render.py",
+      "source_sha256": "9c60c2918ba7345a8fbe4cb990e69bb95d9401f37fc3a422ac8eaaed7617ef2f",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/Skill_Experiment/render_ekorrn.py",
+      "source_sha256": "c9b36191aecea4a38a5797de19a2a0d3be79b298c0eb349a2b337ec4b1e78a9a",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
+      "source_sha256": "d71e9815214bb509068deccec25121c6c8d22fe31ee7294aaf928718c89a8e2c",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
+      "current_sha256": "71b52d21537882fc66371af5f3f35097493d144488415140b7bbef6e5409bf76"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/CountermelodyExperiment.java",
+      "source_sha256": "7241b456ebacac7cbbc80d7f7c9748884e5534337a0e45989b5bbbf4127c4bfe",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/Experiment.java",
+      "source_sha256": "fc0a1ac1985dbeb337797ddb6fd3caa6334053520e383edd26a3219533855b6c",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/LegatoExperiment.java",
+      "source_sha256": "87b1a0caecc39e283126326daef2c1f75110618d869c5d52d20317a25d22a8cf",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/StringExperiment.java",
+      "source_sha256": "c87e7e22a3d01822bb9c0636764f0511a1cdebc85aed3f16c7217227a300ca6b",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_cello_expressive.py",
+      "source_sha256": "b0252bbc29a111c3c8a6d01747d2757f389746368875c039880d72a564774fc7",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_cello_pizz.py",
+      "source_sha256": "f81c6cbb7da7c5236838374506911726092d2d0261e136b6f5a27be560f3f870",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_flute_lyrical.py",
+      "source_sha256": "220534b6c372795300162b30443a3363a1f80948f1e9d3e0f7d5daba24eccf91",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_viola_expressive.py",
+      "source_sha256": "cdd9b94e66ab372869e52ceba749170bef90c5904972ae968ee4485cc13452b8",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_viola_pizz.py",
+      "source_sha256": "2b89733e4978f5cb201d5c219b863e9f1d1dd3edd606790a7fafb7dad2ded75b",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_viola_soft.py",
+      "source_sha256": "74ba96dd0de208a1fbd5df23746963c689ebced7b0bbd95097337c4a75bd6a3c",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/build_sso_violin_soft.py",
+      "source_sha256": "ac3117c3e6b9ba03917c6dd1ef846b074c0424d0eb13d381f74152f61f2e9797",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
+      "source_sha256": "2ed0262103a59ad20796c862471f019674dba4e0a81af811bc77f891b12b98a1",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
+      "current_sha256": "d5880b8a9ef499cc62d57e87f217eb1638cb8b6ffdb912ec2976ba406e7bb0f4"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/child_folders.json",
+      "source_sha256": "37ab6737c4c4bfa90e64a73736537ffafe7c09eb761846b372721debf9d0ad16",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/child_plans.json",
+      "source_sha256": "0543498a1ee896574c4441ed5f9f651f1214f2427ddeeebf8b83d05980d33dce",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/countermelody_folders.json",
+      "source_sha256": "2caa4c3ff1168e725be4495a67607b5d5a4fa3d62e03cd6abd4d5b4e3bb02a28",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/download_libraries.py",
+      "source_sha256": "1612a6ba01a7fe69e78c8ef0c510d2af6c9e36b1cc58eb78cf2920b7073d2973",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/download_piano.py",
+      "source_sha256": "a774ae69e62bc734b08756467f15a5400604ba35f9378d7a63c75a074b73392e",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/englhorn_folders.json",
+      "source_sha256": "3ee72de4e6cf476db8ed3fa867afc582e891c67289a844e2e5e9a02bd23715d7",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
+      "source_sha256": "1e5d2eac1ed1a7c8e14d9a359ba04843f8fd0cd2618c50a5f79be2ca2e717bcf",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
+      "current_sha256": "a5ed9a09dc914d60c695f85549abff20893d11b0283c1200e8857ef126067587"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/folders.json",
+      "source_sha256": "4dc043b62ea355b95369dd474ed0f3249051b3b7cea14d6d73651ebf7770e8ba",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/legato_folders.json",
+      "source_sha256": "b14b49a65905f32d835ed32f96b1604e9c5d10cbb5864b10d7e5fa8ba8f55608",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/oboe_folders.json",
+      "source_sha256": "235aa57a1ea09f7b91a1ba7a91d6043d460358c2fea80c737502355165b38b1c",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_countermelody_versions.py",
+      "source_sha256": "33daef7f5c9ec30ae150961db5444e57ef41e111b8b4e4e567065e2ca1d958ac",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_englhorn_library.py",
+      "source_sha256": "ade135058a7c59f1311d03ee332e8179a15cea6e5024fe95a687acea4b42dc88",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_englhorn_versions.py",
+      "source_sha256": "11a3d2e1c29cc54c52419c9a4a940441da8e3a26ad7e7e97670d6edde2c9f324",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_experiments.py",
+      "source_sha256": "0132c78d715e9d8768b70c8eeed49239c9f1a5ebc543cec2725f8b48a7cb1216",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_legato_versions.py",
+      "source_sha256": "fd6b8df4f6b6ea8d7de9ad6c68eb80f10992530e78524fc02c170050ea3e04d4",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_oboe_library.py",
+      "source_sha256": "4d23816f2e6e9f4e5ec1702d24f935d0c4b86f8308da88c1d2322785a39441b7",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_oboe_versions.py",
+      "source_sha256": "e05d9b9032e370f4cb3ab44b1748bdca33065c9ae67b2f2e85d3c1a8b9b9fe7e",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/prepare_string_versions.py",
+      "source_sha256": "a378a7fd9fff8d5a3022b3b01ad7cdb4c35494c673d7284189851b7da8d383da",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
+      "source_sha256": "4b021e930714c7c89e12dab1feff88f3b1de71af50096f43912eb9be3cf710d7",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
+      "current_sha256": "ccd3c259b823ebcc567fbb8ed5fda0ab07fb62867c6aa82e1ff3e75520dc21d6",
+      "extractions": [
+        {
+          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/listening_page.html",
+          "usage": "Generic listening-page CSS and A/B playback JavaScript",
+          "current_sha256": "c55561cf955a568c6bbecbe9e3b8821e6445fb6c0dd81560032ee6e29ee825fc"
+        }
+      ]
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
+      "source_sha256": "3b55de8a4bc7ac4d49d846abb8302b184fadaa43a052c130bfc3fa1ba8eadb39",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
+      "current_sha256": "278aeded45c996f56fe4ae63d4b45f3b9374a354fb7b0c62de31009227d61e55",
+      "extractions": [
+        {
+          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+          "usage": "Child-event and backing exclusion invariant helpers",
+          "current_sha256": "b8bf048041e678bf6d916e554ab810db3672cd837488dab6f1c5423473c80934"
+        }
+      ]
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_countermelody_versions.py",
+      "source_sha256": "442066700b3f175beaffeabd61c1efd59de5014140bed108d545ac500e1ee2e9",
+      "status": "extracted",
+      "reason": "Only referenced generic logic retained; original container excluded.",
+      "extractions": [
+        {
+          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+          "usage": "CounterRenderer.route sample-library routing",
+          "current_sha256": "67c56e9a296e261e996c5f081bcf29e9382ccd684144eb3d31d91bd53b5046ba"
+        }
+      ]
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_englhorn_versions.py",
+      "source_sha256": "ef76e591f0354914401f245aeddc845027a4b71119e2baf85b45a205daa07213",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_experiments.py",
+      "source_sha256": "dd82ff78e6383a1b2b5506fcda61d6bb510ab881dc3fdfc1d486884da1f758f6",
+      "status": "extracted",
+      "reason": "Only referenced generic logic retained; original container excluded.",
+      "extractions": [
+        {
+          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+          "usage": "Source, melody, harmony, meter, tempo and note-pairing checks; sha helper",
+          "current_sha256": "b8bf048041e678bf6d916e554ab810db3672cd837488dab6f1c5423473c80934"
+        }
+      ]
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_legato_versions.py",
+      "source_sha256": "9144ec15be6d7ff6feb1513686eac62c2b183f2886c22cea1dc8fb71aad223c0",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_oboe_versions.py",
+      "source_sha256": "be6209595c7bb2d48235812b650d248678da60f7940782f8056790210ac20e36",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_string_versions.py",
+      "source_sha256": "c70ba53349db627ec9bf472145227c0d0c6cdfc0ba855fda2f5da1c2d46593d8",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/run_experiments.ps1",
+      "source_sha256": "b104cc2c7485940c9401acfad436691d34652fe247429404cb3a32547bacf3a5",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+      "source_sha256": "70a31f3e23c32d8192817414c858a20400ab92f010798250d4a196ef263c7c48",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+      "current_sha256": "67c56e9a296e261e996c5f081bcf29e9382ccd684144eb3d31d91bd53b5046ba"
+    },
+    {
+      "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/string_folders.json",
+      "source_sha256": "6efc0fb531a9dda055432008472ccd658683a8b86c37bfaf0c10c20913c17994",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "song-arrangement-research/agents/openai.yaml",
+      "source_sha256": "bfc3834a862a032e440c626367c60850a1fd20b4e379141e4e118d2d3bb92a86",
+      "status": "adapted",
+      "reason": "LF line endings/trailing layout whitespace normalized for stable cross-platform source hashes; definitions and instructions unchanged.",
+      "destination": ".agents/skills/song-arrangement-research/agents/openai.yaml",
+      "current_sha256": "8dcfde7bc8be7b5f43160d084bf61deeef9ddb6e8b2a2db68d2d5c48c398e784"
+    },
+    {
+      "source": "song-arrangement-research/references/barnsang-adapter.md",
+      "source_sha256": "e6d34742ec8040ab5f5639e414bac8bc1b09541db5d2c99c2dd9e260b3a1e4b1",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/references/barnsang-adapter.md",
+      "current_sha256": "83ac967fe695fdbedf881b4623c0c68f5c6bd83690e75ef9ee97750d0c0d3d9e"
+    },
+    {
+      "source": "song-arrangement-research/references/brief-contract.md",
+      "source_sha256": "e81a548d122c79ac991a3dafb8802c13b3e17bd48f9b63e55e762dc97b1482bf",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/references/brief-contract.md",
+      "current_sha256": "c46e56f62edb3f231642a3130e064f986eeae9b9b651ba67ab6c34114c9d50dd"
+    },
+    {
+      "source": "song-arrangement-research/scripts/compile_brief.py",
+      "source_sha256": "c9c5863c62aa0c168e547b0841eecbc1fad74f88e5dd3a8ed490a745c3e2b21b",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
+      "current_sha256": "f081ec155ed09994870c7e1a71d5ad097b758649fa97fc63ba20e364df9fdc0c"
+    },
+    {
+      "source": "barnsang-video/SKILL.md",
+      "source_sha256": "17c337f3abfe73184275163c389f286e7589a3142c36afc4eb8acda1c4119443",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/barnsang-video/SKILL.md",
+      "current_sha256": "7f3b01909dad99661ba42337c0b604d33b1a54163245dfc7d6ce9c3f6686feaf"
+    },
+    {
+      "source": "barnsang-video/examples/ekorrn/INSTRUCTIONS.txt",
+      "source_sha256": "363fc77ce12cd1e5b0fc5b9e2fa4dae30b139cb8385e84829840d75d6a2d1b81",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "barnsang-video/examples/ekorrn/VERSE2_RESEARCH.md",
+      "source_sha256": "05c586f25f48cb1b3f7a3fb8b545de6a72af00d32c0c846e38609eb42b702f16",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "barnsang-video/examples/ekorrn/prompts.json",
+      "source_sha256": "d396cc1f4fc98eb2b1b3efc2c3d72c92a5d38b8daae83ca866b3fdd44af2b8ec",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "barnsang-video/examples/ekorrn/storyboard.json",
+      "source_sha256": "a044e4c6485e48f9cb59b398ce13898d7d3658d8f290979d755fab07a5261490",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "barnsang-video/examples/ekorrn/timeline_flow_v7.json",
+      "source_sha256": "5d160975e7349b916b2cd4f751a0aacb8fc0030e47b8037207ecee798542a0e7",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "barnsang-video/scripts/assemble_flow.py",
+      "source_sha256": "3dfc591aa8365eebbc834b90113310f7a9e93dcbd5acc9c5802dc620dcf73fc5",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/barnsang-video/scripts/assemble_flow.py",
+      "current_sha256": "90cd6632779616c591d3d1f20ff3c2efb5fc50a949727aac51b8d6f516c074f1"
+    },
+    {
+      "source": "barnsang-video/scripts/build_animatic.py",
+      "source_sha256": "29c41fb5ed31d4ec545266fd4c638e7a87441387a4c37f01731ae614d0c71ca0",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "barnsang-video/scripts/gen_edit.py",
+      "source_sha256": "869a424ae09d870f33af66c5c48d176fc2055b4f99fe58e4737a6c191e11da31",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/barnsang-video/scripts/gen_edit.py",
+      "current_sha256": "24ee8c59224b828fd6d909d8c731018e41a0c5c6d7a92e1ebe5c7bd2e1a08508"
+    },
+    {
+      "source": "barnsang-video/scripts/gen_image.py",
+      "source_sha256": "8bbed3e288acf5b4dd488f70f6ac28f0dd6bf4db12ecea2f1513d18f38bd7fd8",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/barnsang-video/scripts/gen_image.py",
+      "current_sha256": "c22e2d59d1eebfd8ad1d429100630832a0f5f1b7664719ea33daa0c7ed1cb2d4"
+    },
+    {
+      "source": "barnsang-video/scripts/gen_video.py",
+      "source_sha256": "5ff77fa486bfa24ad1d2c3f0f077e66142bdf7fb29dd52a9fb83f98318994e17",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "barnsang-video/scripts/list_image_models.py",
+      "source_sha256": "7900dc93751e80258a491238fdc2da8dd345c5db08ddc2b8fb6044cb2fa656f2",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "barnsang-video/scripts/make_keyframes.py",
+      "source_sha256": "2559372f8a5b6c3cd55441cc9a00557bc89473932346ca750b9814bc89403793",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "barnsang-video/scripts/run_drafts.py",
+      "source_sha256": "bc7d814b7513a6e9613da255c6299be4a024771fc08aae6ce2d987506f675eec",
+      "status": "excluded",
+      "reason": "Unused historical program or instruction; required general logic retained separately where identified."
+    },
+    {
+      "source": "barnsang-video/scripts/write_flow_instructions.py",
+      "source_sha256": "73338edeb8597facfb04f58dd2d484469112c5ce4b200c9cb61ce9a601760891",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": ".agents/skills/barnsang-video/scripts/write_flow_instructions.py",
+      "current_sha256": "bd8c4f874377a203685c7a0566b8f0d12f860a8505b88f1c7f48bb626b3b5202"
+    },
+    {
+      "source": "jjazzlab/CREDITS.md",
+      "source_sha256": "d8101ef9c55120b0b466706ca71ec227156fc2e5b99a50b858bdbf23be665dc6",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/README_SETUP.md",
+      "source_sha256": "56844f30ca5c86d0b697af6e852e756f7dd9f5f175e96b8d6e7bdf0c0a75a1af",
+      "status": "adapted",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "destination": "tools/jjazzlab/README_SETUP.md",
+      "current_sha256": "4ee8d34a2e9448cd8215ef192414de627c253a775147e8b97c16228ac092cd7b"
+    },
+    {
+      "source": "jjazzlab/library_metadata/bass/download.json",
+      "source_sha256": "89f7310cb675df3cba23fee83a031b314d3f12df214fdd528de55d51532cf1e7",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/clarinet/download.json",
+      "source_sha256": "0e0b240ba680cf9ea87514d530781b40cc8e788e8050d2edd53a08761dd615e8",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/drums/download.json",
+      "source_sha256": "a9346964bf64c4f474d431ca0b6f2e169fe7e41655f32449968549bcce5f28d9",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/generaluser/LICENSE.txt",
+      "source_sha256": "7b32efefdf95ce38a043799f0659853ddc00fbaa14d8c50f0aca16b9b8b405be",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/nylon/download.json",
+      "source_sha256": "5c5c2082bcc4f2507f976b8b2568b5f33b4127a1508ad0dbaf422ef13d1d80ed",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/salamander/download.json",
+      "source_sha256": "e56bb2fca4c1b4b1b045ccb107bd0cb89286cb34d6e2d74eb4c23a66541dcc20",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_cello_expressive/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_cello_expressive/conversion.json",
+      "source_sha256": "636048de75eea2a344a6ec72b2e55c322095e1ff8f3df0cef1bf8b42dfe1a677",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_cello_pizz/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_cello_pizz/conversion.json",
+      "source_sha256": "59998c19734bc4985b13b9f385c14bf5378a30b188b59803049729ce1fc9d582",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_englishhorn/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_englishhorn/conversion.json",
+      "source_sha256": "09e082f3b8abc8372e6f7bd7e95ec763cfd195fae621484d10b73a18127c77b1",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_flute_lyrical/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_flute_lyrical/conversion.json",
+      "source_sha256": "4d02e318e526424fa8bb8939450378ed378b66688663b2333517313de79e8b80",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_expressive/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_expressive/conversion.json",
+      "source_sha256": "89379ca53a5ac4431cf008c45dc3e60e6f75123fa20a5abe3d2ca8eab5dee55d",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_pizz/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_pizz/conversion.json",
+      "source_sha256": "e6e4911057cf38c493c6d96972a6039fda4173028911d5f755ef36e45be04657",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_soft/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_viola_soft/conversion.json",
+      "source_sha256": "79964b74367995d53faf3d473bbbf67fac7e5a83732d94a0e7957ecbf1fd450c",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_violin_soft/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/sso_violin_soft/conversion.json",
+      "source_sha256": "362e7a09807dc86954a3268151e3fc776a5dc29119b5460f2cc1e830e26fec36",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/steel/download.json",
+      "source_sha256": "6d6b62b7e61b07231efde9eae01d6a9062ad13baf50a9af86bc9661149a72ef4",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/vsco_oboe/README.md",
+      "source_sha256": "7390b92b9d58c88e5a96f2be50c5551072c57a457275b5de2ef46a2a2fea71a0",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/library_metadata/vsco_oboe/conversion.json",
+      "source_sha256": "cb7dacb2285c7216d046d1936fe12604cd61f668a4f5b47db4e5e6068ebb29e0",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/bass/LICENSE.txt",
+      "source_sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/bass/README.txt",
+      "source_sha256": "5a5cba6c7c44bdebd3ca195e4e3077c477bbfbee7947a6a37da52b2249649c2f",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/clarinet/readme.txt",
+      "source_sha256": "55c480fcc890cac42ff442e3f171d5535ab74f583167d8f19c0851a02278b0e8",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/drums/LICENSE.txt",
+      "source_sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/drums/README.txt",
+      "source_sha256": "d3d69df4db7bd93b568af9cbc901a9ac00bf17a8f98b9229787bd6023cc4d665",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/generaluser/LICENSE.txt",
+      "source_sha256": "7b32efefdf95ce38a043799f0659853ddc00fbaa14d8c50f0aca16b9b8b405be",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/nylon/cc0.txt",
+      "source_sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/nylon/readme.txt",
+      "source_sha256": "4791887358f865119705b0c2dd9b604be626a06462d37d287edd1b2607d80efb",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/salamander/readme.txt",
+      "source_sha256": "ed3a0ccd16573a8e72966bdfb14bf4b3e18fab94bb9e36da1aa6409522d359f8",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_expressive/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_expressive/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_expressive/cello-solo-looped.sfz",
+      "source_sha256": "ceecb8c6cde1dd475940a0b017dc2cd558b81cd85f84fcbace83bdd109ff6d07",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_expressive/conversion.json",
+      "source_sha256": "636048de75eea2a344a6ec72b2e55c322095e1ff8f3df0cef1bf8b42dfe1a677",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_pizz/Cello Solo Pizzicato.sfz",
+      "source_sha256": "df8e823fb1270281236a776758090798db038c6a97f011b600d27c1673b8c49f",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_pizz/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_pizz/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_cello_pizz/conversion.json",
+      "source_sha256": "59998c19734bc4985b13b9f385c14bf5378a30b188b59803049729ce1fc9d582",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_englishhorn/Cor Anglais Solo Sustain (looped).sfz",
+      "source_sha256": "c1a3b55655d6661022365b260921913d51752b405bc60daf385928fe60f1681d",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_englishhorn/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_englishhorn/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_englishhorn/conversion.json",
+      "source_sha256": "09e082f3b8abc8372e6f7bd7e95ec763cfd195fae621484d10b73a18127c77b1",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_englishhorn/cor-anglais-solo-looped.sfz",
+      "source_sha256": "ed7007cbf91a5a1a1532911568f378b574e8bdc11fe39cb3e25eee8c5013d5ef",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_flute_lyrical/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_flute_lyrical/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_flute_lyrical/conversion.json",
+      "source_sha256": "4d02e318e526424fa8bb8939450378ed378b66688663b2333517313de79e8b80",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_flute_lyrical/flute-solo-1-looped.sfz",
+      "source_sha256": "5afa6fe6bad97b0b8b9eafae99fc2e2e775295ab49710f7bd15b72851a1bc746",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_expressive/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_expressive/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_expressive/conversion.json",
+      "source_sha256": "89379ca53a5ac4431cf008c45dc3e60e6f75123fa20a5abe3d2ca8eab5dee55d",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_expressive/viola-solo-sustain.sfz",
+      "source_sha256": "6c9d381e5222ec76e7d61eb415b9cdf9b540992d14c07b01722a971659fc0fb8",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_pizz/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_pizz/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_pizz/Viola Solo Pizzicato.sfz",
+      "source_sha256": "11207a5ffd24c2d55f199c064220e4f74695b73e9ef6ba7f849c89b1e2bc669e",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_pizz/conversion.json",
+      "source_sha256": "e6e4911057cf38c493c6d96972a6039fda4173028911d5f755ef36e45be04657",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_soft/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_soft/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_soft/conversion.json",
+      "source_sha256": "79964b74367995d53faf3d473bbbf67fac7e5a83732d94a0e7957ecbf1fd450c",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_viola_soft/viola-solo-sustain.sfz",
+      "source_sha256": "6c9d381e5222ec76e7d61eb415b9cdf9b540992d14c07b01722a971659fc0fb8",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_violin_soft/LICENSE",
+      "source_sha256": "30fc40ccc5a8a1e32e7220519b185c9a46d2c5094ff15bde64556fb7021d73b3",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_violin_soft/README.md",
+      "source_sha256": "c4e88fe2c288dee2ad8daf385ed4cd9641bfee487a1a1bf341c03555d7585a89",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_violin_soft/conversion.json",
+      "source_sha256": "362e7a09807dc86954a3268151e3fc776a5dc29119b5460f2cc1e830e26fec36",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/sso_violin_soft/violin-solo-1-looped.sfz",
+      "source_sha256": "4cc8bfefc9f503804b570c427f896330d11588dbb0f5992902ec70959876e22d",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/steel/gpl.txt",
+      "source_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/steel/readme.txt",
+      "source_sha256": "c89ddce8b0c8f1f685c2ece7f0878eabb7d0c8e4e375fac7a637f398befa62b5",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/vsco_oboe/LICENSE",
+      "source_sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/vsco_oboe/OboeSusVib.sfz",
+      "source_sha256": "ce1241e31c308283773c0f53c63f35b9321bef88b2a444ea2e6940dbbb1b77dd",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/vsco_oboe/README.md",
+      "source_sha256": "7390b92b9d58c88e5a96f2be50c5551072c57a457275b5de2ef46a2a2fea71a0",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/licenses/vsco_oboe/conversion.json",
+      "source_sha256": "cb7dacb2285c7216d046d1936fe12604cd61f668a4f5b47db4e5e6068ebb29e0",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/release.json",
+      "source_sha256": "5de485c9823283e36276ceabbeb24af7d78f30817f6e68ca5e150d6eea69651d",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/requirements.txt",
+      "source_sha256": "ae69ec67a7aedb3e634f2b454cec641bde9214e760369beeed2eb1477f427c60",
+      "status": "excluded",
+      "reason": "Installed environment snapshot replaced by maintained root requirements."
+    },
+    {
+      "source": "jjazzlab/sha256_local_files.txt",
+      "source_sha256": "2fa4c29209c8370274b349312a734cc23e8ecdcc91728784720ad43e3ca25d67",
+      "status": "excluded",
+      "reason": "External resource provenance retained with original bundle/resources, not project code."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/LICENSE",
+      "source_sha256": "7ffe1954587c77dfba1cf8eb9b2ea743671fa6e63f9e7a2f258119d42e14eefe",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/README.md",
+      "source_sha256": "6a8ba6c27bd0c66a5cbf4be45fe275af5d6dae8efa4d2914b8329927ee477c45",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/demo/README.md",
+      "source_sha256": "641971308cd98a01a0eaed7e8ab6d8ec645e6e90c52b2de3dd247e37f252b29c",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/demo/Simple.sng",
+      "source_sha256": "e4f08d44bea3c38e5c2778a72b7747afb4f4f601b4b8ffc2b067d92cddde765d",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/demo/nbactions.xml",
+      "source_sha256": "227e64112aaf47fcf1b56296033f86abebff9b3dc73c4971497d5bf152550a8e",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/demo/pom.xml",
+      "source_sha256": "26d2dce2c437fc5deab67fda13228a9e069ce3167681afd3a9ff3b2c277b12f2",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/demo/src/main/java/org/jjazzlab/toolkitdemo/ToolkitDemoApp.java",
+      "source_sha256": "88b13e5c8ca6fa7aadea2de10bf06fa83046b7f8326d2aa354947f639df125ba",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/nbactions.xml",
+      "source_sha256": "f5f7206f9b6ce2ddbffa6e56b3abaed56d89ecfa5172d11d0cb9d4c111995741",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/pom.xml",
+      "source_sha256": "351351cc6b136922c464d70afab21fd299ac0228e52990c263102210fe292b02",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/src/main/java/org/jjazz/toolkit/ToolkitDialogDisplayer.java",
+      "source_sha256": "9fe87b87c948e6615eae36693095cb15661fb8d493dc698e4ecded2591b0e0bf",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/toolkit_docs/src/main/java/org/jjazz/toolkit/ToolkitStatusDisplayer.java",
+      "source_sha256": "3504e11428ba4cf9e1d434decc88baf765480afb8701cc15163ce76e216bdb5b",
+      "status": "excluded",
+      "reason": "Third-party toolkit source, build and demo material; install externally."
+    },
+    {
+      "source": "jjazzlab/trial_code/README.md",
+      "source_sha256": "f5fe748955950f65487957a2602b679a3c4763805c8ce2bb0d208b6f6a782638",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "jjazzlab/trial_code/Trial.java",
+      "source_sha256": "b651f0d6bc067387efa9691890ce1a224edcdaaf49b2f5b904da1af495eee274",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "jjazzlab/trial_code/finalize.py",
+      "source_sha256": "84eebb3d1499ba3c46553323b69bb4d1bb3350d632e7ccff11b2d4f0e6b15c7b",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "jjazzlab/trial_code/inputs.json",
+      "source_sha256": "590f53151b62db934e86f7853524b99cf5fdcda0eb10460d88d57cb1b3c95f12",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "jjazzlab/trial_code/prepare.py",
+      "source_sha256": "7fb3217588e9b0a818d22db3ef2aa74f53bf4f618897d64e9c69047beaebba32",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "jjazzlab/trial_code/provenance.json",
+      "source_sha256": "6a817d9015c6ed656aca993784160eab8fd5b1e7e02eb134972bdc7f318d16f0",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    },
+    {
+      "source": "jjazzlab/trial_code/run_trial.ps1",
+      "source_sha256": "cf1fb58d8d29de416b54249ce33566bece9889a778cd8252def57213622c9047",
+      "status": "excluded",
+      "reason": "Historical experiment with no retained-skill execution path."
+    },
+    {
+      "source": "jjazzlab/trial_code/verification.json",
+      "source_sha256": "ffb7ae1dd17aa29e2d32eca4c4db84aeca593a38cfdc457844a14bbbeb0c3276",
+      "status": "excluded",
+      "reason": "Song/run artifact; original remains in collaborator bundle."
+    }
+  ],
+  "code_ownership": [
+    {
+      "path": ".agents/skills/analyze_music/scripts/analyze_music.py",
+      "owner": "analyze_music",
+      "usage": "Optional score-analysis CLI calls music_analysis.analyze_score."
+    },
+    {
+      "path": ".agents/skills/analyze_music/scripts/music_analysis.py",
+      "owner": "analyze_music",
+      "usage": "analyze_music imports analyze_score and its musical helpers."
+    },
+    {
+      "path": ".agents/skills/barnsang-video/scripts/assemble_flow.py",
+      "owner": "barnsang-video",
+      "usage": "Skill assembly CLI applies supplied clip groups, timings and audio settings."
+    },
+    {
+      "path": ".agents/skills/barnsang-video/scripts/gen_edit.py",
+      "owner": "barnsang-video",
+      "usage": "Skill sequential reference-based image editing CLI."
+    },
+    {
+      "path": ".agents/skills/barnsang-video/scripts/gen_image.py",
+      "owner": "barnsang-video",
+      "usage": "Skill image generation CLI and shared request/output helpers imported by gen_edit."
+    },
+    {
+      "path": ".agents/skills/barnsang-video/scripts/write_flow_instructions.py",
+      "owner": "barnsang-video",
+      "usage": "Skill handoff CLI formats explicit storyboard into Flow instructions."
+    },
+    {
+      "path": ".agents/skills/download-scores/scripts/download_scores.py",
+      "owner": "download-scores",
+      "usage": "Optional acquisition CLI calls its search/download/conversion/lyrics helpers."
+    },
+    {
+      "path": ".agents/skills/plan_vocals/scripts/plan_and_align_vocals.py",
+      "owner": "plan_vocals",
+      "usage": "Optional vocal-planning CLI calls retained selection and alignment helpers."
+    },
+    {
+      "path": ".agents/skills/score-to-musicxml/scripts/slope_grid.py",
+      "owner": "score-to-musicxml",
+      "usage": "Skill geometry step calls process -> fit_staff/robust_line/evaluate/diatonic_pitch."
+    },
+    {
+      "path": ".agents/skills/score-to-musicxml/scripts/validate.py",
+      "owner": "score-to-musicxml",
+      "usage": "verify_score imports audit and canonical, which call the retained score validation helpers."
+    },
+    {
+      "path": ".agents/skills/score-to-musicxml/scripts/verify_score.py",
+      "owner": "score-to-musicxml",
+      "usage": "Skill score/schema/review verification CLI."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
+      "owner": "song-arrangement-research",
+      "usage": "execute_child_plans compiles source and invokes ChildExperiment main."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
+      "owner": "song-arrangement-research",
+      "usage": "Publisher imports check_files; skill delivery CLI checks files and browser playback."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
+      "owner": "song-arrangement-research",
+      "usage": "Skill execution CLI compiles ChildExperiment and preserves/checks baseline events."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/listening_page.html",
+      "owner": "song-arrangement-research",
+      "usage": "publish_experiments reads template and inserts explicit song/version data."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
+      "owner": "song-arrangement-research",
+      "usage": "Skill publication CLI checks render deliveries and builds listening catalogue."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
+      "owner": "song-arrangement-research",
+      "usage": "Skill rendering CLI -> source verification, sample Renderer and shared full/backing gain."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+      "owner": "song-arrangement-research",
+      "usage": "render_child_versions imports Renderer/sample routing/FluidSynth bindings."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+      "owner": "song-arrangement-research",
+      "usage": "Compiler-adjacent adapters import source/hash/event/backing checks and external auditor loading."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
+      "owner": "song-arrangement-research",
+      "usage": "Skill brief compilation CLI -> validate_brief."
+    },
+    {
+      "path": ".agents/skills/syllabify_lyrics/scripts/lyrics_syllabify.py",
+      "owner": "syllabify_lyrics",
+      "usage": "syllabify_lyrics imports reusable parsing/syllable helpers."
+    },
+    {
+      "path": ".agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py",
+      "owner": "syllabify_lyrics",
+      "usage": "Optional lyrics CLI calls lyrics_syllabify.syllabify_lyrics."
+    },
+    {
+      "path": ".agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py",
+      "owner": "synthesize_vocal_with_diffsinger",
+      "usage": "Optional Nishiren CLI validates timing/resources and invokes ONNX phoneme/duration/embedding inference."
+    },
+    {
+      "path": "bin/__init__.py",
+      "owner": "all automated retained skills",
+      "usage": "Makes bin an importable project package."
+    },
+    {
+      "path": "bin/project_runtime.py",
+      "owner": "all automated retained skills",
+      "usage": "All automated skill CLIs share explicit data paths, config-root and selected external tools/resources."
+    },
+    {
+      "path": "bin/read_config.py",
+      "owner": "all automated retained skills",
+      "usage": "All automated skill CLIs load shared/local TOML through project_runtime; also -m bin.read_config."
+    }
+  ]
+}

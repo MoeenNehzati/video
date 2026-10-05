@@ -1,122 +1,41 @@
 ---
 name: refine-vocal-with-rvc
-description: Use when a rough DiffSinger vocal is ready and you want to optionally improve its timbre and naturalness using an RVC voice conversion model before mixing. This is a refinement step, not the core singing step.
+description: Optionally refine a rough vocal through a separately installed RVC/SVC tool, preserving the original for comparison and reviewing timing and intelligibility.
 allowed-tools: Read Bash Grep Glob Write
-argument-hint: [rough-vocal-wav]
-effort: medium
+metadata:
+  argument-hint: "[rough-vocal-wav]"
+  effort: "medium"
 ---
 
-# Skill 4: `refine_vocal_with_rvc`
+# Refine a vocal with an external RVC tool
 
-## Purpose
+RVC converts an existing vocal's timbre. It does not create singing from symbolic
+notes. Keep this optional: conversion can blur consonants, introduce artifacts
+or reduce lyric intelligibility.
 
-Optionally improve the DiffSinger vocal by running it through an RVC/SVC voice conversion model.
+## Configuration and execution
 
-This is a refinement step, not the core singing step.
+This repository supplies instructions, not an RVC implementation or a local
+`refine_vocal_with_rvc` executable. Install the chosen tool externally. Store its
+executable argument prefix in `[tools.rvc].command` in `config.local.toml`, and
+model/index paths in `[resources].rvc_model` and `[resources].rvc_index` when used.
+If the installation needs its own Python, use that interpreter in the command
+prefix. Never vendor the tool or models into this repository.
 
-## Inputs
+1. Read resolved configuration using `env/bin/python -m bin.read_config`
+   (Windows: `env/Scripts/python.exe`). Inspect the configured tool's supported
+   interface; flags differ between RVC installations.
+2. Resolve the explicit input WAV and distinct output WAV/log paths under
+   `paths.data_root`. Validate the input is present and nonsilent, and check
+   all required executable/model/index paths before creating any outputs.
+3. Invoke the external tool using an argument list and checked return code,
+   supplying the reviewed transpose and the resolved input, output and resource
+   paths. Do not guess flags or silently use a different backend.
+4. Verify the output exists, then compare duration/alignment, intelligibility,
+   clipping, silence and audible artifacts with the original rough vocal.
+5. Write a log beside the result containing exact inputs, resource identities,
+   command/settings, output path, duration comparison and review findings.
 
-```text
-rough_vocal.wav
-```
-
-Config:
-
-```json
-{
-  "rvc_model": "models/rvc/singer_b.pth",
-  "rvc_index": "models/rvc/singer_b.index",
-  "transpose": 0,
-  "output": "refined_vocal.wav"
-}
-```
-
-## Tools
-
-Use an RVC CLI or Python wrapper.
-
-RVC converts existing vocal audio into a target voice/timbre. It does not create singing from symbolic notes. That is why this skill comes after DiffSinger.
-
-## Responsibilities
-
-1. Validate input WAV.
-2. Run RVC/SVC inference.
-3. Preserve timing and length as much as possible.
-4. Detect clipping/silence/artifacts.
-5. Write `refined_vocal.wav` and `rvc_log.json`.
-
-## Outputs
-
-```text
-refined_vocal.wav
-rvc_log.json
-```
-
-Example log:
-
-```json
-{
-  "input": "rough_vocal.wav",
-  "output": "refined_vocal.wav",
-  "model": "models/rvc/singer_b.pth",
-  "transpose": 0,
-  "duration_seconds": 23.42,
-  "warnings": []
-}
-```
-
-## Why this output is useful
-
-DiffSinger solves structure:
-
-```text
-notes + lyrics → sung vocal
-```
-
-RVC solves timbre/texture:
-
-```text
-rough synthetic vocal → more natural/pleasant vocal
-```
-
-Keep this step optional because it can sometimes:
-
-- blur consonants
-- add artifacts
-- reduce lyric intelligibility
-- over-color the singer identity
-
-The pipeline should always preserve both:
-
-```text
-rough_vocal.wav
-refined_vocal.wav
-```
-
-for A/B comparison.
-
-## Suggested CLI
-
-```bash
-refine_vocal_with_rvc rough_vocal.wav \
-  --model models/rvc/singer_b.pth \
-  --index models/rvc/singer_b.index \
-  --transpose 0 \
-  --out refined_vocal.wav \
-  --log rvc_log.json
-```
-
-## Failure modes
-
-Fail if:
-
-- input WAV missing or silent
-- RVC model missing
-- inference exits nonzero
-- output WAV missing
-
-Warn if:
-
-- output duration differs significantly from input
-- output clips above -1 dBFS
-- spectral/noise checks suggest severe artifacts
+Retain both rough and refined vocals for A/B review. A missing or unsupported
+external installation is a capability gap: stop before generation and report it.
+No successful conversion or quality check is implied by these instructions.

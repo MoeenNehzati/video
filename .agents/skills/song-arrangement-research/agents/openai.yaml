@@ -1,0 +1,4 @@
+interface:
+  display_name: "Song Arrangement Research"
+  short_description: "Research songs and produce tailored JJazzLab arrangements"
+  default_prompt: "Use $song-arrangement-research to research these songs and create tailored JJazzLab arrangements from the approved scores."

@@ -2,23 +2,54 @@
 
 This project turns sheet music into children's music videos.
 
-## Python environment
+## Workflow
 
-- Use the repo-root `env/` virtual environment (Python 3.11+). If missing, run
-  `python3 -m venv env`, then
-  `env/bin/python -m pip install -r requirements/requirements-python.txt`.
-  Reinstall requirements after they change. Run Python with `env/bin/python`;
-  the `bin/` wrappers use it too.
+- Use `score-to-musicxml`, `song-arrangement-research`, and `barnsang-video` as the
+  default workflow. Preserve the collaborator's proven musical/visual methods;
+  do not reintroduce retired implementations without evidence of improvement.
+- Acquisition and the five analysis/vocal skills are optional. Read the selected
+  skill's prerequisites and limitations. See `docs/skill-adoption.md` and
+  `docs/artifact-contracts.md` for workflow boundaries.
 
-## Configuration and data
+## Python and configuration
 
-- Before pipeline work, run `env/bin/python -m bin.read_config` from the repo root and
-  use its resolved JSON. It combines `config.toml` with local overrides.
-- Persist configuration changes only in `config.local.toml`, preserving other
-  local settings. Never write them to shared `config.toml`.
-- If `paths.data_root` is missing or invalid, ask for the absolute path to an
-  existing project-data directory (reuse a path already confirmed in this
-  conversation). Verify it, update the local file, and rerun the reader.
-- Existing pipeline scripts do not load configuration automatically. Pass
-  explicit paths; their `assets/` defaults are legacy. Preserve the data
-  directory's existing organization and keep binary media and models out of Git.
+- Use the repo-root `env/` environment (Python 3.11+). Create it with
+  `python3 -m venv env` (Windows: `py -3 -m venv env`), then install
+  `requirements/requirements-python.txt` with that environment's Python.
+  Reinstall after requirements change.
+- Invoke Python directly: `env/bin/python` on POSIX or `env/Scripts/python.exe`
+  on Windows. Use canonical `.agents/skills/` script paths, not shell launchers
+  or host-discovery symlinks. Child project scripts use `sys.executable`.
+- Before pipeline work, run that Python with `-m bin.read_config` from the repo
+  root. Use the resolved configuration. Scripts use the same reader through
+  `bin.project_runtime`; `--config-root` supports an explicit config directory.
+- Persist machine settings only in `config.local.toml`, preserving other local
+  settings. Never change shared `config.toml` for local configuration.
+- If `paths.data_root` is invalid, reuse a confirmed existing project-data path
+  or ask for one, verify it, update the local file and rerun the reader.
+- If configuration lacks information needed for the requested stage, follow
+  `docs/configuration.md` and `config.local.example.toml`: inspect available tools,
+  reuse confirmed paths, and ask only for information that cannot be discovered.
+  Add only that stage's settings to local TOML, preserving other settings; verify
+  the configured paths/commands and rerun the reader. Do not guess a model, sample
+  library or musical preset, install software in the repo, or change shared defaults
+  to make one computer work.
+- Configure external tools/resources as documented in `docs/configuration.md`.
+  Missing prerequisites must be reported before producing artifacts.
+
+## Repository and data boundary
+
+- Retain only instructions, skill-used code, and required schemas, tests,
+  configuration and dependency support. Remove orphan code, including unused
+  branches inside retained files. Maintain ownership/provenance in
+  `docs/skill-imports.json` when changing retained code.
+- All song/run artifacts belong under resolved `paths.data_root`: source sheets,
+  XML, MIDI, media, JSON, prompts, logs, reviews and one-off song builders.
+  Pass explicit inputs/outputs; do not write artifacts beside source code.
+- Keep external software, native libraries, sound banks and models outside the
+  checkout; reference them in local TOML. Do not vendor or hide them in ignored
+  project folders. Synthetic tests may use temporary directories.
+- Preserve existing shared organization and reviewed inputs. Do not infer the
+  accepted version from modification time. The artifact ledger is planned in
+  `docs/artifact-ledger-plan.md`, not implemented; this cleanup does not authorize
+  migration or promise automatic history recording.

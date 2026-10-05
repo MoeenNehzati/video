@@ -45,8 +45,17 @@ def load_config(root: Path = ROOT) -> dict:
             or not Path(data_root).is_absolute() or not Path(data_root).is_dir()):
         raise ValueError(
             "paths.data_root must be the absolute path of an existing project-data "
-            "directory. Set it in config.local.toml."
+            "directory. Set it in config.local.toml; see docs/configuration.md."
         )
+    resolved_data = Path(data_root).resolve()
+    if resolved_data.is_relative_to(ROOT) or ROOT.is_relative_to(resolved_data):
+        raise ValueError("paths.data_root must be separate from the repository "
+                         "(neither inside it nor containing it). "
+                         "Fix config.local.toml; see docs/configuration.md.")
+    for table in ("tools", "resources"):
+        if table in config and not isinstance(config[table], dict):
+            raise ValueError(f"{table} must be a TOML table. "
+                             "Fix config.local.toml; see docs/configuration.md.")
     return config
 
 

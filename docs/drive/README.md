@@ -1,44 +1,14 @@
-# Google Drive
+# Shared project data
 
-This directory documents what lives on Google Drive and how it is organized.
-Binary files (PDFs, audio, images, video) are stored there rather than in git.
+Each collaborator sets the absolute path to their local Dropbox project-data copy
+as `paths.data_root` in `config.local.toml`. Resolve it with the repo environment's
+Python and `-m bin.read_config`. See [configuration](../configuration.md).
 
-**Drive link:** _[add shared folder link here]_
+All song/run artifacts belong there, including JSON, prompts, reports and one-off
+song builders. Preserve existing organization and reviewed inputs. Do not use a
+repo-local output/vendor directory. Tools and models live outside the checkout
+and are referenced through local configuration.
 
----
-
-## Why Drive and not git?
-
-Git is designed for text files. Binary files like PDFs and audio bloat the
-repository and make it slow for everyone. Drive handles large files well and
-lets non-technical collaborators upload and download without knowing git.
-
----
-
-## Folder structure
-
-Drive does not need to follow a fixed structure. A good starting point is to
-mirror what is under `assets/` in this repository:
-
-```
-assets/
-├── lyrics/      Lyrics as plain text files
-├── meta/        Spreadsheets and other reference documents
-├── midi/        MIDI files
-├── sheets/      Sheet music in PDF or image format
-└── xml/         MusicXML files
-```
-
-If Drive uses a different structure that is fine, but **each folder on Drive
-must contain a README file** (a Google Doc or a plain text file called README)
-explaining what is in that folder. This makes it possible for anyone to
-understand what they are looking at and to map Drive files into the right
-place under `assets/` locally.
-
----
-
-## Working locally
-
-When you need to work with Drive files in the pipeline scripts, download them
-into the corresponding folder under `assets/` in this repository. That folder
-is gitignored, so your local copies will not be committed to git by accident.
+The proposed nested organization and append-only global history are specified in
+[the artifact ledger plan](../artifact-ledger-plan.md). That mechanism is a separate
+implementation task; current path validation does not record revisions or lineage.

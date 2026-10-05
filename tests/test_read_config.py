@@ -18,8 +18,9 @@ SPEC.loader.exec_module(READER)
 class ReadConfigTests(unittest.TestCase):
     def test_layering_and_entry_points(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            data = root / "data with spaces"
+            root = Path(directory) / "checkout"
+            root.mkdir()
+            data = Path(directory) / "data with spaces"
             data.mkdir()
             (root / "bin").mkdir()
             shutil.copy(SCRIPT, root / "bin" / SCRIPT.name)

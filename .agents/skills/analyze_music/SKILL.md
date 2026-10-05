@@ -2,8 +2,9 @@
 name: analyze-music
 description: Use when an arranged MusicXML score needs to be parsed into music_analysis.json — extracting tempo, meter, key, parts, phrases, melody candidates, and harmony — for downstream vocal planning. Does not read lyrics or alter the score.
 allowed-tools: Read Bash Grep Glob Write
-argument-hint: [musicxml-file]
-effort: medium
+metadata:
+  argument-hint: "[musicxml-file]"
+  effort: "medium"
 ---
 
 # Skill 1: `analyze_music`
@@ -20,15 +21,7 @@ This skill is music-analysis-only. It should not read lyrics and should not alte
 arranged_music.xml
 ```
 
-Optional config:
-
-```json
-{
-  "preferred_vocal_range": ["C4", "A5"],
-  "target_style": "gentle children's song",
-  "language_hint": "English"
-}
-```
+Use `--tempo-bpm` for an explicit tempo override.
 
 ## Tools
 
@@ -123,21 +116,27 @@ The next skill needs to decide where and how to sing. It needs compact facts:
 - how many melody notes are available
 - whether accompaniment conflicts with the vocal register
 
-## Suggested CLI
+## Python invocation
 
-Implementation: [scripts/analyze_music.py](scripts/analyze_music.py), invoked by repo-root `bin/analyze_music`.
+Run from the repository root with `env/bin/python` (Windows:
+`env/Scripts/python.exe`). Resolve `paths.data_root` through `bin.read_config`.
+Artifact arguments are absolute paths under that root or paths relative to it;
+the script validates them and never infers an output from the working directory.
+`--config-root` optionally selects a directory containing the TOML configuration.
+
+
+Implementation: [scripts/analyze_music.py](scripts/analyze_music.py).
 
 ```bash
-./bin/analyze_music arranged_music.xml --out music_analysis.json
+env/bin/python .agents/skills/analyze_music/scripts/analyze_music.py arranged_music.xml --out music_analysis.json
 ```
 
 ## Failure modes
 
-Return a nonzero exit code and diagnostic JSON if:
+The CLI exits nonzero on parse/configuration failures. Review the returned warnings:
 
 - MusicXML cannot be parsed
 - no usable note material is found
-- lyrics are empty
-- tempo cannot be determined and no default is supplied
+- tempo is missing (the analysis helper uses its documented default)
 
 If key, chords, or phrases are uncertain, emit warnings instead of failing.

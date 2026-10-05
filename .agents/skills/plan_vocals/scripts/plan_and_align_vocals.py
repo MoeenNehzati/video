@@ -6,6 +6,11 @@ import json
 import re
 from pathlib import Path
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from bin.project_runtime import add_config_argument, data_path, load_project
+
 from music21 import converter
 from music21 import pitch as m21pitch
 
@@ -160,20 +165,23 @@ def _choose_anchor_indices(note_events: list[dict], syllable_count: int, score_i
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("music_analysis_json", type=Path)
-    ap.add_argument("lyrics_json", type=Path, nargs="?", default=None)
+    ap.add_argument("lyrics_json", type=Path)
     ap.add_argument("--score", type=Path, required=True)
     ap.add_argument("--cue", default="clear vocals, minimal melisma")
     ap.add_argument("--out", type=Path, required=True)
+    add_config_argument(ap)
     args = ap.parse_args()
+    config = load_project(args.config_root)
+    args.music_analysis_json = data_path(config, args.music_analysis_json, must_exist=True)
+    args.lyrics_json = data_path(config, args.lyrics_json, must_exist=True)
+    args.score = data_path(config, args.score, must_exist=True)
+    args.out = data_path(config, args.out)
+    if args.out in {args.music_analysis_json, args.lyrics_json, args.score}:
+        raise ValueError("Output must not replace an input file")
 
     music_analysis = _load_json(args.music_analysis_json)
-    if args.lyrics_json is None:
-        score_info = music_analysis["score"]
-        lyrics_info = music_analysis["lyrics"]
-    else:
-        score_info = music_analysis["score"]
-        lyrics_payload = _load_json(args.lyrics_json)
-        lyrics_info = lyrics_payload["lyrics"]
+    score_info = music_analysis["score"]
+    lyrics_info = _load_json(args.lyrics_json)["lyrics"]
 
     warnings: list[str] = []
     arrangement_notes: list[dict] = []

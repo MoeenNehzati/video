@@ -94,7 +94,7 @@ def analyze_score(score, tempo_bpm_override: float | None = None) -> tuple[dict,
     melody_candidates = []
     for idx, part in enumerate(score.parts, start=1):
         part_id = f"P{idx}"
-        name = (part.partName or part.id or part_id).strip() if hasattr(part, "partName") else part_id
+        name = str(part.partName or part.id or part_id).strip() if hasattr(part, "partName") else part_id
         name_l = name.lower()
 
         is_perc = any("drum" in (instr.partName or "").lower() for instr in part.getInstruments())

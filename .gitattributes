@@ -1,0 +1,2 @@
+# Keep source/provenance hashes stable across Windows, macOS and Linux checkouts.
+* text=auto eol=lf

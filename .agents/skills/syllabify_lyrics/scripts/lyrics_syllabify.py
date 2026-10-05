@@ -7,7 +7,7 @@ from pathlib import Path
 
 _VOWELS = set("aeiouy")
 _EXCEPTIONS_EN: dict[str, list[str]] = {
-    # Small set of hand-tuned splits to make common demo material behave well.
+    # Common English syllabification exceptions; song-specific splits use input hyphens.
     "twinkle": ["twin", "kle"],
     "little": ["lit", "tle"],
     "above": ["a", "bove"],

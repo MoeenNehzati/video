@@ -2,8 +2,9 @@
 name: syllabify-lyrics
 description: Use when lyrics.txt needs to be parsed and syllabified into lyrics.json for downstream vocal alignment. Respects explicit hyphens and applies a heuristic syllabifier. Does not inspect or modify the score.
 allowed-tools: Read Bash Grep Glob Write
-argument-hint: [lyrics-txt]
-effort: low
+metadata:
+  argument-hint: "[lyrics-txt]"
+  effort: "low"
 ---
 
 # Skill: `syllabify_lyrics`
@@ -40,12 +41,19 @@ Optional config:
 
 Write `lyrics.json` matching [the shared schema](../../../references/schemas/lyrics.schema.json).
 
-## Suggested CLI
+## Python invocation
 
-Implementation: [scripts/syllabify_lyrics.py](scripts/syllabify_lyrics.py), invoked by repo-root `bin/syllabify_lyrics`.
+Run from the repository root with `env/bin/python` (Windows:
+`env/Scripts/python.exe`). Resolve `paths.data_root` through `bin.read_config`.
+Artifact arguments are absolute paths under that root or paths relative to it;
+the script validates them and never infers an output from the working directory.
+`--config-root` optionally selects a directory containing the TOML configuration.
+
+
+Implementation: [scripts/syllabify_lyrics.py](scripts/syllabify_lyrics.py).
 
 ```bash
-./bin/syllabify_lyrics lyrics.txt --language English --out lyrics.json
+env/bin/python .agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py lyrics.txt --language English --out lyrics.json
 ```
 
 ## Failure modes

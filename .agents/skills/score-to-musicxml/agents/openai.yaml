@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scanned Score to MusicXML"
+  short_description: "Convert scanned melodies with source-based verification"
+  default_prompt: "Use $score-to-musicxml to transcribe these scanned scores and verify the MusicXML against the source images."

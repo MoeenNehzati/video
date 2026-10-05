@@ -1,0 +1,41 @@
+# Copy to config.local.toml and edit locally. This example is not loaded.
+# Paths must be absolute and outside this checkout. On Windows use forward slashes
+# (C:/Users/...) or TOML literal strings ('C:\Users\...'). Do not use ~ or $VARS.
+[paths]
+data_root = "/absolute/path/to/Dropbox/project-data"
+
+# Enable only the tools needed for your selected skill. Commands are argv lists,
+# never shell strings; use an absolute executable path or a name already on PATH.
+# [tools.musescore]
+# command = ["/absolute/path/to/MuseScore"]
+# [tools.audiveris]
+# command = ["java", "-jar", "/absolute/path/to/Audiveris.jar"]
+# [tools.java]
+# command = ["java"]
+# [tools.javac]
+# command = ["javac"]
+# [tools.ffmpeg]
+# command = ["ffmpeg"]
+# [tools.ffprobe]
+# command = ["ffprobe"]
+# [tools.browser]
+# command = ["/absolute/path/to/chromium"]
+# [tools.rvc]
+# command = ["/absolute/path/to/external/python", "/absolute/path/to/RVC/infer.py"]
+
+# Enable only the resources used by your stage. No models or sample data in Git.
+# [resources]
+# jjazzlab_toolkit = "/absolute/path/to/jjazzlab-toolkit.jar"
+# jjazzlab_rhythms = "/absolute/path/to/rhythms"
+# midi_audit = "/absolute/path/to/proven/audit_existing_midi.py"
+# fluidsynth_library = "/absolute/path/to/platform/fluidsynth-library"
+# soundfont_manifest = "/absolute/path/to/soundfonts/banks.json"
+# soundfont_credits = "/absolute/path/to/soundfonts/CREDITS.md"
+# nishiren_root = "/absolute/path/to/Nishiren"
+# pronunciation_lexicon = "/absolute/path/to/pronunciation.json"
+# rvc_model = "/absolute/path/to/voice-model.pth"
+# rvc_index = "/absolute/path/to/voice-model.index"
+
+# Optional pointer used when auditing/updating the original collaborator bundle.
+# [provenance]
+# skill_source_bundle = "/absolute/path/to/Dropbox/Skills"

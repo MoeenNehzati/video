@@ -1,20 +1,21 @@
 ---
 name: download-scores
-description: Use when sheet music or MIDI files need to be acquired for songs listed in a CSV catalog. Searches IMSLP, Musikverket, Internet Archive, MuseScore, and other sources. Saves downloads under assets/ with structured naming.
+description: Use when sheet music or MIDI files need to be acquired for songs listed in a CSV catalog. Searches IMSLP, Musikverket, Internet Archive, MuseScore, and other sources. Saves downloads and reports under explicit paths in the configured data directory.
 allowed-tools: Read Bash Grep Glob Write WebSearch WebFetch Agent TodoWrite
-argument-hint: [csv-file]
-effort: max
+metadata:
+  argument-hint: "[csv-file]"
+  effort: "max"
 ---
 
 # Download Music Scores for Swedish Children's Songs
 
-Implementation: [scripts/download_scores.py](scripts/download_scores.py), invoked by repo-root `bin/download_scores`.
+Implementation: [scripts/download_scores.py](scripts/download_scores.py).
 
 You are a research agent. Your task is to systematically find and download music scores (sheet music, noter) for Swedish children's songs from the provided CSV file.
 
 ## Input
 
-The CSV file path is provided as `$ARGUMENTS`. If no argument is given, look for a CSV file in the current working directory that contains song data (e.g., `songs.csv`, `barnvisor.csv`, or similar).
+The CSV file is an explicit input under the configured `paths.data_root`. Do not search the repository for song data.
 
 Read the CSV file first. Identify columns for: song number, song title, composer, and copyright status.
 
@@ -34,21 +35,18 @@ For each song we want (in order of importance):
 
 MusicXML and MIDI are the most valuable: **either one should let us export the other, and also generate a PDF sheet** (via MuseScore). Lyrics still usually need to be found separately.
 
-All *downloaded inputs* live under `assets/`:
+The CLI requires explicit `--sheets-dir`, `--xml-dir`, `--midi-dir`,
+`--lyrics-dir`, `--build-dir` and `--report` paths, all under `paths.data_root`
+resolved by `bin.read_config`. Relative paths are relative to that data root.
+The chosen build directory contains derived `xml/`, `midi/`, `sheets/` and XML
+conversion logs. These are project artifacts, never repository files.
 
-- PDFs/images → `assets/sheets/`
-- MIDI → `assets/midi/`
-- MusicXML/MXL/MSCZ → `assets/xml/`
-- Lyrics text → `assets/lyrics/`
-
-All *derived conversions* (PDF→MXL, MIDI→MusicXML, etc.) live under `assets/_build/`.
-
-Inside `assets/_build/` we mirror the same structure:
-
-- `assets/_build/xml/` (derived MusicXML/MXL)
-- `assets/_build/midi/` (derived MIDI)
-- `assets/_build/sheets/` (derived PDF sheets)
-- logs/reports under `assets/_build/reports/`
+Configure `[tools.musescore].command` and, when PDF conversion is requested,
+`[tools.audiveris].command` as executable argument lists in `config.local.toml`.
+Command prefixes may include required host-specific options. Missing requested
+tools stop the run before downloads or output directories are created.
+`--no-convert` permits acquisition without those tools. Display/headless setup
+belongs to the external installation; the script does not override `HOME` or `DISPLAY`.
 
 ## Per-song decision policy
 
@@ -132,17 +130,20 @@ The repo includes a helper downloader (`download_scores`) that can:
 - optionally fall back to PDF and convert via Audiveris
 - optionally convert MIDI→MusicXML via MuseScore (recommended when PDFs are disallowed)
 
-Suggested usage:
+Run from the repo root (use `env/Scripts/python.exe` on Windows). All example
+artifact paths below are relative to the configured data root; choose the
+destinations for the actual project before running.
 
 ```bash
-./bin/download_scores songs.csv --search-direct --verify-downloads
+env/bin/python .agents/skills/download-scores/scripts/download_scores.py catalog.csv \
+  --sheets-dir acquisition/sheets --xml-dir acquisition/xml \
+  --midi-dir acquisition/midi --lyrics-dir acquisition/lyrics \
+  --build-dir acquisition/derived --report acquisition/report.md \
+  --search-direct --verify-downloads
 ```
 
-To allow PDF fallback:
-
-```bash
-./bin/download_scores songs.csv --search-direct --convert-pdf-to-mxl
-```
+Add `--convert-pdf-to-mxl` to request Audiveris, or `--no-convert` for downloads
+only. `--config-root` optionally selects a directory containing configuration.
 
 ### Notes about search
 
@@ -158,12 +159,12 @@ If you find a collection (e.g., "Sjung med oss Mamma" on Internet Archive) that 
 ## Thoroughness Requirements
 
 - Try at least 3-4 different sources and search queries before marking a song as NOT FOUND.
-- If multiple versions or arrangements exist, download all of them.
+- If multiple versions or arrangements are needed, acquire each as a separate reviewed source. The helper stops at the first usable primary source per catalogue number; it does not collect every version automatically.
 - Quality matters more than speed. A thorough search that finds 80% is far more valuable than a fast search that finds 30%.
 
 ## Logging — For Each Song
 
-Track progress with TodoWrite. For each song produce a log entry:
+For each song produce a report entry:
 
 ```
 Song #[n]: [Title]
@@ -175,7 +176,7 @@ Search notes: [what you tried, what you found, why certain sources were skipped]
 
 ## Final Report
 
-When done, produce `assets/_build/reports/download_scores/DOWNLOAD_REPORT.md` containing:
+When done, produce the explicit `--report` file containing:
 
 1. Total songs processed
 2. Songs with at least one score found (with filenames)

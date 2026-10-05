@@ -2,8 +2,9 @@
 name: plan-vocals
 description: Use when music_analysis.json and lyrics.json are ready and syllables need to be aligned to melody notes to produce vocal_events.json for singing synthesis. This is the main LLM-assisted musical decision step.
 allowed-tools: Read Bash Grep Glob Write
-argument-hint: [music-analysis-json] [lyrics-json]
-effort: high
+metadata:
+  argument-hint: "[music-analysis-json] [lyrics-json]"
+  effort: "high"
 ---
 
 # Skill 3: `plan_and_align_vocals`
@@ -144,7 +145,10 @@ Example plan:
 }
 ```
 
-Then deterministic code builds the final event list.
+The shipped deterministic CLI selects the highest-ranked melody candidate and
+applies the anchor heuristic; it does not consume this illustrative LLM plan.
+Review its result against the musical decisions above before synthesis. Separate
+music-analysis and lyrics files are required; combined legacy analysis is unsupported.
 
 ## Output
 
@@ -161,20 +165,27 @@ If the result sounds wrong, the fix should usually happen here:
 - too high/low → transpose vocal events
 - bad melisma → edit `is_slur`
 
-## Suggested CLI
+## Python invocation
 
-Implementation: [scripts/plan_and_align_vocals.py](scripts/plan_and_align_vocals.py), invoked by repo-root `bin/plan_and_align_vocals`.
+Run from the repository root with `env/bin/python` (Windows:
+`env/Scripts/python.exe`). Resolve `paths.data_root` through `bin.read_config`.
+Artifact arguments are absolute paths under that root or paths relative to it;
+the script validates them and never infers an output from the working directory.
+`--config-root` optionally selects a directory containing the TOML configuration.
+
+
+Implementation: [scripts/plan_and_align_vocals.py](scripts/plan_and_align_vocals.py).
 
 ```bash
-./bin/plan_and_align_vocals music_analysis.json lyrics.json \
+env/bin/python .agents/skills/plan_vocals/scripts/plan_and_align_vocals.py music_analysis.json lyrics.json \
   --score arranged_music.xml \
   --cue "gentle children's song, clear lyrics, no complex melismas" \
   --out vocal_events.json
 ```
 
-## Validation checks
+## Human review checks
 
-Warn if:
+The CLI warns about dropped trailing syllables. Additionally review:
 
 - vocal range exceeds configured target range
 - more than 8 seconds pass without a breath opportunity
