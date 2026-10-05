@@ -36,6 +36,39 @@ that cannot be determined. Fix **local TOML**, verify the path/command and rerun
 its reader. Do not alter shared defaults or copy software into the repository to
 repair a host. Do not replace an existing configuration wholesale.
 
+## Load configuration into a command's environment
+
+The agent reads configuration at session start, then uses `--run` whenever a
+command needs environment variables. Collaborators still launch Codex or Claude
+normally; there is no client launcher, settings sync or Git hook to install.
+
+```console
+env/bin/python -m bin.read_config --run env/bin/python -c "import os; print(os.environ['MUSIC_VIDEO_DATA_ROOT'])"
+```
+
+On Windows replace both Python paths with `env/Scripts/python.exe`.
+
+| Variable | Value |
+| --- | --- |
+| `MUSIC_VIDEO_DATA_ROOT` | Validated, resolved `paths.data_root` |
+| `MUSIC_VIDEO_CONFIG_ROOT` | Absolute directory containing the TOML files |
+| `MUSIC_VIDEO_CONFIG_JSON` | Full merged configuration as JSON; arrays, booleans and numbers retain their types; TOML dates/times become ISO strings |
+
+Other inherited variables are preserved; these three values replace any stale
+inherited copies. Each invocation rereads TOML, validates it before launching, and
+returns the child's exit status without printing configuration alongside its
+output. For another configuration directory, put `--config-root DIR` **before**
+`--run`. From another working directory, invoke the reader by its absolute file
+path instead of `-m bin.read_config`.
+
+Arguments are passed directly, without shell expansion. In Python use `os.environ`
+and `json.loads` for the JSON value. To use shell variables, explicitly launch the
+shell, for example `--run bash -c 'printf "%s\\n" "$MUSIC_VIDEO_DATA_ROOT"'`;
+expansion must occur inside that child, not in the outer tool call.
+Repeat `--run` for separate commands: it changes neither the parent agent's
+environment nor future independent shells. Existing skill scripts keep their
+TOML reader and path checks; these environment variables do not replace validation.
+
 ## Conventions
 
 - Configuration paths are absolute strings. `~` and environment-variable syntax

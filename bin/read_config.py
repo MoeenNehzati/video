@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Load shared and local TOML configuration; print the result as JSON when run."""
+"""Read project TOML as JSON, or pass it to a command through its environment."""
 
+import argparse
 from datetime import date, datetime, time
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
 import tomllib
 
@@ -65,12 +68,38 @@ def _json_default(value):
     raise TypeError(f"Cannot encode {type(value).__name__} as JSON")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config-root", type=Path, default=ROOT,
+                        help="Directory containing config.toml and config.local.toml")
+    parser.add_argument("--run", nargs=argparse.REMAINDER, metavar="COMMAND",
+                        help="Run an argv command with project configuration in its environment")
+    args = parser.parse_args(argv)
+    if args.run == []:
+        parser.error("--run requires a command")
     try:
-        output = json.dumps(load_config(), indent=2, default=_json_default, allow_nan=False)
+        root = args.config_root.resolve()
+        config = load_config(root)
+        output = json.dumps(config, indent=2, default=_json_default, allow_nan=False)
     except (OSError, ValueError) as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 1
+    if args.run is not None:
+        environment = os.environ.copy()
+        environment.update({
+            "MUSIC_VIDEO_CONFIG_ROOT": str(root),
+            "MUSIC_VIDEO_DATA_ROOT": str(Path(config["paths"]["data_root"]).resolve()),
+            "MUSIC_VIDEO_CONFIG_JSON": json.dumps(
+                config, default=_json_default, allow_nan=False, separators=(",", ":")),
+        })
+        try:
+            result = subprocess.run(args.run, env=environment)
+        except OSError as exc:
+            print(f"Command error: {exc}", file=sys.stderr)
+            return 127
+        except KeyboardInterrupt:
+            return 130
+        return result.returncode if result.returncode >= 0 else 128 - result.returncode
     print(output)
     return 0
 

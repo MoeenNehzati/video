@@ -1350,7 +1350,7 @@
     {
       "path": "bin/read_config.py",
       "owner": "all automated retained skills",
-      "usage": "All automated skill CLIs load shared/local TOML through project_runtime; also -m bin.read_config."
+      "usage": "All automated skill CLIs load shared/local TOML through project_runtime; AGENTS.md also uses -m bin.read_config for startup and --run to supply configuration in child environments."
     }
   ]
 }
