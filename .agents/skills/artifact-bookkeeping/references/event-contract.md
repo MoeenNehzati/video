@@ -1,14 +1,16 @@
 # Artifact ledger v1 contract
 
-Implementation specification for the [bookkeeping plan](artifact-ledger-plan.md).
-This document defines the schema and state rules; the JSON Schema and runtime do
-not exist yet. All events and revision bytes are immutable.
+The ledger is implemented. This reference describes its event/state invariants;
+[event.schema.json](../schema/event.schema.json) defines structural validation and
+[ledger_replay.py](../scripts/ledger_replay.py) enforces causal state rules.
+Use [the execution guide](usage.md) for current public operations. Events and
+published revision bytes are immutable.
 
 ## Types and records
 
 IDs are lowercase hyphenated UUIDv4 strings. Times are UTC RFC3339 strings ending
-in `Z`; they are display evidence, never ordering. Paths follow the plan's portable
-relative-path rules. SHA-256 values are 64 lowercase hex characters. Arrays of IDs
+in `Z`; they are display evidence, never ordering. Paths follow the portable
+relative-path rules in [the execution guide](usage.md#failure-recovery-and-queries). SHA-256 values are 64 lowercase hex characters. Arrays of IDs
 and heads are sorted and unique. Reject duplicate JSON keys, non-finite numbers,
 unknown schema versions and unknown structural fields. Free-form producer settings
 and error details are JSON objects; never store credentials.
@@ -28,8 +30,9 @@ and error details are JSON objects; never store credentials.
 The start's inputs are the union of the outputs' external dependencies. Each output
 pins its own dependency edges before execution; completion must match them exactly.
 For same-completion outputs with discovery contracts, intent declares role selectors;
-finalize expands them to explicit files in the captured manifest. Undeclared input
-use fails finalization, not a retroactive provenance amendment.
+finalize expands them to explicit files in the captured manifest. Finalization rejects changes to declared inputs. It cannot detect every
+undeclared read by arbitrary software; the agent must declare all consumed inputs
+before preparation rather than invent provenance afterward.
 
 A create has a new artifact/revision ID and null `previous_revision_id`. A variant
 may set `branched_from`; it still records actual consumed inputs as dependencies.
@@ -177,7 +180,7 @@ history garbage collector or automatic abandoned-work cleanup is included.
 
 ## Required fixtures
 
-Use the [worked examples](artifact-ledger-examples.md) as readable acceptance cases.
+Use the [worked examples](examples.md) as readable acceptance cases.
 
 Encode small synthetic files, not real song artifacts: two sources feeding an XML;
 two XML alternatives; explicit revision of one; two arrangements per alternative;

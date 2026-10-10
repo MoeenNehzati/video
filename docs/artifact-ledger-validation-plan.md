@@ -1,19 +1,20 @@
 # Interactive artifact-workflow validation
 
-Final acceptance step of the [implementation plan](artifact-ledger-plan.md), after
-core fixtures and skill integration pass. **Planned, not executed.** This tests
-whether fresh agents doing ordinary song work discover and follow the repository's
-`AGENTS.md`, skills and artifact organization without extra procedural instruction.
-It does not replace schema, boundary, concurrency or crash-recovery unit tests.
+Protocol for full source-to-film acceptance after automated implementation checks
+pass. Practical acceptance remains incomplete; this file is not a result report.
+Use the current [bookkeeping skill](../.agents/skills/artifact-bookkeeping/SKILL.md)
+and [supported routes](artifact-ledger-entrypoints.md). The narrower
+[decoupling protocol](artifact-bookkeeping-decoupling-validation.md) tests agent
+integration without requiring a complete creative production.
 
 ## Unattended execution mode
 
-Follow the [overnight protocol](artifact-ledger-plan.md#8-unattended-overnight-execution).
-Consult advisers instead of asking routine questions; keep producers uncoached.
-Record stage checkpoints and continue independent cases when human review, manual
-actions, resources or spending authorization are missing. Those cases remain BLOCKED;
-subagent assessments and test-only assumptions are not human approval. Collect
-unresolved needs in the final report without weakening acceptance gates.
+When unattended validation is requested, retain checkpoints and actual evidence,
+keep producers uncoached, and continue independent authorized cases when another
+case lacks resources, manual actions, spending authorization or human review.
+Those cases remain BLOCKED; adviser opinions and test-only assumptions are not
+human approval. Do not invent creative choices or weaken acceptance gates. Report
+unresolved needs and preserve interrupted work for resumption.
 
 ## 1. What is being tested
 
@@ -29,7 +30,7 @@ Do not explicitly name the bookkeeping skill or tell them to run the configurati
 reader. They must discover those requirements through normal project instructions.
 
 Separate worker tasks from the evaluator's oracle. The evaluator may use the
-[event contract](artifact-ledger-contract.md), [worked examples](artifact-ledger-examples.md)
+[event contract](../.agents/skills/artifact-bookkeeping/references/event-contract.md), [worked examples](../.agents/skills/artifact-bookkeeping/references/examples.md)
 and [entrypoint inventory](artifact-ledger-entrypoints.md); never pass those as test
 instructions to producers. Ordinary production documentation reached through the
 repository's own instructions remains available. If a producer reads evaluator-only

@@ -1,9 +1,14 @@
 # Artifact bookkeeping plan
 
+> Archived design/implementation plan. The text below describes its historical
+> baseline; obsolete paths, status claims and implementation steps are not current
+> instructions. Runtime implementation exists; practical acceptance remains separate.
+> Current instructions: [artifact-bookkeeping](../../.agents/skills/artifact-bookkeeping/SKILL.md), [execution coverage](../artifact-ledger-entrypoints.md), and [practical validation](../artifact-bookkeeping-decoupling-validation.md).
+
 > Historical planning baseline (2026-10-08). Implementation-status statements below
 > describe that snapshot. For current capabilities and execution instructions, use
-> [the usage guide](artifact-ledger-usage.md) and
-> [the execution coverage documentation](artifact-ledger-entrypoints.md).
+> [the usage guide](../../.agents/skills/artifact-bookkeeping/references/usage.md) and
+> [the execution coverage documentation](../artifact-ledger-entrypoints.md).
 
 Updated 2026-10-08. Implementation design; no ledger, skill integration or data
 migration is implemented. Layout, event semantics and current entrypoints are
@@ -12,10 +17,10 @@ specified below and in the linked contracts.
 Build one bookkeeping skill with shared Python helpers to organize artifacts,
 preserve their provenance and retrieve them across sessions. Adapt file handling
 in every retained skill; preserve the collaborator skills' musical/visual methods.
-See [workflow contracts](artifact-contracts.md) for production-specific requirements,
-[the event contract](artifact-ledger-contract.md) for state transitions, and
-[the entrypoint inventory](artifact-ledger-entrypoints.md) for integration coverage.
-[Worked examples](artifact-ledger-examples.md) show the nested layout and expected
+See [workflow contracts](../artifact-contracts.md) for production-specific requirements,
+[the event contract](../../.agents/skills/artifact-bookkeeping/references/event-contract.md) for state transitions, and
+[the entrypoint inventory](../artifact-ledger-entrypoints.md) for integration coverage.
+[Worked examples](../../.agents/skills/artifact-bookkeeping/references/examples.md) show the nested layout and expected
 behavior; turn their checks into fixtures during implementation.
 
 ## 1. Storage and identity
@@ -130,7 +135,7 @@ mutable tool preferences are not part of the resource snapshot.
 
 ## 2. Ledger contract
 
-Implement JSON Schema plus semantic validation from the [event contract](artifact-ledger-contract.md).
+Implement JSON Schema plus semantic validation from the [event contract](../../.agents/skills/artifact-bookkeeping/references/event-contract.md).
 These records share one meaning across Python, CLI and skill instructions:
 
 | Record | Fields |
@@ -207,7 +212,7 @@ rule and update every skill's instructions and command examples.
 4. Cover canonical Python entrypoints, shared helpers, nested adapters and configured
    external tools. A caller is not covered until its callees are. Unavailable routes
    stop before writes or external generation calls.
-5. Classify every current mode and call edge in the [entrypoint inventory](artifact-ledger-entrypoints.md).
+5. Classify every current mode and call edge in the [entrypoint inventory](../artifact-ledger-entrypoints.md).
    The removed `analyze_inputs` and `clear_downloads` commands are not integrations.
    Internal Java writers accept allocated workspaces only; raw external invocations
    are not automatically protected by `scripts.read_config --run`.
@@ -251,7 +256,7 @@ Historical queries use causal event state rather than assuming clocks define ord
 | 2. Build shared core | Config resolution, validation/replay, allocation, revision resolution, publication/recovery and metadata operations pass fixture tests. |
 | 3. Expose bookkeeping | Skill instructions and Python API/CLI cover the lifecycle, retrieval and reconciliation. Provide explicit import, recording known provenance and marking unknown details; no automatic bulk migration. |
 | 4. Integrate all skills | Update `AGENTS.md`, inventory, examples and adapters. Enable each production entrypoint only after its boundary tests pass. |
-| 5. Interactive end-to-end acceptance | Execute the [interactive validation plan](artifact-ledger-validation-plan.md) as the final implementation step: fresh, uncoached producer/consumer subagents, independent verification and human source/listening/video checkpoints. Defer unavailable human checkpoints during unattended execution; report missing stages as blocked, not passed. |
+| 5. Interactive end-to-end acceptance | Execute the [interactive validation plan](../artifact-ledger-validation-plan.md) as the final implementation step: fresh, uncoached producer/consumer subagents, independent verification and human source/listening/video checkpoints. Defer unavailable human checkpoints during unattended execution; report missing stages as blocked, not passed. |
 
 Acceptance checklist:
 

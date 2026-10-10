@@ -12,7 +12,7 @@ provenance, revisions, publication and recovery. Local bookkeeping blocks declar
 inputs, outputs, resources, settings and domain constraints; they do not override
 this lifecycle. Repository source/configuration inspection is outside the song
 ledger. Read
-[usage and API examples](../../../docs/artifact-ledger-usage.md) and the selected
+[usage and API examples](references/usage.md) and the selected
 entrypoint's classification in
 [the coverage inventory](../../../docs/artifact-ledger-entrypoints.md).
 

@@ -25,9 +25,9 @@ It never edits either file. The shared defaults contain no machine paths.
    outside the checkout. Record verified paths and observed versions in local TOML.
    Missing model/sample choices require an explicit selection; do not
    substitute arbitrary ones. API credentials come from environment variables.
-5. Configure bookkeeping as described below, then use the selected skill's managed
-   entrypoint with exact registered inputs and declared outputs. Read
-   [artifact bookkeeping usage](artifact-ledger-usage.md) before producing files.
+5. Configure bookkeeping as described below. The agent uses bookkeeping to run
+   the selected skill's ordinary interface with exact inputs and outputs. Read
+   [artifact bookkeeping usage](../.agents/skills/artifact-bookkeeping/references/usage.md) before producing files.
    Its preflight checks the settings it uses. `--config-root DIR` selects another
    directory containing `config.toml` and an optional `config.local.toml`; by default
    configuration comes from the code checkout regardless of working directory.
@@ -52,14 +52,11 @@ consumed files into a private verified snapshot; it must never hardlink a mutabl
 installation or silently substitute newer bytes. A descriptor in the ledger does
 not prove that its historical resource bytes are locally available.
 
-Native tool descriptors record the entrypoint, loader when applicable, and
-library directories. Preparation verifies dependency closure for every declared
-ELF file, including supplied runtime-loaded libraries. Origin-relative
-RPATH/RUNPATH are allowed only within the snapshot. Application resources such as
-JDK modules, browser fonts/plugins, OCR data and soundfonts still require a reviewed
-complete manifest; ELF linkage cannot discover them. Tool execution uses a private
-profile. A valid executable path in local TOML is setup information, not proof that
-this application's complete resource closure has been qualified.
+Native tool capture currently supports Linux ELF binaries/libraries, not macOS
+Mach-O or Windows PE formats. Python portability does not qualify native backends.
+The bookkeeping [execution guide](../.agents/skills/artifact-bookkeeping/references/usage.md#resources-and-execution-limits)
+defines descriptor fields and dependency-manifest requirements. A configured path
+is setup information, not proof that a tool's full resource set is qualified.
 
 Python-package adapters additionally require `resources.python_packages` to name
 the active environment's installed package directory. Discover it with
@@ -89,7 +86,7 @@ operations and explicitly imported files; setup does not scan and migrate the
 shared root. Machine caches and publication/view journals are namespaced by
 `host_id`; immutable ledger events and history live under `paths.data_root`.
 `scripts.read_config --run` only supplies configuration: it does not make arbitrary
-external commands managed. Use the bookkeeping lifecycle and declared adapters.
+external commands managed. Use the bookkeeping skill and its declared operations.
 
 When a required setting is absent, first inspect existing local settings and
 available installations, reuse confirmed paths, and ask only for information

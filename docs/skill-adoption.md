@@ -20,7 +20,7 @@ resources and are required for publication.
 | --- | --- |
 | [score-to-musicxml](../.agents/skills/score-to-musicxml/SKILL.md) | Staff geometry, MusicXML schema/musical audit and reviewed-state hash checking; independent source and engraving review remain required. |
 | [song-arrangement-research](../.agents/skills/song-arrangement-research/SKILL.md) | Brief compilation, baseline percussion variations, source-built Java adapter, sample routing/rendering, invariant checks and publication/delivery helpers. |
-| [barnsang-video](../.agents/skills/barnsang-video/SKILL.md) | Image generation/editing, sequential continuity instructions, data-driven Flow handoff and timeline/assembly. Flow generation remains manual. |
+| [barnsang-video](../.agents/skills/barnsang-video/SKILL.md) | Sequential continuity instructions, data-driven Flow handoff and timeline/assembly. Flow generation remains manual; automated image generation/editing is disabled. |
 
 Acquisition and the five analysis/vocal skills remain optional. Their I/O now uses
 the same local configuration/path boundary. Synthesis retains the Nishiren ONNX
@@ -42,8 +42,10 @@ lists and resources come from local TOML; missing prerequisites stop the stage.
 Artifacts include JSON, prompts, reports and song builders, not just binary media.
 
 Path validation alone does not record provenance or revision history. The
-[implemented ledger](artifact-ledger-usage.md) adds those records through managed
-operations; [adapter coverage](artifact-ledger-entrypoints.md) remains partial. It does
+[implemented ledger](../.agents/skills/artifact-bookkeeping/references/usage.md) adds those records through managed
+operations. Production scripts expose ordinary interfaces; the central skill
+handles execution using their Bookkeeping declarations. See
+[supported routes](artifact-ledger-entrypoints.md) for current limits. The ledger does
 not sandbox arbitrary third-party software. Existing shared-data folders and
 files were not migrated.
 Legacy execution payloads can still contain absolute paths and must be regenerated
@@ -53,10 +55,10 @@ or validated on another machine.
 
 - Deterministic arrangement execution needs an approved baseline; initial pitched
   arrangement creation is not supplied by this retained route.
-- The upstream MIDI audit helper is absent. Execution/rendering require a configured,
+- The upstream MIDI audit helper is not included in the source bundle. Execution/rendering require a configured,
   proven helper with the expected contract and stop if it is unavailable.
-- No JDK/toolkit JAR was available here for actual Java compilation. Tests exercise
-  command construction with stubs; toolkit compatibility remains unverified.
+- Java/toolkit compatibility and native rendering require qualification on the
+  selected host. Fixture command construction is not evidence of live compatibility.
 - Final recorded-vocal alignment/mixing remains open. Optional synthesis does not
   implement a complete vocal-production pipeline; its accepted event timing is
   narrower than the planner's general output.
@@ -64,11 +66,17 @@ or validated on another machine.
   representative-song run require their real resources and source/listening/visual
   review. Linux fixture tests do not certify Windows/macOS external installations.
 
-## Validation
+## Original cleanup validation (2026-10-05)
 
-All 34 synthetic tests pass and exercise the configured direct entrypoints from another working
+At that checkpoint, 34 synthetic tests passed and exercised the configured direct entrypoints from another working
 directory with spaces, input preservation, invalid-path/resource rejection, score
 schema/geometry checks, arrangement hashes/invariants, optional vocal contracts and
 two different video configurations. External commands/APIs use test doubles.
 A fresh temporary Python environment and a staged-only checkout passed these checks
 on 2026-10-05; neither used the current machine's local TOML or production assets.
+
+Those results describe the original cleanup, not the current candidate. Rerun the
+repository suite for current code and record fresh-agent acceptance separately
+under the [active protocol](artifact-bookkeeping-decoupling-validation.md).
+The [cleanup plan](archive/repository-cleanup-commit-plan.md) and
+[decoupling plan](archive/artifact-bookkeeping-decoupling-plan.md) are historical records.

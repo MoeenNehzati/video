@@ -1,9 +1,10 @@
 # Interactive validation of bookkeeping decoupling
 
-Status: planned, not run. Execute after the
-[implementation plan](artifact-bookkeeping-decoupling-plan.md) and automated checks
-are complete. This protocol tests whether fresh agents can use the refactored
-skills in practice. Plan reviewers and unit tests do not count as these producers.
+Status: practical acceptance remains incomplete. This document is the test protocol,
+not a results report. Run it against the candidate implementation after automated
+checks pass, using the current [bookkeeping skill](../.agents/skills/artifact-bookkeeping/SKILL.md)
+and [supported routes](artifact-ledger-entrypoints.md). Plan review and unit tests
+do not count as fresh-agent production trials.
 
 ## Scope and setup
 
@@ -14,7 +15,7 @@ case answers outside the producer's data root and discovery surface. Record the
 snapshot manifest, configuration identity, prerequisites and setup changes; redact
 credentials. Do not use accepted production assets for failure experiments.
 
-Exclude this protocol, the implementation plan and other evaluator-only case
+Exclude this protocol, `docs/archive/` and other evaluator-only case
 documents from the producer-visible copy. Record those intentional omissions in
 the coordinator's manifest; production code and operational instructions must
 remain identical. Check normal discovery links do not expose the excluded oracle.

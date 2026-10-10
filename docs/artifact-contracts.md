@@ -1,21 +1,10 @@
-# Retained workflows and artifact requirements
+# Cross-stage artifact contracts
 
-This audit records the contracts of the collaborator's three retained skills.
-Their musical and visual methods remain the baseline; older repo implementations
-are not being merged into them. The later [artifact ledger plan](artifact-ledger-plan.md)
-records the agreed global, append-only history design and supersedes the earlier
-per-artifact-manifest recommendation. The ledger is implemented, with partial
-producer integration documented in [usage](artifact-ledger-usage.md) and the
-[entrypoint inventory](artifact-ledger-entrypoints.md); the workflow requirements below
-still apply.
-
-Before pipeline work, resolve configuration with `env/bin/python -m scripts.read_config`.
-Use its `paths.data_root` and pass explicit paths to tools. Machine settings belong
-in `config.local.toml`; shared artifact references must survive different local
-Dropbox mount paths. Code lives in the repo, media and project data in Dropbox.
-Preserve existing organization; migration is not automatic. Managed operations
-record exact dependencies and immutable revisions, while unavailable entrypoints
-stop before production. Path validation alone does not provide that provenance.
+These contracts describe what the retained score, arrangement and video workflows
+exchange and what review evidence downstream stages require. Each production skill
+owns its detailed method and local I/O declarations; [artifact-bookkeeping](../.agents/skills/artifact-bookkeeping/SKILL.md)
+owns revision, publication and recovery rules. See [configuration](configuration.md)
+for setup and [supported routes](artifact-ledger-entrypoints.md) for capability limits.
 
 ## 1. Source scores to reviewed MusicXML
 
@@ -45,7 +34,8 @@ and [external requirements](../requirements/requirements.md).
 
 - **Inputs:** exact approved XML, melody MIDI and chord timing; research evidence;
   arrangement decisions; and, for controlled variations, a named baseline and its
-  exact MIDI hash. Initial arrangement creation must also work without a baseline.
+  exact MIDI hash. Initial pitched-arrangement creation without a baseline remains
+  an open capability, not part of this automated route.
 - **Outputs:** `research.json`, `arrangement_brief.json`, compiled instructions and
   execution plan; per-variant parameters, native `.sng`/`.mix`, exported MIDI,
   track maps and verification records; instrument-library provenance and licenses.
@@ -81,48 +71,23 @@ Source: [barnsang-video](../.agents/skills/barnsang-video/SKILL.md).
   kit is produced; decide how kits and source-image history relate before automating
   deletion. Final video timing must identify whether it uses demo or final vocal audio.
 
-## Requirements for storage and the ledger
+## Shared lineage and execution boundary
 
-Each result needs a stable identity, song association, kind, readable label, creator,
-creation time, exact parent inputs and hashes, output files/roles, settings and tool
-versions, and explicit completion/review evidence. Existing detailed parameter and
-review records should be referenced rather than duplicated into a second authority.
+Cross-stage relationships form a graph: multiple sheets can feed one XML; an XML
+can have alternative arrangements; one MIDI performance can have several renders;
+and a film combines exact audio, images and clips. Each downstream artifact must
+identify the revisions actually consumed, including intermediate results and
+review evidence. A selected result and a reviewed result are different states.
 
-These relationships form a graph: multiple sheets can feed one XML; one XML can have
-multiple arrangements; an arrangement can inherit a baseline; one performance can
-have multiple renders; a video combines audio, images and clips from different runs.
-Distinguish a revision from a sibling alternative, and record superseded/accepted
-decisions without choosing a version merely because its timestamp is newest.
+Use [artifact-bookkeeping](../.agents/skills/artifact-bookkeeping/SKILL.md) for
+identity, selection, immutable history, synchronization conflicts and publication.
+Its [event contract](../.agents/skills/artifact-bookkeeping/references/event-contract.md)
+and [lineage examples](../.agents/skills/artifact-bookkeeping/references/examples.md)
+explain those rules. No separate per-stage sidecar is an authority for lineage.
 
-Concurrent collaborators must create independent results without allocating the
-same next version number or rewriting one shared catalogue. Discovery must recognize
-partly synchronized outputs and validate files/hashes before reuse. Cross-machine
-paths must resolve against configuration. A searchable catalogue can be derived;
-it need not be the only durable record of artifact relationships.
-
-The global ledger holds authoritative dependency and change records; the
-catalogue derives current and historical views from its events. Per-artifact
-sidecars are not authoritative. The directory layout supports
-ordinary browsing without being the only record of ancestry. Compare layouts
-against the branched examples in the [plan](artifact-ledger-plan.md) before changing
-any Dropbox artifacts.
-
-## Execution boundaries after cleanup
-
-The retained scripts use the shared configuration reader and explicit data-root
-paths. Machine tools/resources are configured in local TOML; see
-[configuration](configuration.md). Historical song data, vendored software, shell
-launchers and orphan programs are excluded. Video handoff/assembly take explicit
-run inputs; FluidSynth loads its configured native library only when rendering.
-
-The arrangement route still starts from an approved baseline. Its external MIDI
-audit helper is absent from the supplied bundle and must be recovered and checked
-before production execution. Java compilation and the chosen sample banks require
-real toolchain validation. Initial pitched-arrangement creation and final
-recorded-vocal alignment/mixing remain open capabilities.
-
-The [ledger implementation](artifact-ledger-usage.md) supports multiple
-XML/arrangement/render alternatives, relocated roots, stale hashes and concurrent
-updates. Producer adapter coverage remains partial and final interactive acceptance
-is blocked. Synthetic tests establish code integration, not musical or end-to-end
-production acceptance. Existing Dropbox artifacts are not migrated automatically.
+The current automated arrangement route requires an approved baseline and a
+separately configured MIDI auditor. Native tools, sample banks and optional models
+need live qualification. Initial pitched-arrangement creation and final
+recorded-vocal alignment/mixing remain open. Synthetic tests establish code
+integration, not musical quality or [end-to-end acceptance](artifact-ledger-validation-plan.md).
+Existing project data is not migrated automatically.

@@ -1,5 +1,10 @@
 # Repository cleanup and commit plan
 
+> Archived design/implementation plan. The text below describes its historical
+> baseline; obsolete paths, status claims and implementation steps are not current
+> instructions. Runtime implementation exists; practical acceptance remains separate.
+> Current instructions: [artifact-bookkeeping](../../.agents/skills/artifact-bookkeeping/SKILL.md), [execution coverage](../artifact-ledger-entrypoints.md), and [practical validation](../artifact-bookkeeping-decoupling-validation.md).
+
 Status: implemented and validated on 2026-10-05. The artifact bookkeeping plan is
 already committed as `51c8024`; ledger implementation and artifact migration remain
 separate work. This document records the audited cleanup scope and commit checks.

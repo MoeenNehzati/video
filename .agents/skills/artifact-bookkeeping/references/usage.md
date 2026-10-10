@@ -1,18 +1,30 @@
 # Artifact bookkeeping usage
 
-The implementation follows the preserved [plan](artifact-ledger-plan.md),
-[event contract](artifact-ledger-contract.md) and
-[worked examples](artifact-ledger-examples.md). Those documents describe the
-design baseline. This guide describes how to use the implementation; synthetic
-checks do not replace the final [interactive acceptance](artifact-ledger-validation-plan.md).
+This is the central execution reference for [artifact-bookkeeping](../SKILL.md).
+Use the [event contract](event-contract.md) for ledger semantics and
+[worked examples](examples.md) for lineage scenarios. Production skills declare
+local I/O; the agent translates those declarations into the operations below.
+See [supported routes](../../../../docs/artifact-ledger-entrypoints.md) for enabled
+capabilities and [interactive validation](../../../../docs/artifact-bookkeeping-decoupling-validation.md)
+for the separate practical acceptance gate. Existing song data is not migrated
+automatically.
 
-Use the [bookkeeping skill](../.agents/skills/artifact-bookkeeping/SKILL.md) with
-every production stage. The [execution coverage](artifact-ledger-entrypoints.md)
-states which entrypoints are enabled, manual-managed, read-only or unavailable.
-An unavailable adapter stops before production; configuration alone cannot enable
-an incomplete adapter. Existing song data is not migrated automatically.
-The image routes remain disabled. Automated and interactive acceptance are
-separate; a passing synthetic fixture does not complete fresh-agent validation.
+## Skill declarations
+
+A production skill needs one Bookkeeping block naming artifact-bookkeeping, with
+one entry per materially different operation. Declare direct and indirect inputs,
+including files named by manifests; deliverables, retained reports and separate
+scratch; tools/packages/models and relevant settings; and domain constraints such
+as embedded-path rules, input relationships and external handoffs. Identify
+outputs that have different dependencies or need independent revisions. Reference
+the skill's ordinary CLI documentation instead of duplicating its arguments.
+
+Keep ledger IDs, request schemas and lifecycle commands out of production skills.
+The agent resolves invocation-specific selections and constructs the central
+request. Loading this skill does not intercept arbitrary I/O: complete declarations
+and prepared bindings are required, including for implicit tool reads and writes.
+
+## Resources and execution limits
 
 Python computation uses the interpreter, standard library and operating-system
 libraries as a recorded platform boundary. The package adapter captures selected
@@ -21,7 +33,7 @@ captured project code against private package copies in an isolated subprocess.
 It checks consumed snapshots after execution and prevents repeating the same
 prepared child execution. This is not an operating-system sandbox or a hermetic
 machine snapshot. Configure the active package source and short private cache as
-described in [configuration](configuration.md#artifact-bookkeeping).
+described in [configuration](../../../../docs/configuration.md#artifact-bookkeeping).
 
 Tool adapters accept declared self-contained static ELF executables, reviewed
 standard-library Python tools, or explicit ELF loader/library closures. A resource
@@ -47,31 +59,19 @@ the reviewed manifest must include all consumed resources. Configured executable
 paths alone do not qualify a closure. Do not substitute an arbitrary tool to
 bypass that boundary.
 
-Managed script routes include score inspection, music analysis, vocal planning,
-lyrics syllabification, Flow instruction formatting, arrangement-brief
-compilation, JJazzLab execution, FluidSynth rendering, self-contained review-bundle
-publication, browser verification, acquisition and score conversion, and optional
-model-backed synthesis. Assembly and external tools require reviewed resource
-closures satisfying the boundary above.
-Consult the inventory for the full current list and runtime prerequisites.
-Brief compilation consumes five
-exact inputs (`brief`, `research`, `source_xml`, `baseline_parameters`,
-`baseline_midi`) and publishes `execution_plan.json` plus `PROMPT.md` together.
-Bookkeeping rewrites embedded paths only in its private execution copy. Its
-success does not qualify subsequent JJazzLab execution or rendering on this host;
-those managed adapters still require compatible complete external resources and
-real musical verification. No RVC implementation/model has been selected; use
-the prepared manual handoff/import route with exact vocal and model provenance.
-There is no generic automated RVC adapter.
-Live image API adapters remain disabled by automatic approval review. Offline
-response-publication tests do not enable API calls or certify provider output.
+Domain-specific inputs, outputs and prerequisites belong to the selected
+production skill's Bookkeeping block. A successful stage does not qualify later
+stages or a host's native resources. Native execution currently supports the ELF
+formats described above; macOS Mach-O and Windows PE binaries are unsupported.
+No automatic RVC backend/model is selected. Image generation/editing routes remain
+disabled; offline response tests do not enable provider calls.
 
 ## Configuration and identity
 
 Run `env/bin/python -m scripts.read_config` from the checkout. Configure
 `bookkeeping.actor_id` and a machine-stable UUIDv4 `bookkeeping.host_id` in local
 TOML. Resource-consuming work additionally requires the private resource cache
-described in [configuration](configuration.md#artifact-bookkeeping).
+described in [configuration](../../../../docs/configuration.md#artifact-bookkeeping).
 
 The data root contains immutable `ledger/<event_id>.json` and
 `history/<artifact_id>/<revision_id>/` records, isolated `work/<run_id>/`
@@ -197,9 +197,9 @@ A syllabification request has this shape (replace the exact revision references)
                "dependencies": ["text"],
                "contract": {"files": [{"path": "lyrics.json", "role": "lyrics"}]}}
   },
-  "settings": {"language": "en"},
+  "settings": {"language": "English"},
   "command": ["{python}", "{code:.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py}",
-              "{input:text}", "--lang", "en", "--out", "{output:lyrics/lyrics.json}"]
+              "{input:text}", "--language", "English", "--out", "{output:lyrics/lyrics.json}"]
 }
 ```
 

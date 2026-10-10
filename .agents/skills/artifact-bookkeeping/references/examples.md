@@ -1,12 +1,11 @@
 # Artifact bookkeeping worked examples
 
-Companion checks for the [plan](artifact-ledger-plan.md) and
-[event contract](artifact-ledger-contract.md). These are synthetic design examples,
-not existing song artifacts or executable fixtures. Implementation should translate
-them into tests and retain the expected outcomes below.
+Conceptual examples of the [event contract](event-contract.md), not existing song
+artifacts or a test-results report. Use [the execution guide](usage.md) for runnable
+API/CLI examples and the skill's [tests](../tests) for automated checks.
 
 Names such as `xml-a` and references such as `XML-A@r1` are readable aliases for
-UUID identities. Real directories carry the plan's unique suffixes and must pass
+UUID identities. Real directories carry unique identity suffixes and must pass
 its path-length checks. `@r1` identifies an exact revision, not a filename. Trees
 omit some supporting artifacts to stay readable; native projects, exported MIDI,
 research, prompts and persisted checks remain separate artifacts when required.

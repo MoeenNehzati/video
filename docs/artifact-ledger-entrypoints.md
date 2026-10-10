@@ -3,7 +3,7 @@
 Production skills integrate through their `SKILL.md` Bookkeeping blocks. Their
 scripts are ordinary domain programs. Bookkeeping interprets the declarations,
 binds immutable inputs/resources and invokes captured commands using the
-[generic execution interface](artifact-ledger-usage.md#ordinary-commands-through-bookkeeping).
+[generic execution interface](../.agents/skills/artifact-bookkeeping/references/usage.md#ordinary-commands-through-bookkeeping).
 This document records supported routes and restrictions. The derived source
 inventory is generated at `_build/skill-entrypoints.json` by the repository tests;
 it is ignored by Git and never required for execution. Regenerate it from the

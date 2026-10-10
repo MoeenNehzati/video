@@ -1,12 +1,17 @@
 # Decouple production scripts from artifact bookkeeping
 
+> Archived design/implementation plan. The text below describes its historical
+> baseline; obsolete paths, status claims and implementation steps are not current
+> instructions. Runtime implementation exists; practical acceptance remains separate.
+> Current instructions: [artifact-bookkeeping](../../.agents/skills/artifact-bookkeeping/SKILL.md), [execution coverage](../artifact-ledger-entrypoints.md), and [practical validation](../artifact-bookkeeping-decoupling-validation.md).
+
 Status: implementation plan; no runtime changes made by this document.
 
 ## Fresh-agent handoff
 
 Start in the live checkout at `/home/moeen/Documents/video`. Read its `AGENTS.md`,
 the bookkeeping `SKILL.md`, this plan and
-[the separate interactive validation protocol](artifact-bookkeeping-decoupling-validation.md).
+[the separate interactive validation protocol](../artifact-bookkeeping-decoupling-validation.md).
 Inspect Git state before editing: the working tree contains uncommitted work, so
 the tested baseline must include relevant dirty and untracked files, not just HEAD.
 Preserve unrelated changes; do not commit, push or touch production song data
@@ -194,7 +199,7 @@ Keep old/new differences out of the final production instructions.
   Change live code/packages after preparation and verify execution still uses the
   prepared versions.
 - **Declaration sufficiency and fresh-agent behavior:** run the required cases in
-  [the interactive protocol](artifact-bookkeeping-decoupling-validation.md) after
+  [the interactive protocol](../artifact-bookkeeping-decoupling-validation.md) after
   implementation. It tests real agent execution, block-only onboarding, indirect
   inputs, manual work and recovery separately from automated fixtures. Require no
   central-code changes or adapter registration for the new test skill; inventory

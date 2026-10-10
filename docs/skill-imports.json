@@ -1397,67 +1397,74 @@
     {
       "path": ".agents/skills/artifact-bookkeeping/SKILL.md",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from the collaborator bundle."
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/schema/event.schema.json",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from the collaborator bundle."
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/artifact_ledger.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; fresh-host revision preflight added after live validation reproduced missing projection authority."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; fresh-host revision preflight added after live validation reproduced missing projection authority."
     },
     {
       "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_browser.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_conversion.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_delivery.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_jjazz.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_producer.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from the collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_python.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle."
     },
     {
       "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_render.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_replay.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from the collaborator bundle."
     },
     {
       "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_tools.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle."
     },
     {
       "path": ".agents/skills/barnsang-video/scripts/ledger_video.py",
       "owner": "artifact-bookkeeping",
-      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+      "origin": "Original project implementation of docs/archive/artifact-ledger-plan.md; not imported from collaborator bundle.",
+      "status": "retired"
     },
     {
       "path": ".agents/skills/score-to-musicxml/scripts/render_pdf.py",
