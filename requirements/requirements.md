@@ -17,7 +17,7 @@ environment setup are listed separately in
    exists. Only install a missing requirement, or replace an incompatible one after
    identifying the failed requirement. Keep software and resources outside the repo.
 4. Record verified paths and versions in local TOML using the keys below, preserving
-   other settings. Rerun `bin.read_config` and the selected operation's smoke check.
+   other settings. Rerun `scripts.read_config` and the selected operation's smoke check.
    Refresh the version record whenever the installation or configured path changes.
 
 | Selected operation | Dependencies to check | Version/identity check |
@@ -60,8 +60,8 @@ locations and verified versions; it does not install software.
   Never substitute a desired version, directory name or unknown value for evidence.
   These version fields are setup records: the reader preserves them, but current
   scripts do not enforce version pins or refresh them automatically.
-- `bin.read_config` merges shared defaults with local TOML; automated scripts use
-  it through `bin.project_runtime`. Run the repo Python with `-m bin.read_config`
+- `scripts.read_config` merges shared defaults with local TOML; automated scripts use
+  it through `scripts.project_runtime`. Run the repo Python with `-m scripts.read_config`
   after changing settings. Then perform the relevant check below: path validation
   alone does not establish a working installation.
 

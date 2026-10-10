@@ -7,7 +7,7 @@ records the agreed global, append-only history design and supersedes the earlier
 per-artifact-manifest recommendation. The agreed directory structure and ledger remain unimplemented; the workflow
 requirements below still apply.
 
-Before pipeline work, resolve configuration with `env/bin/python -m bin.read_config`.
+Before pipeline work, resolve configuration with `env/bin/python -m scripts.read_config`.
 Use its `paths.data_root` and pass explicit paths to tools. Machine settings belong
 in `config.local.toml`; shared artifact references must survive different local
 Dropbox mount paths. Code lives in the repo, media and project data in Dropbox.

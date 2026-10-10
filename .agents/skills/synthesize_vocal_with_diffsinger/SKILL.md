@@ -16,7 +16,7 @@ of the existing adapter. No model or external application is stored in Git.
 
 ## Inputs and configuration
 
-Read resolved configuration with `env/bin/python -m bin.read_config` (Windows:
+Read resolved configuration with `env/bin/python -m scripts.read_config` (Windows:
 `env/Scripts/python.exe`). Set `[resources].nishiren_root` in `config.local.toml`
 to the absolute directory of a complete, separately obtained voicebank. It needs
 `dsdur`, `dsmain` and `dsvocoder`; optional `dspitch`/`dsvariance` model groups

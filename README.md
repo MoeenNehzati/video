@@ -34,7 +34,7 @@ On Windows use `py -3 -m venv env`, then `env/Scripts/python.exe` for Python cal
 Set an existing absolute `paths.data_root` in ignored `config.local.toml`, then run:
 
 ```console
-env/bin/python -m bin.read_config
+env/bin/python -m scripts.read_config
 ```
 
 See [configuration](docs/configuration.md) for external tool/resource keys and

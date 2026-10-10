@@ -9,7 +9,7 @@ description: Research a song's background, approved lyrics and documented record
 
 Read [adoption notes](../../../docs/skill-adoption.md) and
 [artifact contracts](../../../docs/artifact-contracts.md). Resolve configuration
-with `python -m bin.read_config` using the activated repo environment (POSIX:
+with `python -m scripts.read_config` using the activated repo environment (POSIX:
 `env/bin/python`; Windows: `env/Scripts/python.exe`). All script commands below
 use that Python. Inputs/outputs must be explicit and inside `paths.data_root`;
 external tools, sound libraries and installation paths belong in `config.local.toml`.
@@ -55,10 +55,10 @@ From the repository root, replace the illustrative data-relative arguments:
 
 ```text
 python .agents/skills/song-arrangement-research/scripts/compile_brief.py song/arrangement_brief.json song/research.json --out song/compiled
-python .agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py song/compiled/execution_plan.json --out song/variant_folders.json
-python .agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py song/variant_folders.json --out-dir song/render-comparison
-python .agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py song/render-comparison/verification.json --out-dir song/listening
-python .agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py song/render-comparison/verification.json --page-dir song/listening --out song/delivery_checks.json
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py song/compiled/execution_plan.json --out song/variant_folders.json
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py song/variant_folders.json --out-dir song/render-comparison
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py song/render-comparison/verification.json --out-dir song/listening
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py song/render-comparison/verification.json --page-dir song/listening --out song/delivery_checks.json
 ```
 
 Use new output locations; these commands refuse existing delivery directories or

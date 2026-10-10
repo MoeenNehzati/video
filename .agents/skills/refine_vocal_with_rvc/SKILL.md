@@ -22,7 +22,7 @@ model/index paths in `[resources].rvc_model` and `[resources].rvc_index` when us
 If the installation needs its own Python, use that interpreter in the command
 prefix. Never vendor the tool or models into this repository.
 
-1. Read resolved configuration using `env/bin/python -m bin.read_config`
+1. Read resolved configuration using `env/bin/python -m scripts.read_config`
    (Windows: `env/Scripts/python.exe`). Inspect the configured tool's supported
    interface; flags differ between RVC installations.
 2. Resolve the explicit input WAV and distinct output WAV/log paths under

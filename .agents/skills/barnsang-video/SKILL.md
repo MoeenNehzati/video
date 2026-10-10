@@ -14,7 +14,7 @@ describe the pending ledger integration.
 
 Use the repo environment's Python (`env/bin/python` on POSIX,
 `env/Scripts/python.exe` on Windows). Commands below use `python` for that interpreter.
-Run `python -m bin.read_config`; paths passed to these scripts are absolute within,
+Run `python -m scripts.read_config`; paths passed to these scripts are absolute within,
 or relative to, its resolved `paths.data_root`. Default configuration loading works
 from any current directory; optional `--config-root` selects a repository config.
 Configure external commands through `[tools.ffmpeg].command` and

@@ -5,7 +5,7 @@ No note's pitch is read against a constant horizontal reference.
 from pathlib import Path
 import argparse, hashlib, json, sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from bin.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, load_project
 import cv2
 import numpy as np
 

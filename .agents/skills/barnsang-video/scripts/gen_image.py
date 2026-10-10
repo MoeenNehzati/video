@@ -12,7 +12,7 @@ import time
 import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from bin.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, load_project
 
 
 def parser(description: str) -> argparse.ArgumentParser:

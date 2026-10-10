@@ -8,7 +8,7 @@ import sys
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
-from bin.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, load_project
 from verification import component, require
 from check_delivery import check_files
 

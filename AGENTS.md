@@ -22,19 +22,19 @@ This project turns sheet music into children's music videos.
 - Invoke Python directly: `env/bin/python` on POSIX or `env/Scripts/python.exe`
   on Windows. Use canonical `.agents/skills/` script paths, not shell launchers
   or host-discovery symlinks. Child project scripts use `sys.executable`.
-- At session start, run that Python with `-m bin.read_config` from the repo root
+- At session start, run that Python with `-m scripts.read_config` from the repo root
   and resolve missing configuration before pipeline work. This is the agent's
   initialization task; collaborators launch Codex/Claude normally.
 - For commands needing configuration as environment variables, use
-  `env/bin/python -m bin.read_config --run COMMAND ARG...` (Windows:
-  `env/Scripts/python.exe -m bin.read_config --run COMMAND ARG...`). It reloads TOML
+  `env/bin/python -m scripts.read_config --run COMMAND ARG...` (Windows:
+  `env/Scripts/python.exe -m scripts.read_config --run COMMAND ARG...`). It reloads TOML
   and sets `MUSIC_VIDEO_DATA_ROOT`, `MUSIC_VIDEO_CONFIG_ROOT`, and
   `MUSIC_VIDEO_CONFIG_JSON` for that command and its children, preserving other
   inherited variables. Repeat for each independent tool call; it cannot modify
   the parent agent's environment. Python reads these via `os.environ`; shell
   expansion requires explicitly launching that shell. See `docs/configuration.md`.
 - Scripts continue to use the resolved configuration through
-  `bin.project_runtime`; `--config-root` supports an explicit config directory.
+  `scripts.project_runtime`; `--config-root` supports an explicit config directory.
 - Persist machine settings only in `config.local.toml`, preserving other local
   settings. Never change shared `config.toml` for local configuration.
 - If `paths.data_root` is invalid, reuse a confirmed existing project-data path

@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
-from bin.project_runtime import data_path, resource_path
+from scripts.project_runtime import data_path, resource_path
 
 
 def require(condition, message):

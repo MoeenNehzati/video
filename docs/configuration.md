@@ -1,6 +1,6 @@
 # Configuration and fresh-machine setup
 
-`bin.read_config` recursively merges tracked `config.toml` and ignored
+`scripts.read_config` recursively merges tracked `config.toml` and ignored
 `config.local.toml`. Local scalars/lists replace defaults; nested tables merge.
 It never edits either file. The shared defaults contain no machine paths.
 
@@ -16,7 +16,7 @@ It never edits either file. The shared defaults contain no machine paths.
    settings, preserving existing values. Set `paths.data_root` to an existing
    local copy of the shared project-data directory separate from the checkout
    (neither inside it nor containing it).
-3. Run the environment's Python with `-m bin.read_config` from the repo root.
+3. Run the environment's Python with `-m scripts.read_config` from the repo root.
    Correct the named setting if validation fails. The printed JSON is the resolved
    configuration; do not commit it as an artifact.
 4. Read the selected skill and [installation instructions](../requirements/README.md).
@@ -43,7 +43,7 @@ command needs environment variables. Collaborators still launch Codex or Claude
 normally; there is no client launcher, settings sync or Git hook to install.
 
 ```console
-env/bin/python -m bin.read_config --run env/bin/python -c "import os; print(os.environ['MUSIC_VIDEO_DATA_ROOT'])"
+env/bin/python -m scripts.read_config --run env/bin/python -c "import os; print(os.environ['MUSIC_VIDEO_DATA_ROOT'])"
 ```
 
 On Windows replace both Python paths with `env/Scripts/python.exe`.
@@ -59,7 +59,7 @@ inherited copies. Each invocation rereads TOML, validates it before launching, a
 returns the child's exit status without printing configuration alongside its
 output. For another configuration directory, put `--config-root DIR` **before**
 `--run`. From another working directory, invoke the reader by its absolute file
-path instead of `-m bin.read_config`.
+path instead of `-m scripts.read_config`.
 
 Arguments are passed directly, without shell expansion. In Python use `os.environ`
 and `json.loads` for the JSON value. To use shell variables, explicitly launch the

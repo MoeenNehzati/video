@@ -2,7 +2,7 @@
 
 Each collaborator sets the absolute path to their local Dropbox project-data copy
 as `paths.data_root` in `config.local.toml`. Resolve it with the repo environment's
-Python and `-m bin.read_config`. See [configuration](../configuration.md).
+Python and `-m scripts.read_config`. See [configuration](../configuration.md).
 
 All song/run artifacts belong there, including JSON, prompts, reports and one-off
 song builders. Preserve existing organization and reviewed inputs. Do not use a

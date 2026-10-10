@@ -11,7 +11,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/score-to-musicxml/SKILL.md",
-      "current_sha256": "2f40ecf9371e78c9d1809f8a10f4ad990a6553ca148fe41e9836e3a5afb042fb"
+      "current_sha256": "d4430ef4b60d3a5125c8367078adeb13b1777b580c27ecdcb8b850e92153919d"
     },
     {
       "source": "score-to-musicxml/agents/openai.yaml",
@@ -30,7 +30,7 @@
         {
           "destination": ".agents/skills/score-to-musicxml/SKILL.md",
           "usage": "General review/hash/editorial-scope instructions, with collection state excluded",
-          "current_sha256": "2f40ecf9371e78c9d1809f8a10f4ad990a6553ca148fe41e9836e3a5afb042fb"
+          "current_sha256": "d4430ef4b60d3a5125c8367078adeb13b1777b580c27ecdcb8b850e92153919d"
         }
       ]
     },
@@ -94,7 +94,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/score-to-musicxml/scripts/slope_grid.py",
-      "current_sha256": "caed59a7d2829999cff29db69fd881149fc9d47f88ac850bac8057b1831ef217"
+      "current_sha256": "8c35ede39bd05fb0cf1f15af2779997f1dd4e6a15a83f7b5bf795a180363cd2f"
     },
     {
       "source": "score-to-musicxml/scripts/validate.py",
@@ -110,7 +110,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/score-to-musicxml/scripts/verify_score.py",
-      "current_sha256": "1179c95bfbe2e84144d4e92220ecc5c01538d0fe4a1301dad9cdc36a5bf5d5f8"
+      "current_sha256": "08f09557683b687acc9340438be353b6a5c7f31b61e8d951ddbadadde4ba9717"
     },
     {
       "source": "song-arrangement-research/SKILL.md",
@@ -118,14 +118,14 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/song-arrangement-research/SKILL.md",
-      "current_sha256": "c96bb3f2ae2efa9f23b3026e3ea762db5cb1e7a5ab554e7abfd81cdd63c9f5c4"
+      "current_sha256": "cebd738c9e699101726edaa004ae59ff5873ced99f2444ec621dc181bc18e6db"
     },
     {
       "source": "song-arrangement-research/adapter_code/README.md",
       "source_sha256": "50dda30c70ba328dca54c4abc4ae4c4be84663db5e718cf93281dc41a2f82a69",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/README.md",
+      "destination": ".agents/skills/song-arrangement-research/scripts/README.md",
       "current_sha256": "18374ab4751ddf65f9ee1f78627705a46e0653e6bf9b6dc9153410808016bd2c"
     },
     {
@@ -217,7 +217,7 @@
       "source_sha256": "d71e9815214bb509068deccec25121c6c8d22fe31ee7294aaf928718c89a8e2c",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ChildExperiment.java",
       "current_sha256": "71b52d21537882fc66371af5f3f35097493d144488415140b7bbef6e5409bf76"
     },
     {
@@ -291,8 +291,8 @@
       "source_sha256": "2ed0262103a59ad20796c862471f019674dba4e0a81af811bc77f891b12b98a1",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
-      "current_sha256": "d5880b8a9ef499cc62d57e87f217eb1638cb8b6ffdb912ec2976ba406e7bb0f4"
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py",
+      "current_sha256": "a82b993703ee0725ec4164edea92daef6191912ca077c245040711809b780833"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/child_folders.json",
@@ -335,8 +335,8 @@
       "source_sha256": "1e5d2eac1ed1a7c8e14d9a359ba04843f8fd0cd2618c50a5f79be2ca2e717bcf",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
-      "current_sha256": "a5ed9a09dc914d60c695f85549abff20893d11b0283c1200e8857ef126067587"
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py",
+      "current_sha256": "5d6a354fe231876ddaaca05edfdbd592e8b31892452e3a3444117dca3d4a4497"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/folders.json",
@@ -409,11 +409,11 @@
       "source_sha256": "4b021e930714c7c89e12dab1feff88f3b1de71af50096f43912eb9be3cf710d7",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
-      "current_sha256": "ccd3c259b823ebcc567fbb8ed5fda0ab07fb62867c6aa82e1ff3e75520dc21d6",
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py",
+      "current_sha256": "364da67c4a0070ee5126a08498b3f4413a491686b674bb6b81944ece28d8e31f",
       "extractions": [
         {
-          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/listening_page.html",
+          "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/listening_page.html",
           "usage": "Generic listening-page CSS and A/B playback JavaScript",
           "current_sha256": "c55561cf955a568c6bbecbe9e3b8821e6445fb6c0dd81560032ee6e29ee825fc"
         }
@@ -424,13 +424,13 @@
       "source_sha256": "3b55de8a4bc7ac4d49d846abb8302b184fadaa43a052c130bfc3fa1ba8eadb39",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
-      "current_sha256": "278aeded45c996f56fe4ae63d4b45f3b9374a354fb7b0c62de31009227d61e55",
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py",
+      "current_sha256": "56b9139e932709b3c68936809fad8872c617278aafb22d3323c908ddbe8e2766",
       "extractions": [
         {
-          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+          "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/verification.py",
           "usage": "Child-event and backing exclusion invariant helpers",
-          "current_sha256": "b8bf048041e678bf6d916e554ab810db3672cd837488dab6f1c5423473c80934"
+          "current_sha256": "47732f158804bcc2a96de7d52da07dd6ca587aa43bab871a09026492c3f6d458"
         }
       ]
     },
@@ -441,9 +441,9 @@
       "reason": "Only referenced generic logic retained; original container excluded.",
       "extractions": [
         {
-          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+          "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/sample_renderer.py",
           "usage": "CounterRenderer.route sample-library routing",
-          "current_sha256": "67c56e9a296e261e996c5f081bcf29e9382ccd684144eb3d31d91bd53b5046ba"
+          "current_sha256": "e03c15d553688987f8c5048b73d22401e5b0299521a4ab2833eab3dcf75bf2fe"
         }
       ]
     },
@@ -460,9 +460,9 @@
       "reason": "Only referenced generic logic retained; original container excluded.",
       "extractions": [
         {
-          "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+          "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/verification.py",
           "usage": "Source, melody, harmony, meter, tempo and note-pairing checks; sha helper",
-          "current_sha256": "b8bf048041e678bf6d916e554ab810db3672cd837488dab6f1c5423473c80934"
+          "current_sha256": "47732f158804bcc2a96de7d52da07dd6ca587aa43bab871a09026492c3f6d458"
         }
       ]
     },
@@ -495,8 +495,8 @@
       "source_sha256": "70a31f3e23c32d8192817414c858a20400ab92f010798250d4a196ef263c7c48",
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
-      "destination": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
-      "current_sha256": "67c56e9a296e261e996c5f081bcf29e9382ccd684144eb3d31d91bd53b5046ba"
+      "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/sample_renderer.py",
+      "current_sha256": "e03c15d553688987f8c5048b73d22401e5b0299521a4ab2833eab3dcf75bf2fe"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/string_folders.json",
@@ -534,7 +534,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
-      "current_sha256": "f081ec155ed09994870c7e1a71d5ad097b758649fa97fc63ba20e364df9fdc0c"
+      "current_sha256": "a0551936c31c6695aae3653c9e52efb9a0e90d4d598e4ddb91057094fa8693a3"
     },
     {
       "source": "barnsang-video/SKILL.md",
@@ -542,7 +542,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/barnsang-video/SKILL.md",
-      "current_sha256": "7f3b01909dad99661ba42337c0b604d33b1a54163245dfc7d6ce9c3f6686feaf"
+      "current_sha256": "93009a56e285373ce0d8f015d8a8e7d168e8b32b1a206f590f201ddc6fd02afa"
     },
     {
       "source": "barnsang-video/examples/ekorrn/INSTRUCTIONS.txt",
@@ -580,7 +580,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/barnsang-video/scripts/assemble_flow.py",
-      "current_sha256": "90cd6632779616c591d3d1f20ff3c2efb5fc50a949727aac51b8d6f516c074f1"
+      "current_sha256": "a72a748edaa2c88933e1961630596c40a20a3fa44860063d81aec083e83a3f28"
     },
     {
       "source": "barnsang-video/scripts/build_animatic.py",
@@ -602,7 +602,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/barnsang-video/scripts/gen_image.py",
-      "current_sha256": "c22e2d59d1eebfd8ad1d429100630832a0f5f1b7664719ea33daa0c7ed1cb2d4"
+      "current_sha256": "b865089403776e66178d7e38edb82c9934655c3ecdf4569a2d4d3180db775dfb"
     },
     {
       "source": "barnsang-video/scripts/gen_video.py",
@@ -634,7 +634,7 @@
       "status": "adapted",
       "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
       "destination": ".agents/skills/barnsang-video/scripts/write_flow_instructions.py",
-      "current_sha256": "bd8c4f874377a203685c7a0566b8f0d12f860a8505b88f1c7f48bb626b3b5202"
+      "current_sha256": "a13d85aec14b0fd8c88b9c9a69131da663e73b178c110269311e53d37e3913a6"
     },
     {
       "source": "jjazzlab/CREDITS.md",
@@ -648,7 +648,7 @@
       "status": "adapted",
       "reason": "JJazzLab setup retained within the consolidated non-Python requirements/installations guide; verified paths belong in local TOML.",
       "destination": "requirements/requirements.md",
-      "current_sha256": "f3a330c730f7241fd584a17d0b10757d602dcb0964878f486ba0ab3e5a0e31c1"
+      "current_sha256": "9ede97459ed18525c15bbebd8550579d170dca0c90cf974f9b87e82ce97adace"
     },
     {
       "source": "jjazzlab/library_metadata/bass/download.json",
@@ -1278,42 +1278,42 @@
       "usage": "Skill score/schema/review verification CLI."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ChildExperiment.java",
       "owner": "song-arrangement-research",
       "usage": "execute_child_plans compiles source and invokes ChildExperiment main."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py",
       "owner": "song-arrangement-research",
       "usage": "Publisher imports check_files; skill delivery CLI checks files and browser playback."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py",
       "owner": "song-arrangement-research",
       "usage": "Skill execution CLI compiles ChildExperiment and preserves/checks baseline events."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/listening_page.html",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/listening_page.html",
       "owner": "song-arrangement-research",
       "usage": "publish_experiments reads template and inserts explicit song/version data."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py",
       "owner": "song-arrangement-research",
       "usage": "Skill publication CLI checks render deliveries and builds listening catalogue."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py",
       "owner": "song-arrangement-research",
       "usage": "Skill rendering CLI -> source verification, sample Renderer and shared full/backing gain."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/sample_renderer.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/sample_renderer.py",
       "owner": "song-arrangement-research",
       "usage": "render_child_versions imports Renderer/sample routing/FluidSynth bindings."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments/verification.py",
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/verification.py",
       "owner": "song-arrangement-research",
       "usage": "Compiler-adjacent adapters import source/hash/event/backing checks and external auditor loading."
     },
@@ -1338,19 +1338,19 @@
       "usage": "Optional Nishiren CLI validates timing/resources and invokes ONNX phoneme/duration/embedding inference."
     },
     {
-      "path": "bin/__init__.py",
+      "path": "scripts/__init__.py",
       "owner": "all automated retained skills",
-      "usage": "Makes bin an importable project package."
+      "usage": "Makes scripts an importable project package."
     },
     {
-      "path": "bin/project_runtime.py",
+      "path": "scripts/project_runtime.py",
       "owner": "all automated retained skills",
       "usage": "All automated skill CLIs share explicit data paths, config-root and selected external tools/resources."
     },
     {
-      "path": "bin/read_config.py",
+      "path": "scripts/read_config.py",
       "owner": "all automated retained skills",
-      "usage": "All automated skill CLIs load shared/local TOML through project_runtime; AGENTS.md also uses -m bin.read_config for startup and --run to supply configuration in child environments."
+      "usage": "All automated skill CLIs load shared/local TOML through project_runtime; AGENTS.md also uses -m scripts.read_config for startup and --run to supply configuration in child environments."
     }
   ]
 }

@@ -37,7 +37,7 @@ MusicXML and MIDI are the most valuable: **either one should let us export the o
 
 The CLI requires explicit `--sheets-dir`, `--xml-dir`, `--midi-dir`,
 `--lyrics-dir`, `--build-dir` and `--report` paths, all under `paths.data_root`
-resolved by `bin.read_config`. Relative paths are relative to that data root.
+resolved by `scripts.read_config`. Relative paths are relative to that data root.
 The chosen build directory contains derived `xml/`, `midi/`, `sheets/` and XML
 conversion logs. These are project artifacts, never repository files.
 

@@ -17,7 +17,7 @@ import numpy as np
 import soundfile as sf
 
 REPO = Path(__file__).resolve().parents[1]
-ADAPTER = REPO / ".agents/skills/song-arrangement-research/adapter_code/jjazzlab_experiments"
+ADAPTER = REPO / ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments"
 sys.path.insert(0, str(ADAPTER))
 
 

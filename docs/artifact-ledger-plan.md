@@ -10,7 +10,7 @@ See [workflow contracts](artifact-contracts.md) for production-specific requirem
 
 ## 1. Storage and identity
 
-Resolve `paths.data_root` through `bin.read_config`; machine settings stay in
+Resolve `paths.data_root` through `scripts.read_config`; machine settings stay in
 `config.local.toml`. The global ledger lives at `<data_root>/ledger/`, with one
 immutable JSON file per event. It is the only provenance authority. Search indexes
 and browsing views are rebuildable; no authoritative per-artifact sidecars or
@@ -144,7 +144,7 @@ rule and update every skill's instructions and command examples.
 4. Cover canonical Python entrypoints, shared helpers, nested adapters and configured
    external tools. A caller is not covered until its callees are. Unavailable routes
    stop before writes or external generation calls.
-5. Adapt or explicitly disable legacy writers in `scripts/`, `adapter_code/` and
+5. Adapt or explicitly disable legacy writers in `scripts/`, `scripts/` and
    JJazzLab trials. Include the combined `analyze_inputs` command; exclude raw
    `clear_downloads` deletion from managed-data operations.
 

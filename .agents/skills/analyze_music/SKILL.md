@@ -119,7 +119,7 @@ The next skill needs to decide where and how to sing. It needs compact facts:
 ## Python invocation
 
 Run from the repository root with `env/bin/python` (Windows:
-`env/Scripts/python.exe`). Resolve `paths.data_root` through `bin.read_config`.
+`env/Scripts/python.exe`). Resolve `paths.data_root` through `scripts.read_config`.
 Artifact arguments are absolute paths under that root or paths relative to it;
 the script validates them and never infers an output from the working directory.
 `--config-root` optionally selects a directory containing the TOML configuration.

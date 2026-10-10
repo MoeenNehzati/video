@@ -6,8 +6,8 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from bin.project_runtime import data_path, load_project, resource_path, tool_command
-from bin.read_config import ROOT
+from scripts.project_runtime import data_path, load_project, resource_path, tool_command
+from scripts.read_config import ROOT
 
 
 class RuntimeTests(unittest.TestCase):

@@ -19,8 +19,8 @@ import tempfile
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from bin.project_runtime import add_config_argument, data_path, load_project
-from bin.project_runtime import tool_command
+from scripts.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import tool_command
 
 _DUCKDUCKGO_BLOCKED = False
 _CONVERT_LOCK = threading.Lock()
@@ -840,7 +840,7 @@ def main() -> None:
                 "MSCZ": "mscz",
                 "MUSICXML": "musicxml",
                 "XML": "musicxml",
-            }.get(fmt.upper(), "bin")
+            }.get(fmt.upper(), "scripts")
             base = f"{number}_{song_slug}_{_slug(src)}"
             out_dir = args.midi_dir if fmt.upper() in {"MIDI", "MID"} else args.xml_dir
             out_path = artifact_path(out_dir / f"{base}.{ext_guess}")

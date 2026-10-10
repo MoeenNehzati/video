@@ -6,7 +6,7 @@ import sys
 from urllib.parse import unquote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
-from bin.project_runtime import add_config_argument, data_path, load_project, tool_command
+from scripts.project_runtime import add_config_argument, data_path, load_project, tool_command
 from verification import artifact_file, component, require, sha
 
 

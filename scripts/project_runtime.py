@@ -8,7 +8,7 @@ import argparse
 from pathlib import Path
 import shutil
 
-from bin.read_config import ROOT, load_config
+from scripts.read_config import ROOT, load_config
 
 
 def add_config_argument(parser: argparse.ArgumentParser) -> None:

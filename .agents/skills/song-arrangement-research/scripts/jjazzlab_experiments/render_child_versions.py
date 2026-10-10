@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
-from bin.project_runtime import add_config_argument, data_path, load_project, resource_path, tool_command
+from scripts.project_runtime import add_config_argument, data_path, load_project, resource_path, tool_command
 from verification import artifact_file, component, check_frozen_messages, check_backing, check_child_events, load_auditor, require, sha, verify
 
 RATE = 48000

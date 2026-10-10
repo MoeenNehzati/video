@@ -50,7 +50,7 @@ class RepositoryContractTests(unittest.TestCase):
                         self.assertTrue((path.parent / target).exists())
         example = tomllib.loads((REPO / 'config.local.example.toml').read_text())
         self.assertTrue(example['paths']['data_root'])
-        self.assertEqual({p.name for p in (REPO / 'bin').iterdir() if p.is_file()},
+        self.assertEqual({p.name for p in (REPO / 'scripts').iterdir() if p.is_file()},
                          {'__init__.py', 'read_config.py', 'project_runtime.py'})
 
 

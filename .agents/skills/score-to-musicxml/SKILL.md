@@ -10,7 +10,7 @@ description: Transcribe scanned or photographed sheet music into carefully verif
 Read [adoption notes](../../../docs/skill-adoption.md) and
 [artifact contracts](../../../docs/artifact-contracts.md). Run the repo environment's
 Python (`env/bin/python` on POSIX; `env/Scripts/python.exe` on Windows) and resolve
-configuration with `python -m bin.read_config`. The commands below use `python` to
+configuration with `python -m scripts.read_config`. The commands below use `python` to
 mean that interpreter. Artifact arguments resolve relative to `paths.data_root`;
 absolute paths must also stay inside that root. All generated score data, builders,
 geometry and review records belong there. External tool locations belong in

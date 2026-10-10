@@ -2,7 +2,7 @@
 from pathlib import Path
 import ctypes as C, os, json, hashlib, struct, sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
-from bin.read_config import ROOT
+from scripts.read_config import ROOT
 from verification import require
 import numpy as np
 import mido

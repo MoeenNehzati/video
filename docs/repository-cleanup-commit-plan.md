@@ -81,18 +81,18 @@ Delete tracked `.claude/settings.json` and keep its existing ignore rule. It con
 a machine-specific path; no shared replacement is needed.
 
 Delete the following launchers and update every caller in the same commit. Invoke
-scripts with the repo environment's Python; retain `bin/__init__.py` and
-`bin/read_config.py`, including the existing configuration API/module command.
+scripts with the repo environment's Python; retain `scripts/__init__.py` and
+`scripts/read_config.py`, including the existing configuration API/module command.
 
 | Remove | Python target, relative to repo root |
 | --- | --- |
-| `bin/analyze_inputs` | No replacement; remove the orphan combined-analysis script and schema. |
-| `bin/analyze_music` | `.agents/skills/analyze_music/scripts/analyze_music.py` |
-| `bin/download_scores` | `.agents/skills/download-scores/scripts/download_scores.py` |
-| `bin/plan_and_align_vocals` | `.agents/skills/plan_vocals/scripts/plan_and_align_vocals.py` |
-| `bin/syllabify_lyrics` | `.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py` |
-| `bin/synthesize_vocal_with_diffsinger` | `.agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py` |
-| `bin/clear_downloads`, already-deleted `bin/mix_and_validate` | No replacement. Cleanup awaits ledger-aware operations; the mixer is retired. |
+| `scripts/analyze_inputs` | No replacement; remove the orphan combined-analysis script and schema. |
+| `scripts/analyze_music` | `.agents/skills/analyze_music/scripts/analyze_music.py` |
+| `scripts/download_scores` | `.agents/skills/download-scores/scripts/download_scores.py` |
+| `scripts/plan_and_align_vocals` | `.agents/skills/plan_vocals/scripts/plan_and_align_vocals.py` |
+| `scripts/syllabify_lyrics` | `.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py` |
+| `scripts/synthesize_vocal_with_diffsinger` | `.agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py` |
+| `scripts/clear_downloads`, already-deleted `scripts/mix_and_validate` | No replacement. Cleanup awaits ledger-aware operations; the mixer is retired. |
 
 Document `env/bin/python` on POSIX and `env/Scripts/python.exe` on Windows. Child
 project scripts use `sys.executable`; separately installed inference backends use
@@ -101,7 +101,7 @@ orchestration in Python. Do not add a new launcher framework.
 
 ### 3. Make retained code configurable and portable
 
-- Load configuration through `bin.read_config`; persist actual paths/settings only
+- Load configuration through `scripts.read_config`; persist actual paths/settings only
   in `config.local.toml`. Leave shared `config.toml` unchanged. Document proposed
   local keys for executable argument lists, toolkit/install locations, shared
   libraries, model paths and external Python interpreters.

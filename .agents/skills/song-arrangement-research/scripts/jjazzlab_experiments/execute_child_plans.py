@@ -12,7 +12,7 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[4]))
-from bin.project_runtime import add_config_argument, data_path, load_project, resource_path, tool_command
+from scripts.project_runtime import add_config_argument, data_path, load_project, resource_path, tool_command
 from verification import component, load_auditor, require, sha, verify
 
 

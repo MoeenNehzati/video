@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "bin" / "read_config.py"
+SCRIPT = REPO / "scripts" / "read_config.py"
 SPEC = importlib.util.spec_from_file_location("read_config", SCRIPT)
 READER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(READER)
@@ -115,9 +115,9 @@ class ReadConfigTests(unittest.TestCase):
             root.mkdir()
             data = Path(directory) / "data with spaces"
             data.mkdir()
-            (root / "bin").mkdir()
-            shutil.copy(SCRIPT, root / "bin" / SCRIPT.name)
-            shutil.copy(REPO / "bin" / "__init__.py", root / "bin" / "__init__.py")
+            (root / "scripts").mkdir()
+            shutil.copy(SCRIPT, root / "scripts" / SCRIPT.name)
+            shutil.copy(REPO / "scripts" / "__init__.py", root / "scripts" / "__init__.py")
             shared = root / "config.toml"
             local = root / "config.local.toml"
             shared.write_text(
@@ -137,15 +137,15 @@ class ReadConfigTests(unittest.TestCase):
             self.assertEqual(resolved["render"]["formats"], ["mp3"])
             self.assertIs(resolved["render"]["normalize"], False)
             direct = subprocess.run(
-                [sys.executable, str(root / "bin" / SCRIPT.name)],
+                [sys.executable, str(root / "scripts" / SCRIPT.name)],
                 cwd=data, capture_output=True, text=True, check=True,
             )
             module = subprocess.run(
-                [sys.executable, "-m", "bin.read_config"],
+                [sys.executable, "-m", "scripts.read_config"],
                 cwd=root, capture_output=True, text=True, check=True,
             )
             imported = subprocess.run(
-                [sys.executable, "-c", "from bin.read_config import load_config; "
+                [sys.executable, "-c", "from scripts.read_config import load_config; "
                  "assert load_config()['render']['audio']['rate'] == 48000"],
                 cwd=root, capture_output=True, text=True, check=True,
             )
@@ -161,7 +161,7 @@ class ReadConfigTests(unittest.TestCase):
                 with self.subTest(value=value), self.assertRaisesRegex(ValueError, "config.local.toml"):
                     READER.load_config(root)
             failed = subprocess.run(
-                [sys.executable, "-m", "bin.read_config"],
+                [sys.executable, "-m", "scripts.read_config"],
                 cwd=root, capture_output=True, text=True,
             )
             self.assertEqual(failed.returncode, 1)

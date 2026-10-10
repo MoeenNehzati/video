@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from bin.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, load_project
 
 from music21 import converter
 from music21 import pitch as m21pitch
