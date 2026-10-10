@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import re
+import unicodedata
 from pathlib import Path
 
 
@@ -16,7 +16,8 @@ _EXCEPTIONS_EN: dict[str, list[str]] = {
 
 
 def _clean_token(token: str) -> str:
-    return re.sub(r"[^A-Za-z0-9'\\-]+", "", token).strip()
+    return "".join(char for char in unicodedata.normalize("NFC", token)
+                   if char.isalnum() or char in "'-")
 
 
 def _split_on_vowel_groups(word: str) -> list[str]:
@@ -95,6 +96,8 @@ def syllabify_lyrics(path: Path, language: str) -> tuple[dict, list[str]]:
     text = path.read_text(encoding="utf-8").strip()
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
     warnings: list[str] = []
+    if language.strip().casefold().replace("_", "-").split("-")[0] not in {"english", "en"}:
+        warnings.append("The syllabification heuristic is English-oriented; review this language's syllable boundaries before vocal alignment.")
 
     out_lines = []
     for i, ln in enumerate(lines, start=1):

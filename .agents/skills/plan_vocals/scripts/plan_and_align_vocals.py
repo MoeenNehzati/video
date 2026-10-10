@@ -9,10 +9,9 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
 
-from music21 import converter
-from music21 import pitch as m21pitch
+
 
 
 def _load_json(path: Path) -> dict:
@@ -62,6 +61,7 @@ def _clean_word(token: str) -> str:
 
 
 def _pitch_midi(p: str) -> int:
+    from music21 import pitch as m21pitch
     try:
         return int(m21pitch.Pitch(p).midi)
     except Exception:
@@ -172,13 +172,18 @@ def main() -> None:
     add_config_argument(ap)
     args = ap.parse_args()
     config = load_project(args.config_root)
-    args.music_analysis_json = data_path(config, args.music_analysis_json, must_exist=True)
-    args.lyrics_json = data_path(config, args.lyrics_json, must_exist=True)
-    args.score = data_path(config, args.score, must_exist=True)
+    for name in ("music_analysis_json", "lyrics_json", "score"):
+        setattr(args, name, data_path(config, getattr(args, name), must_exist=True))
     args.out = data_path(config, args.out)
-    if args.out in {args.music_analysis_json, args.lyrics_json, args.score}:
-        raise ValueError("Output must not replace an input file")
+    produce(args)
 
+
+def produce(args):
+    args.out = Path(args.out)
+    args.music_analysis_json = Path(args.music_analysis_json)
+    args.lyrics_json = Path(args.lyrics_json)
+    args.out = fresh_output(args.out, inputs=[args.music_analysis_json, args.lyrics_json, args.score])
+    from music21 import converter
     music_analysis = _load_json(args.music_analysis_json)
     score_info = music_analysis["score"]
     lyrics_info = _load_json(args.lyrics_json)["lyrics"]

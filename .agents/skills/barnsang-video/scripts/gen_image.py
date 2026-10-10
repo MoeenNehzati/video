@@ -27,6 +27,7 @@ def parser(description: str) -> argparse.ArgumentParser:
 
 
 def prepare(args):
+    raise ValueError('Image generation is disabled: remote request/image bundle support is not implemented')
     config = load_project(args.config_root)
     prompt_path = data_path(config, args.prompt, must_exist=True)
     out = data_path(config, args.output)
@@ -45,6 +46,10 @@ def prepare(args):
 
 
 def save_response(response, out, metadata, record, started):
+    if out.resolve() == metadata.resolve() or out.exists() or metadata.exists():
+        raise ValueError('Image and request outputs must be distinct new files')
+    if out.resolve() in metadata.resolve().parents or metadata.resolve() in out.resolve().parents:
+        raise ValueError('Image and request output files cannot contain one another')
     response.raise_for_status()
     result = response.json()
     item = result["data"][0]
@@ -52,15 +57,23 @@ def save_response(response, out, metadata, record, started):
     if not payload:
         raise ValueError("Image API returned an empty image")
     record.update(seconds=round(time.monotonic() - started, 2),
-                  usage=result.get("usage"), revised_prompt=item.get("revised_prompt"))
+                  usage=result.get("usage"), revised_prompt=item.get("revised_prompt"),
+                  provider_created=result.get("created"), model_revision=None,
+                  model_revision_unknown_reason="Provider model internals are not exposed or locally replayable")
+    request_id = response.headers.get("x-request-id")
+    record["provider_request_id"] = request_id if isinstance(request_id, str) else None
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_bytes(payload)
-    metadata.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    metadata.parent.mkdir(parents=True, exist_ok=True)
+    with out.open('xb') as stream:
+        stream.write(payload)
+    with metadata.open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
     print(out)
 
 
 def main(argv=None):
     args = parser(__doc__).parse_args(argv)
+    raise ValueError('Image generation is disabled: remote request/image bundle support is not implemented')
     _, out, metadata, prompt, key = prepare(args)
     started = time.monotonic()
     record = {"model": args.model, "quality": args.quality, "size": args.size, "prompt": prompt}

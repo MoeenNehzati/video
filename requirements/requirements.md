@@ -23,6 +23,7 @@ environment setup are listed separately in
 | Selected operation | Dependencies to check | Version/identity check |
 | --- | --- | --- |
 | Score engraving/conversion | MuseScore | Configured command plus `--version` |
+| PDF review pages | Poppler `pdftoppm`, its runtime data and fonts | `pdftoppm -v`; bounded rendering trace |
 | Optional scanned-PDF OMR | Audiveris and its OCR data | Command plus `-version`; data release/hash |
 | Arrangement execution | Java JDK, JJazzLab Toolkit, rhythms, MIDI auditor | Java/compiler `-version`; resource release/hash |
 | Arrangement audio rendering | FluidSynth library, approved soundfonts, MIDI auditor, FFmpeg | Native `fluid_version_str()`; bank/helper hashes; FFmpeg `-version` |
@@ -87,6 +88,36 @@ those in `tools.NAME.bundled_versions` (a string-valued table), and OCR data in
 `tools.audiveris.ocr_data_version`. Reuse an application's bundled runtime when
 sufficient; a separate system JDK is needed only by the Java arrangement adapter.
 The sections below explain installation **only when the checks above require it**.
+
+### Private native tool resources
+
+Managed native tools need a reviewed resource descriptor, not only an installed
+command. Build the private bundle outside the checkout, preserving the executable,
+ELF loader, required libraries and consumed plugins/data/fonts. Dereference copied
+symlinks: the resource manifest rejects them. Record each original path/hash and
+copied hash; if an installed relocation tool changes a copied library's absolute
+RUNPATH, record its command/version and both hashes. Never patch the installed
+system library. Record the bundle path as `resources.native_tools` and its manifest
+hash in `resource_versions.native_tools`; keep qualification evidence alongside it.
+
+Descriptors preserve fixed flags in `source.execution.arguments`; use
+`{resource}/relative/path` for captured files or directories. MuseScore's
+`source.conversion.environment` binds its supported font and Qt paths to the
+snapshot, and `closure_review` records the review evidence. With an explicit ELF
+loader, Qt may seek `qt.conf` beside that loader rather than beside MuseScore;
+verify the actual lookup. A version check alone does not qualify engraving.
+Trace a bounded installation test, record remaining platform reads, and keep
+candidate status until required plugins, fonts and data are accounted for.
+
+## Poppler: PDF review pages
+
+PDF review uses an independently qualified `pdftoppm` resource. Reuse installed
+Poppler, recording `tools.pdftoppm.command`/`version` and `resources.pdf_renderer`/
+`resource_versions.pdf_renderer` locally. Capture its loader, libraries, fonts and
+runtime data. Check that data paths actually resolve within the private resource;
+do not assume an environment variable overrides a compiled path. Any relocation
+of copied bytes requires original/new hashes and a render trace before qualification.
+The managed renderer runs with the resource root as its working directory.
 
 ## MuseScore: engraving and score conversion
 

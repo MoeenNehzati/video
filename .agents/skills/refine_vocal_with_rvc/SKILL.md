@@ -9,6 +9,18 @@ metadata:
 
 # Refine a vocal with an external RVC tool
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with the declarations
+below. It owns all artifact access, including implicit tool I/O, and supplies the
+execution procedure. Command examples here specify domain arguments for that
+skill to execute. Local configuration:
+
+- Inputs: rough vocal and selected model/index; settings: transpose and the
+  chosen external tool's supported options; outputs: refined WAV and comparison log.
+- Route: manual handoff/import of an externally supplied result; no automated
+  RVC adapter is provided. Keep unknown model/production provenance explicit.
+
 RVC converts an existing vocal's timbre. It does not create singing from symbolic
 notes. Keep this optional: conversion can blur consonants, introduce artifacts
 or reduce lyric intelligibility.
@@ -25,10 +37,11 @@ prefix. Never vendor the tool or models into this repository.
 1. Read resolved configuration using `env/bin/python -m scripts.read_config`
    (Windows: `env/Scripts/python.exe`). Inspect the configured tool's supported
    interface; flags differ between RVC installations.
-2. Resolve the explicit input WAV and distinct output WAV/log paths under
-   `paths.data_root`. Validate the input is present and nonsilent, and check
+2. Identify the input WAV and required WAV/log deliverables. Validate the input is
+   present and nonsilent, and check
    all required executable/model/index paths before creating any outputs.
-3. Invoke the external tool using an argument list and checked return code,
+3. For an enabled execution route, invoke the external tool using an argument list
+   and checked return code,
    supplying the reviewed transpose and the resolved input, output and resource
    paths. Do not guess flags or silently use a different backend.
 4. Verify the output exists, then compare duration/alignment, intelligibility,

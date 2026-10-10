@@ -6,7 +6,8 @@ import sys
 import tempfile
 import unittest
 
-REPO = Path(__file__).resolve().parents[1]
+
+REPO = Path(__file__).resolve().parents[4]
 
 
 class SkillEntrypointTests(unittest.TestCase):
@@ -28,6 +29,19 @@ class SkillEntrypointTests(unittest.TestCase):
             self.assertEqual(line['syllables'], ['Twin', 'kle', 'lit', 'tle', 'star'])
             self.assertEqual(line['syllable_count'], 5)
             self.assertEqual(lyrics.read_text(), 'Twin-kle lit-tle star\n')
+
+    def test_existing_output_and_input_alias_preserve_bytes(self):
+        with tempfile.TemporaryDirectory(prefix='lyrics å ') as directory:
+            root = Path(directory)
+            data = root / 'data'; data.mkdir()
+            (root/'config.toml').write_text('[paths]\ndata_root='+json.dumps(str(data))+'\n')
+            source=data/'lyrics.txt'; source.write_text('La-la\n')
+            output=data/'output.json'; output.write_bytes(b'keep')
+            for destination, expected in ((source,b'La-la\n'),(output,b'keep')):
+                result=subprocess.run([sys.executable,str(REPO/'.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py'),
+                    str(source),'--out',str(destination),'--config-root',str(root)],capture_output=True,text=True)
+                self.assertNotEqual(result.returncode,0)
+                self.assertEqual(destination.read_bytes(),expected)
 
 
 if __name__ == '__main__':

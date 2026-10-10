@@ -5,6 +5,8 @@ running tools or loading external libraries.
 """
 
 import argparse
+import json
+import os
 from pathlib import Path
 import shutil
 
@@ -19,7 +21,23 @@ def add_config_argument(parser: argparse.ArgumentParser) -> None:
 
 
 def load_project(config_root: Path | None = None) -> dict:
+    if config_root is None and os.environ.get('MUSIC_VIDEO_CONFIG_JSON'):
+        return json.loads(os.environ['MUSIC_VIDEO_CONFIG_JSON'])
     return load_config(ROOT if config_root is None else config_root)
+
+
+def fresh_output(value, *, inputs=()) -> Path:
+    """Refuse existing destinations and aliases before an ordinary producer writes."""
+    path = Path(value)
+    resolved = path.resolve()
+    if resolved in {Path(item).resolve() for item in inputs}:
+        raise ValueError('Output must not replace an input file')
+    if path.exists() or path.is_symlink():
+        raise ValueError(f'Output already exists: {path}')
+    for parent in path.parents:
+        if parent.exists() and not parent.is_dir():
+            raise ValueError(f'Output ancestor is not a directory: {parent}')
+    return resolved
 
 
 def data_path(config: dict, value: str | Path, *, must_exist: bool = False,
@@ -32,6 +50,8 @@ def data_path(config: dict, value: str | Path, *, must_exist: bool = False,
     path = Path(value)
     if not path.is_absolute():
         path = root / path
+    if not must_exist and path.is_symlink():
+        raise ValueError(f'Output symlink is forbidden: {path}')
     path = path.resolve()
     if not path.is_relative_to(root):
         raise ValueError(f"Project path must be inside paths.data_root: {value}")

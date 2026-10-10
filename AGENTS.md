@@ -10,6 +10,18 @@ This project turns sheet music into children's music videos.
 - Acquisition and the five analysis/vocal skills are optional. Read the selected
   skill's prerequisites and limitations. See `docs/skill-adoption.md` and
   `docs/artifact-contracts.md` for workflow boundaries.
+- Route all song-artifact access through
+  `.agents/skills/artifact-bookkeeping/SKILL.md`, including implicit reads and writes
+  by scripts, subprocesses, GUI actions, downloads and API calls. Load it before
+  starting or resuming artifact work, including after context compaction.
+  Each production skill's minimal Bookkeeping block names that skill and supplies
+  only local inputs, outputs, resources, settings and domain constraints. Skill
+  instructions must not call bookkeeping scripts, specify its API/CLI or duplicate
+  its procedure. Artifact-bookkeeping translates those declarations into the actual
+  execution and owns organizational policy and recovery.
+  Production scripts expose ordinary domain CLIs without bookkeeping imports,
+  flags, callbacks or registration; bookkeeping invokes their captured code.
+  Repository source/configuration inspection is outside the song ledger.
 
 ## Python and configuration
 
@@ -59,6 +71,14 @@ This project turns sheet music into children's music videos.
 
 ## Repository and data boundary
 
+- Skills own their implementation and tests. Keep bookkeeping implementation in
+  `.agents/skills/artifact-bookkeeping/scripts/`; other skill instructions depend on
+  the bookkeeping skill and its local configuration declarations. Root `scripts/`
+  holds only repository-wide configuration
+  helpers and the test runner. Root `tests/` holds shared fixtures, cross-skill
+  integration and repository checks. Run all suites with
+  `env/bin/python scripts/run_tests.py` (Windows:
+  `env/Scripts/python.exe scripts/run_tests.py`).
 - Retain only instructions, skill-used code, and required schemas, tests,
   configuration and dependency support. Remove orphan code, including unused
   branches inside retained files. Maintain ownership/provenance in
@@ -66,10 +86,17 @@ This project turns sheet music into children's music videos.
 - All song/run artifacts belong under resolved `paths.data_root`: source sheets,
   XML, MIDI, media, JSON, prompts, logs, reviews and one-off song builders.
   Pass explicit inputs/outputs; do not write artifacts beside source code.
+- Put reproducible repository audit reports and build intermediates in `_build/`
+  (Git-ignored). A clean checkout must work without them. Keep required schemas,
+  reusable templates and source provenance versioned; song artifacts still belong
+  under `paths.data_root`.
 - Keep external software, native libraries, sound banks and models outside the
   checkout; reference them in local TOML. Do not vendor or hide them in ignored
   project folders. Synthetic tests may use temporary directories.
 - Preserve existing shared organization and reviewed inputs. Do not infer the
-  accepted version from modification time. The artifact ledger is planned in
-  `docs/artifact-ledger-plan.md`, not implemented; this cleanup does not authorize
-  migration or promise automatic history recording.
+  accepted version from modification time, label, directory or newest revision.
+  Resolve explicit selections or ask for an ambiguous creative choice. Import
+  existing files explicitly, preserving their originals and unknown provenance;
+  never bulk-migrate existing data. The ledger specifications remain in
+  `docs/artifact-ledger-plan.md`; implementation usage and limitations are in
+  `docs/artifact-ledger-usage.md`.

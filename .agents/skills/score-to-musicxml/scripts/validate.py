@@ -3,7 +3,6 @@ from pathlib import Path
 from fractions import Fraction as F
 from collections import Counter,defaultdict
 import xml.etree.ElementTree as ET
-from lxml import etree
 DUR={"whole":F(4),"half":F(2),"quarter":F(1),"eighth":F(1,2),"16th":F(1,4),"32nd":F(1,8),"64th":F(1,16)}
 def text(n,path,default=None):return n.findtext(path,default)
 def canonical(path):
@@ -27,6 +26,8 @@ def canonical(path):
                     lyrics=tuple((l.get("number","1"),text(l,"syllabic","single"),text(l,"text",""),tuple(x.get("type","") for x in l.findall("extend"))) for l in e.findall("lyric"))
                     notation=tuple(sorted((x.tag,tuple(sorted(x.attrib.items()))) for n in e.findall("notations") for x in n))
                     items.append(["note",part.get("id"),mn,str(onset),str(dur),pitch,e.find("rest") is not None,text(e,"type"),len(e.findall("dot")),lyrics,notation,tuple((b.get("number"),b.text) for b in e.findall("beam"))])
+                    if e.find("rest") is not None and e.find("rest").get("measure","no")=="yes":
+                        items.append(["measure_rest",part.get("id"),mn,str(onset)])
                     if e.find("notehead") is not None:
                         nh=e.find("notehead");items.append(["notehead",part.get("id"),mn,str(onset),pitch,nh.text,tuple(sorted(nh.attrib.items()))])
                     for container in e.findall("notations/*"):
@@ -52,6 +53,7 @@ def canonical(path):
 def audit(path,schema_path=None,expected=None):
     path=Path(path);issues=[];root=ET.parse(path).getroot()
     if schema_path:
+        from lxml import etree
         schema=etree.XMLSchema(etree.parse(str(schema_path)))
         if not schema.validate(etree.parse(str(path))):issues.extend("schema: "+str(x) for x in schema.error_log)
     counts=Counter();measure_lengths=[]

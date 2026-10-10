@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tomllib
+from uuid import UUID
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,6 +60,33 @@ def load_config(root: Path = ROOT) -> dict:
         if table in config and not isinstance(config[table], dict):
             raise ValueError(f"{table} must be a TOML table. "
                              "Fix config.local.toml; see docs/configuration.md.")
+    if "bookkeeping" in config:
+        bookkeeping = config["bookkeeping"]
+        if (not isinstance(bookkeeping, dict)
+                or not isinstance(bookkeeping.get("actor_id"), str)
+                or not bookkeeping["actor_id"].strip()):
+            raise ValueError("Set bookkeeping.actor_id to a nonempty label in config.local.toml")
+        host = bookkeeping.get("host_id")
+        try:
+            identifier = UUID(host) if isinstance(host, str) else None
+        except ValueError:
+            identifier = None
+        if identifier is None or identifier.version != 4 or str(identifier) != host:
+            raise ValueError("Set bookkeeping.host_id to a machine-stable lowercase UUIDv4 "
+                             "in config.local.toml")
+    if "resource_cache" in paths:
+        value = paths["resource_cache"]
+        if not isinstance(value, str) or not Path(value).is_absolute():
+            raise ValueError("paths.resource_cache must be an absolute path in config.local.toml")
+        cache = Path(value).resolve()
+        if any(cache.is_relative_to(boundary) or boundary.is_relative_to(cache)
+               for boundary in (ROOT, resolved_data)):
+            raise ValueError("paths.resource_cache must be separate from the repository and "
+                             "paths.data_root; fix config.local.toml")
+        if cache.exists() and not cache.is_dir():
+            raise ValueError("paths.resource_cache must identify a directory in config.local.toml")
+        if any(parent.exists() and not parent.is_dir() for parent in cache.parents):
+            raise ValueError("paths.resource_cache has a non-directory ancestor; fix config.local.toml")
     return config
 
 

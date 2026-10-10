@@ -86,13 +86,13 @@ scripts with the repo environment's Python; retain `scripts/__init__.py` and
 
 | Remove | Python target, relative to repo root |
 | --- | --- |
-| `scripts/analyze_inputs` | No replacement; remove the orphan combined-analysis script and schema. |
-| `scripts/analyze_music` | `.agents/skills/analyze_music/scripts/analyze_music.py` |
-| `scripts/download_scores` | `.agents/skills/download-scores/scripts/download_scores.py` |
-| `scripts/plan_and_align_vocals` | `.agents/skills/plan_vocals/scripts/plan_and_align_vocals.py` |
-| `scripts/syllabify_lyrics` | `.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py` |
-| `scripts/synthesize_vocal_with_diffsinger` | `.agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py` |
-| `scripts/clear_downloads`, already-deleted `scripts/mix_and_validate` | No replacement. Cleanup awaits ledger-aware operations; the mixer is retired. |
+| `bin/analyze_inputs` | No replacement; remove the orphan combined-analysis script and schema. |
+| `bin/analyze_music` | `.agents/skills/analyze_music/scripts/analyze_music.py` |
+| `bin/download_scores` | `.agents/skills/download-scores/scripts/download_scores.py` |
+| `bin/plan_and_align_vocals` | `.agents/skills/plan_vocals/scripts/plan_and_align_vocals.py` |
+| `bin/syllabify_lyrics` | `.agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py` |
+| `bin/synthesize_vocal_with_diffsinger` | `.agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesize_vocal_with_diffsinger.py` |
+| `bin/clear_downloads`, already-deleted `bin/mix_and_validate` | No replacement. Cleanup awaits ledger-aware operations; the mixer is retired. |
 
 Document `env/bin/python` on POSIX and `env/Scripts/python.exe` on Windows. Child
 project scripts use `sys.executable`; separately installed inference backends use

@@ -8,7 +8,8 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
+
 
 from lyrics_syllabify import syllabify_lyrics
 
@@ -22,13 +23,11 @@ def main() -> None:
     args = ap.parse_args()
     config = load_project(args.config_root)
     args.lyrics = data_path(config, args.lyrics, must_exist=True)
-    args.out = data_path(config, args.out)
-    if args.out in {args.lyrics}:
-        raise ValueError("Output must not replace an input file")
-
+    args.out = fresh_output(data_path(config, args.out), inputs=[args.lyrics])
     payload, _warnings = syllabify_lyrics(args.lyrics, args.language)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
 
 
 if __name__ == "__main__":

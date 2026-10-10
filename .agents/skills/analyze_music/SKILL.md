@@ -9,6 +9,14 @@ metadata:
 
 # Skill 1: `analyze_music`
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these local declarations.
+The ordinary script interfaces are documented below:
+
+- `analyze_music.py`: input `arranged_score`; output `music_analysis.json`;
+  setting `tempo_bpm`; Python resource `music21`.
+
 ## Purpose
 
 Turn `arranged_music.xml` into a compact musical representation that an LLM can reason over without reading raw MusicXML.

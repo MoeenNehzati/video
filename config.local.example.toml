@@ -2,10 +2,22 @@
 # Follow requirements/requirements.md: find/reuse compatible installations first.
 # Install only missing requirements for the selected operation; record paths/versions
 # in config.local.toml, preserving other settings. Never put them in this example.
-# Paths must be absolute and outside this checkout. On Windows use forward slashes
+# Paths must be absolute; external resources stay outside this checkout except
+# the active Python environment's package source described below. On Windows use forward slashes
 # (C:/Users/...) or TOML literal strings ('C:\Users\...'). Do not use ~ or $VARS.
 [paths]
 data_root = "/absolute/path/to/Dropbox/project-data"
+# Needed only for operations consuming external resource snapshots. Keep local,
+# outside both the checkout and synchronized data root (neither contains the other).
+# resource_cache = "/absolute/path/to/local/music-video-resources"
+# Keep the cache root short: observed music21 manifests need <=41 characters.
+
+# Required before managed production. Keep the actor label stable across sessions.
+# Generate host_id once on each machine with Python: import uuid; print(uuid.uuid4())
+# Do not copy another machine's ID or commit this machine-specific configuration.
+# [bookkeeping]
+# actor_id = "your-collaborator-label"
+# host_id = "<machine-stable UUIDv4>"
 
 # Enable only the tools needed for your selected skill. Commands are argv lists,
 # never shell strings; use an absolute executable path or a name already on PATH.
@@ -30,6 +42,8 @@ data_root = "/absolute/path/to/Dropbox/project-data"
 
 # Enable only the resources used by your stage. No models or sample data in Git.
 # [resources]
+# Discover with env/bin/python -c "import sysconfig; print(sysconfig.get_path('purelib'))"
+# python_packages = "/absolute/path/to/active/environment/site-packages"
 # jjazzlab_toolkit = "/absolute/path/to/jjazzlab-toolkit.jar"
 # jjazzlab_rhythms = "/absolute/path/to/rhythms"
 # midi_audit = "/absolute/path/to/proven/audit_existing_midi.py"
@@ -44,6 +58,7 @@ data_root = "/absolute/path/to/Dropbox/project-data"
 # Add tools.NAME.version for every configured tool. Resource versions/identities
 # use the same names as [resources]; omit resources not selected for this workflow.
 # [resource_versions]
+# python_packages = "<observed Python version; distribution versions recorded per run>"
 # fluidsynth_library = "<observed native library version>"
 # jjazzlab_toolkit = "<verified release or sha256:digest>"
 # soundfont_manifest = "sha256:<digest of manifest recording all bank hashes>"

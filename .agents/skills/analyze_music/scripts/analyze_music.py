@@ -8,11 +8,9 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
 
-from music21 import converter
 
-from music_analysis import analyze_score
 
 
 def main() -> None:
@@ -25,12 +23,15 @@ def main() -> None:
     config = load_project(args.config_root)
     args.arranged_score = data_path(config, args.arranged_score, must_exist=True)
     args.out = data_path(config, args.out)
-    if args.out in {args.arranged_score}:
-        raise ValueError("Output must not replace an input file")
+    produce(args)
 
+
+def produce(args):
+    args.out = fresh_output(args.out, inputs=[args.arranged_score])
+    from music21 import converter
+    from music_analysis import analyze_score
     score = converter.parse(str(args.arranged_score))
     score_dict, warnings = analyze_score(score, tempo_bpm_override=args.tempo_bpm)
-
     payload = {"score": score_dict, "warnings": warnings}
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

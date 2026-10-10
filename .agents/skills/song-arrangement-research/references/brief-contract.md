@@ -6,7 +6,9 @@ arrangement_brief.json required fields:
 - song_id: approved folder stem
 - source_xml and source_sha256
 - baseline_folder and baseline_midi_sha256
-- output_root: explicit directory under configured paths.data_root
+- output_root: explicit destination root under configured paths.data_root;
+  the executor CLI uses its explicit --output-root/song_id/variant_id. Existing variants are
+  rejected before native generation.
 - audience: {age_min, age_max, context}
 - vocals: user_supplied
 - invariants: nonempty list of musical/source constraints

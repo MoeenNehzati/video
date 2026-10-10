@@ -5,9 +5,9 @@ No note's pitch is read against a constant horizontal reference.
 from pathlib import Path
 import argparse, hashlib, json, sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
-import cv2
-import numpy as np
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
+import sys
+
 
 def diatonic_pitch(position, clef_bottom="E4"):
     letters="CDEFGAB"
@@ -16,10 +16,12 @@ def diatonic_pitch(position, clef_bottom="E4"):
     return letters[index]+str(octave)
 
 def evaluate(system,x):
+    import numpy as np
     t=(np.asarray(x)-system["x0"])/(system["x1"]-system["x0"])
     return np.array([np.polynomial.polynomial.polyval(t,c) for c in system["coefficients"]])
 
 def robust_fit(t,y,spacing):
+    import numpy as np
     rng=np.random.default_rng(20260911)
     best=None
     for _ in range(150):
@@ -37,6 +39,8 @@ def robust_fit(t,y,spacing):
     return c,keep,residual
 
 def fit_system(gray,seed):
+    import cv2
+    import numpy as np
     anchors = seed.get("anchors") if isinstance(seed,dict) else None
     if anchors:
         x0,yl=anchors[0];x1,yr=anchors[-1];sl=sr=seed["spacing"]
@@ -82,6 +86,9 @@ def fit_system(gray,seed):
     return sys
 
 def process(source,seeds,out):
+    fresh_output(out, inputs=[source])
+    import cv2
+    import numpy as np
     out=Path(out)
     original=cv2.imread(str(source))
     if original is None: raise ValueError("Source is not a readable image")
@@ -139,13 +146,20 @@ def main(argv=None):
     p.add_argument("source");p.add_argument("seeds");p.add_argument("output")
     a=p.parse_args(argv)
     config=load_project(a.config_root)
-    source=data_path(config,a.source,must_exist=True)
-    seeds=data_path(config,a.seeds,must_exist=True)
-    output=data_path(config,a.output,directory=True)
-    if output.exists() and any(output.iterdir()):
-        raise ValueError("Geometry output directory must be new or empty")
-    r=process(source,json.loads(seeds.read_text(encoding="utf-8-sig")),output)
-    print(json.dumps([{"system":s["system"],"checks":s["line_checks"]} for s in r["systems"]]))
+    a.source = data_path(config, a.source, must_exist=True)
+    a.seeds = data_path(config, a.seeds, must_exist=True)
+    a.output = data_path(config, a.output, directory=True)
+    produce(a)
+
+
+def produce(args):
+    output=fresh_output(args.output, inputs=[args.source,args.seeds])
+    seeds=json.loads(Path(args.seeds).read_text(encoding="utf-8-sig"))
+    if not isinstance(seeds,list) or not seeds:
+        raise ValueError("Provide at least one staff seed")
+    result=process(Path(args.source),json.loads(Path(args.seeds).read_text(encoding="utf-8-sig")),output)
+    print(json.dumps([{"system":s["system"],"checks":s["line_checks"]} for s in result["systems"]]))
+
 
 if __name__=="__main__":
     main()

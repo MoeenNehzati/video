@@ -9,6 +9,30 @@ metadata:
 
 # Download Music Scores for Swedish Children's Songs
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these local declarations.
+The ordinary script interfaces are documented below:
+
+- Catalogue discovery: input CSV; output candidate JSON retaining numbers, titles,
+  source URLs and license claims. Settings: direct/lyric search, PDF exclusion and
+  candidate limit. Optional search makes network calls and can be blocked.
+- Download: input chosen candidate evidence; explicit URL and title settings;
+  output source file and acquisition receipt (requested/final URL, timestamp,
+  original name, size and optional format/title warnings). Each downloaded file
+  is a separate bounded operation. Raw lyric pages remain separate from extraction.
+- Extraction: inputs raw lyric page and its acquisition evidence; URL/title
+  settings; output cleaned lyric text; quality failures produce no accepted text.
+- Conversion: input source score; separate export and conversion log; scratch is
+  disposable. Resource configured MuseScore or Audiveris command plus native
+  fonts/plugins/data and environment. MuseScore MusicXML-to-MIDI also uses music21
+  and mido to preserve trailing silence. Audiveris produces exactly one MXL.
+- A conversion consumes the completed source; lyric extraction consumes completed
+  raw text; the final agent-written report consumes all successful outputs and
+  retained failures. Do not assume future download outcomes or rerun uncertain
+  external calls. Catalogue entries marked SKYDDAD are excluded before acquisition.
+- Retain catalogue number/title, original names, URLs and license evidence.
+
 Implementation: [scripts/download_scores.py](scripts/download_scores.py).
 
 You are a research agent. Your task is to systematically find and download music scores (sheet music, noter) for Swedish children's songs from the provided CSV file.
@@ -24,7 +48,7 @@ Read the CSV file first. Identify columns for: song number, song title, composer
 - Songs marked FRI GLOBALT or FRI I EU/SE: search and download.
 - Songs marked SKYDDAD (copyright protected): **skip entirely**. Do not attempt to download.
 
-## Output Directory
+## Deliverables
 
 For each song we want (in order of importance):
 
@@ -35,18 +59,11 @@ For each song we want (in order of importance):
 
 MusicXML and MIDI are the most valuable: **either one should let us export the other, and also generate a PDF sheet** (via MuseScore). Lyrics still usually need to be found separately.
 
-The CLI requires explicit `--sheets-dir`, `--xml-dir`, `--midi-dir`,
-`--lyrics-dir`, `--build-dir` and `--report` paths, all under `paths.data_root`
-resolved by `scripts.read_config`. Relative paths are relative to that data root.
-The chosen build directory contains derived `xml/`, `midi/`, `sheets/` and XML
-conversion logs. These are project artifacts, never repository files.
-
-Configure `[tools.musescore].command` and, when PDF conversion is requested,
-`[tools.audiveris].command` as executable argument lists in `config.local.toml`.
-Command prefixes may include required host-specific options. Missing requested
-tools stop the run before downloads or output directories are created.
-`--no-convert` permits acquisition without those tools. Display/headless setup
-belongs to the external installation; the script does not override `HOME` or `DISPLAY`.
+All destination paths are explicit and new. Configure `[tools.musescore].command`
+and, when PDF conversion is requested, `[tools.audiveris].command` as executable
+argument lists in `config.local.toml`. Discover requested tools before acquisition.
+Command prefixes may include required host-specific options. Downloads need no
+converter; display/headless setup belongs to the external installation.
 
 ## Per-song decision policy
 
@@ -72,20 +89,6 @@ When downloading lyrics (usually separate from MIDI/MusicXML):
    - normalize to “full text format” with no repeat signs (e.g. expand `:||:` repeats), and remove/standardize stanza numbering when present
 4. If the LLM judges the text unusable, retry with the next candidate URL.
 5. Record retries and the final cleaning decisions in the per-song report entry.
-
-## File Naming Convention
-
-Every downloaded file must follow this pattern:
-
-```
-[number]_[song_name]_[source].[ext]
-```
-
-Example: `007_Ekorr_n_satt_i_granen_IMSLP.pdf`
-
-- Use the number and name exactly as in the CSV.
-- Replace spaces with `_`, strip special characters: å→a, ä→a, ö→o, '→nothing.
-- Multiple files for the same song: append `_v1`, `_v2`, etc.
 
 ## Search Strategy — For Every Eligible Song
 
@@ -113,7 +116,7 @@ Check **all** of these sources:
 
 ## MIDI Files — Priority
 
-MIDI files are especially valuable. If found, always download them. Name identically to PDFs but with `.mid` extension.
+MIDI files are especially valuable. If found, always download them. Keep the catalogue and source association with each MIDI.
 
 ## MusicXML Files — Priority
 
@@ -126,24 +129,26 @@ If only PDF sheet music is available, either skip it (for "XML only" runs) or do
 The repo includes a helper downloader (`download_scores`) that can:
 
 - search the web for direct score files (MusicXML/MXL/MSCZ/MIDI) by title
-- download the first matching direct score file (preferring XML over MIDI over PDF)
-- optionally fall back to PDF and convert via Audiveris
-- optionally convert MIDI→MusicXML via MuseScore (recommended when PDFs are disallowed)
+- list candidates in XML, MIDI, PDF preference order
+- download a selected source with an acquisition receipt
+- extract reviewed lyric pages or separately convert sources through MuseScore/Audiveris
 
 Run from the repo root (use `env/Scripts/python.exe` on Windows). All example
-artifact paths below are relative to the configured data root; choose the
-destinations for the actual project before running.
+input paths below are relative to the configured data root.
 
 ```bash
-env/bin/python .agents/skills/download-scores/scripts/download_scores.py catalog.csv \
-  --sheets-dir acquisition/sheets --xml-dir acquisition/xml \
-  --midi-dir acquisition/midi --lyrics-dir acquisition/lyrics \
-  --build-dir acquisition/derived --report acquisition/report.md \
-  --search-direct --verify-downloads
+env/bin/python .agents/skills/download-scores/scripts/download_scores.py catalogue catalog.csv --out candidates.json --search-direct
+env/bin/python .agents/skills/download-scores/scripts/download_scores.py download URL --title TITLE --out source.musicxml --receipt acquisition.json --verify-downloads
+env/bin/python .agents/skills/download-scores/scripts/download_scores.py extract raw.txt --url URL --title TITLE --out lyrics.txt
+env/bin/python .agents/skills/download-scores/scripts/convert_score.py source.musicxml --out score.mid --log conversion.log --scratch conversion-work
 ```
 
-Add `--convert-pdf-to-mxl` to request Audiveris, or `--no-convert` for downloads
-only. `--config-root` optionally selects a directory containing configuration.
+`catalogue --search-lyrics` adds fallback web lyric searches; `--no-pdf` filters
+PDF candidates. Search may return no results when blocked. Use curated direct URLs
+when appropriate. Conversion defaults to MuseScore; `--engine audiveris` requests
+PDF-to-MXL. Each operation accepts `--config-root`. Keep stages bounded: inspect
+candidate evidence before download and completed sources before choosing exports.
+The script performs no implicit conversions or extraction during download.
 
 ### Notes about search
 
@@ -176,7 +181,7 @@ Search notes: [what you tried, what you found, why certain sources were skipped]
 
 ## Final Report
 
-When done, produce the explicit `--report` file containing:
+When done, write a report at an explicit destination containing:
 
 1. Total songs processed
 2. Songs with at least one score found (with filenames)

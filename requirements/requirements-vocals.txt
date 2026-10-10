@@ -1,3 +1,6 @@
 # Install only for the explicitly selected synthesize-vocal-with-diffsinger skill.
 -r requirements-python.txt
 onnxruntime==1.26.0
+
+# Decode ONNX tensor references without loading external model data before snapshotting.
+onnx>=1.24,<2

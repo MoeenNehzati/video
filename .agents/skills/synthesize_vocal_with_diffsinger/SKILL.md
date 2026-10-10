@@ -9,6 +9,21 @@ metadata:
 
 # Synthesize a vocal with Nishiren
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these local declarations.
+The ordinary script interfaces are documented below:
+
+- Inputs: `vocal_events_json` and optional `pronunciation_lexicon`.
+- Resource `nishiren`: selected models, maps, embeddings, vocoder and external ONNX
+  tensors from `resources.nishiren_root` (or explicit `--nishiren-root`), plus
+  Python packages onnx, onnxruntime, soundfile, numpy and music21. The optional
+  lexicon comes from explicit `--pronunciation-lexicon` or the configured path.
+  `model_files(root, style)` enumerates the exact selected model closure.
+- Outputs: WAV, debug JSON and log together; settings: `nishiren_lang`,
+  `nishiren_style`, `nishiren_vel`, `nishiren_gender`, `nishiren_steps`, `sample_rate`.
+  Missing models/decoder/backend cannot use placeholders.
+
 This optional workflow converts [vocal events](../../../references/schemas/vocal_events.schema.json)
 into Nishiren phoneme/duration/pitch inputs and runs the external voicebank's
 ONNX models. It preserves the duration, embedding, acoustic and vocoder method
@@ -38,7 +53,7 @@ language before rendering. There is no automatic download or demo-song lexicon.
 
 Implementation: [scripts/synthesize_vocal_with_diffsinger.py](scripts/synthesize_vocal_with_diffsinger.py).
 Run from the repository root; on Windows replace the interpreter as above.
-Artifact paths must be under `paths.data_root`; relative paths resolve from
+Input paths must be under `paths.data_root`; relative paths resolve from
 that directory. `--config-root` optionally selects the configuration directory.
 
 ```bash
@@ -49,7 +64,7 @@ env/bin/python .agents/skills/synthesize_vocal_with_diffsinger/scripts/synthesiz
 
 Choose the embedding, velocity, gender and inference steps deliberately; retain
 the reviewed settings with the synthesis output. The WAV, debug input and log
-must have distinct paths. Debug output follows the
+must have distinct, new output paths. Debug output follows the
 [payload schema](references/diffsinger_input.schema.json); duration values are
 frames, with sample rate and hop size recorded in metadata.
 

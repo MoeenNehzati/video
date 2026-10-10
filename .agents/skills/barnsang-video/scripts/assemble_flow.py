@@ -19,13 +19,13 @@ def positive(value, name):
     return result
 
 
-def duration(path, ffprobe):
+def duration(path, ffprobe, environment=None):
     result = subprocess.run([*ffprobe, "-v", "error", "-show_entries", "format=duration",
-                             "-of", "csv=p=0", str(path)], check=True, capture_output=True, text=True)
+                             "-of", "csv=p=0", str(path)], check=True, capture_output=True, text=True, env=environment)
     return positive(result.stdout.strip(), f"duration of {path}")
 
 
-def prepare(settings, clip_map, audio, config, ffprobe):
+def prepare(settings, clip_map, audio, config, ffprobe, environment=None):
     source_bpm = positive(settings["source_bpm"], "source_bpm")
     target_bpm = positive(settings["target_bpm"], "target_bpm")
     tempo = target_bpm / source_bpm
@@ -47,7 +47,7 @@ def prepare(settings, clip_map, audio, config, ffprobe):
     for key in keys:
         entry = entries[key]
         source = data_path(config, entry["file"], must_exist=True)
-        available = duration(source, ffprobe)
+        available = duration(source, ffprobe, environment)
         length = positive(entry.get("trim_end_s", available), f"trim_end_s of {key}")
         if length > available + .01:
             raise ValueError(f"Clip {key} trim exceeds its duration")
@@ -57,7 +57,7 @@ def prepare(settings, clip_map, audio, config, ffprobe):
     trim = float(settings.get("end_trim_s", 0))
     if not math.isfinite(trim) or trim < 0:
         raise ValueError("end_trim_s must be nonnegative")
-    end = offsets[-1] + duration(audio, ffprobe) / tempo - trim
+    end = offsets[-1] + duration(audio, ffprobe, environment) / tempo - trim
     if end <= offsets[-1]:
         raise ValueError("End trim removes the final verse")
     rows, index, cursor = [], 0, 0.0
@@ -73,7 +73,9 @@ def prepare(settings, clip_map, audio, config, ffprobe):
     return {"tempo": tempo, "duration_s": end, "verse_starts_s": offsets, "clips": rows}
 
 
-def render(plan, settings, audio, output, output_audio, ffmpeg):
+def render(plan, settings, audio, output, output_audio, ffmpeg, environment=None):
+    if output.resolve() == output_audio.resolve() or any(path.exists() for path in (output, output_audio)):
+        raise ValueError("Media outputs must be distinct new files")
     end = plan["duration_s"]
     fade_audio = float(settings.get("audio_fade_s", 2))
     fade_in = float(settings.get("video_fade_in_s", .6))
@@ -101,7 +103,7 @@ def render(plan, settings, audio, output, output_audio, ffmpeg):
     filters.append(labels + f"amix=inputs={len(plan['verse_starts_s'])}:duration=longest:normalize=0,atrim=0:{end}"
                    + (f",afade=t=out:st={end-fade_audio}:d={fade_audio}" if fade_audio else "") + "[a]")
     subprocess.run([*ffmpeg, "-n", "-v", "error", *audio_inputs, "-filter_complex", ";".join(filters),
-                    "-map", "[a]", "-c:a", "pcm_s24le", "-ar", "48000", str(output_audio)], check=True)
+                    "-map", "[a]", "-c:a", "pcm_s24le", "-ar", "48000", str(output_audio)], check=True, env=environment)
     inputs, filters = [], []
     for index, clip in enumerate(plan["clips"]):
         inputs.extend(["-t", str(clip["source_s"]), "-i", str(clip["path"])])
@@ -114,7 +116,7 @@ def render(plan, settings, audio, output, output_audio, ffmpeg):
     subprocess.run([*ffmpeg, "-n", "-v", "error", *inputs, "-i", str(output_audio),
         "-filter_complex", ";".join(filters), "-map", "[v]", "-map", f"{len(plan['clips'])}:a",
         "-c:v", "libx264", "-crf", str(crf), "-preset", preset, "-c:a", "aac", "-b:a", "256k",
-        "-shortest", "-movflags", "+faststart", str(output)], check=True)
+        "-shortest", "-movflags", "+faststart", str(output)], check=True, env=environment)
 
 
 def main(argv=None):
@@ -124,28 +126,31 @@ def main(argv=None):
         p.add_argument("--" + name, required=True)
     args = p.parse_args(argv)
     config = load_project(args.config_root)
-    ffmpeg, ffprobe = tool_command(config, "ffmpeg"), tool_command(config, "ffprobe")
-    source = data_path(config, args.song_config, must_exist=True)
-    clip_file = data_path(config, args.clips, must_exist=True)
-    audio = data_path(config, args.audio, must_exist=True)
+    ffmpeg, ffprobe = tool_command(config, 'ffmpeg'), tool_command(config, 'ffprobe')
+    sources = [data_path(config, value, must_exist=True) for value in (args.song_config, args.clips, args.audio)]
     outputs = [data_path(config, value) for value in (args.output, args.output_audio, args.timeline)]
-    if len(set(outputs)) != 3 or any(path.exists() for path in outputs):
-        raise ValueError("Provide three distinct, new output paths")
-    if outputs[0].suffix.lower() != ".mp4" or outputs[1].suffix.lower() != ".wav" or outputs[2].suffix.lower() != ".json":
-        raise ValueError("Outputs must be MP4, WAV and timeline JSON respectively")
-    settings = json.loads(source.read_text(encoding="utf-8-sig"))
-    clips = json.loads(clip_file.read_text(encoding="utf-8-sig"))
+    if len(set(outputs)) != len(outputs) or any(path.exists() for path in outputs):
+        raise ValueError("Assembly outputs must be distinct new files")
+    if any(a in b.parents for a in outputs for b in outputs if a != b):
+        raise ValueError("Assembly output files cannot contain one another")
+    for path, suffix in zip(outputs, ('.mp4', '.wav', '.json')):
+        if path.suffix.lower() != suffix:
+            raise ValueError(f"Assembly output requires {suffix}: {path}")
+    settings = json.loads(sources[0].read_text(encoding='utf-8-sig'))
+    clips = json.loads(sources[1].read_text(encoding='utf-8-sig'))
+    audio = sources[2]
     plan = prepare(settings, clips, audio, config, ffprobe)
     render(plan, settings, audio, outputs[0], outputs[1], ffmpeg)
     for path in outputs[:2]:
         if not path.is_file() or path.stat().st_size == 0:
             raise RuntimeError(f"External tool did not create a nonempty output: {path}")
     timeline = {**plan, "source_bpm": settings["source_bpm"], "target_bpm": settings["target_bpm"],
-                "audio": str(audio), "film": str(outputs[0]), "prepared_audio": str(outputs[1]),
-                "settings": settings}
+                "audio": str(audio), "film": str(outputs[0]),
+                "prepared_audio": str(outputs[1]), "settings": settings}
     timeline["clips"] = [{**clip, "path": str(clip["path"])} for clip in plan["clips"]]
     outputs[2].parent.mkdir(parents=True, exist_ok=True)
-    outputs[2].write_text(json.dumps(timeline, indent=2) + "\n", encoding="utf-8")
+    with outputs[2].open('x', encoding='utf-8') as stream:
+        stream.write(json.dumps(timeline, indent=2) + "\n")
     print(outputs[0])
 
 

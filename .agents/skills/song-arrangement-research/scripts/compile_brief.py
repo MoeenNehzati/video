@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from scripts.project_runtime import add_config_argument, data_path, load_project
 
 
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
@@ -63,7 +64,7 @@ def compile_brief(brief_path, research_path, out, config):
     out = data_path(config, out, directory=True)
     require(not out.exists() or not any(out.iterdir()), "Use an empty output directory")
     lines = ["# Codex arrangement instruction", f"Arrange {plan['song_id']} for ages {plan['audience']['age_min']}-{plan['audience']['age_max']} ({plan['audience']['context']}).",
-             "User supplies vocals; create no vocals. Deliver guide preview and aligned backing-only exports.", f"Baseline: {plan['baseline_folder']}", "## Preserve"]
+             "User supplies vocals; create no vocals. Deliver guide preview and aligned backing-only exports.", f"Baseline MIDI SHA256: {plan['baseline_midi_sha256']} (path in execution_plan.json)", "## Preserve"]
     lines.extend("- " + x for x in plan["invariants"])
     for v in plan["variants"]:
         lines += [f"## {v['id']}: {v['label']}", f"Change only: {v['axis']}. {v['rationale']}",
@@ -84,8 +85,9 @@ def main():
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
     config = load_project(args.config_root)
-    compile_brief(data_path(config, args.brief, must_exist=True), data_path(config, args.research, must_exist=True), args.out, config)
-    print("Validated brief; wrote PROMPT.md and execution_plan.json")
+    compile_brief(data_path(config, args.brief, must_exist=True),
+                  data_path(config, args.research, must_exist=True), args.out, config)
+    print("Wrote PROMPT.md and execution_plan.json")
 
 
 if __name__ == "__main__":

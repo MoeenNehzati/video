@@ -21,6 +21,50 @@ Score acquisition and the analysis/vocal steps are optional.
 | [synthesize-vocal-with-diffsinger](.agents/skills/synthesize_vocal_with_diffsinger/SKILL.md) | Renders planned notes and lyrics as a sung WAV. | Reviewed vocal events + phonemes → Nishiren DiffSinger models via ONNX Runtime. |
 | [refine-vocal-with-rvc](.agents/skills/refine_vocal_with_rvc/SKILL.md) | Changes an existing vocal's timbre. | External RVC/SVC tool and voice model → timing and intelligibility review. |
 
+## Adding a skill: bookkeeping
+
+Every skill that accesses song artifacts must use
+[artifact-bookkeeping](.agents/skills/artifact-bookkeeping/SKILL.md). This includes
+implicit reads and writes by tools, subprocesses, downloads, APIs and GUI actions,
+as well as files written by the agent. Repository source/configuration inspection
+is outside the song ledger.
+
+The skill's only bookkeeping integration is a short `Bookkeeping` block in its
+`SKILL.md`. Name artifact-bookkeeping and declare, per operation:
+
+- **Inputs:** consumed files and their purpose, including files referenced inside
+  manifests, prompts and other indirect inputs.
+- **Outputs:** deliverables and retained reports/logs, separate scratch files, and
+  any outputs with different dependencies or independent revision needs.
+- **Resources/settings:** tools, packages, models, libraries and relevant options
+  or configuration keys. Never include credentials.
+- **Domain constraints:** input relationships, how embedded paths resolve, and
+  any manual or external action requiring a handoff.
+
+For example, a lyrics skill could include:
+
+```markdown
+## Bookkeeping
+
+Use artifact-bookkeeping with these local declarations:
+- Syllabification: input lyrics text; output lyrics JSON; setting language.
+- Use the ordinary script interface documented below. No score is consumed.
+```
+
+The agent loads artifact-bookkeeping before artifact work and again when resuming,
+including after compaction. The central skill supplies revision resolution,
+preparation, captured execution or handoff, publication and recovery. Read-only
+inspection needs no ledger event; persisted reports and reviews do.
+
+Keep domain methods and ordinary CLI documentation in the production skill. Its
+scripts accept explicit input/output/scratch paths and settings, retain domain
+validation, and report failures. They must not import or call bookkeeping code,
+require ledger flags, or implement ledger lifecycle steps. The Bookkeeping block
+contains declarations, not request schemas or bookkeeping commands; no per-skill
+bookkeeping adapter or runtime registration is required. See the central skill's
+[usage guide](docs/artifact-ledger-usage.md) for execution details and
+[supported routes](docs/artifact-ledger-entrypoints.md) for limitations.
+
 ## Setup
 
 Use Python 3.11+. On POSIX:
@@ -39,7 +83,8 @@ env/bin/python -m scripts.read_config
 
 See [configuration](docs/configuration.md) for external tool/resource keys and
 [requirements](requirements/README.md) for installation boundaries. Run canonical
-skill scripts with the environment's Python and explicit artifact paths. Shared
+skill scripts through bookkeeping for song-artifact work, using the environment's
+Python and prepared explicit artifact paths. Shared
 path validation checks that inputs and outputs stay beneath `data_root`.
 
 ## Scope
@@ -51,11 +96,13 @@ production includes manual Flow work. Optional synthesis has explicit timing and
 model restrictions. These are not claims of an end-to-end production run.
 
 Git contains instructions, skill-used code and its support files. Dropbox contains
-all song/run data, including text and JSON. The [artifact ledger plan](docs/artifact-ledger-plan.md)
-is a separate implementation task; this cleanup creates no ledger or new Dropbox
-layout. See [adoption and validation](docs/skill-adoption.md),
+all song/run data, including text and JSON. The artifact ledger now records exact
+revisions through managed operations; existing Dropbox data is not migrated.
+Producer integration remains partial: see [usage and limits](docs/artifact-ledger-usage.md)
+and the [entrypoint inventory](docs/artifact-ledger-entrypoints.md).
+See [adoption and validation](docs/skill-adoption.md),
 [artifact contracts](docs/artifact-contracts.md), and the
 [cleanup plan](docs/repository-cleanup-commit-plan.md).
 
-Run local fixture tests with `env/bin/python -m unittest discover -s tests -v`.
+Run local fixture tests with `env/bin/python scripts/run_tests.py`.
 Tests do not require paid API calls or production media/models.

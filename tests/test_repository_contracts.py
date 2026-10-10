@@ -16,7 +16,7 @@ class RepositoryContractTests(unittest.TestCase):
         found = set()
         for directory, folders, names in os.walk(REPO):
             folders[:] = [name for name in folders if name not in
-                          {'.git', 'env', '__pycache__', 'tests'} and
+                          {'.git', 'env', '__pycache__', '_build', 'tests'} and
                           not (Path(directory) / name).is_symlink()]
             for name in names:
                 path = Path(directory) / name
@@ -41,7 +41,8 @@ class RepositoryContractTests(unittest.TestCase):
     def test_local_markdown_links_and_toml_example(self):
         files = [REPO / 'AGENTS.md', REPO / 'README.md', REPO / '.claude/README.md']
         for folder in ('docs', 'requirements', '.agents/skills'):
-            files.extend((REPO / folder).rglob('*.md'))
+            files.extend(path for path in (REPO / folder).rglob('*.md')
+                         if '_build' not in path.relative_to(REPO).parts)
         for path in files:
             for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', path.read_text()):
                 target = target.split('#')[0]
@@ -50,8 +51,9 @@ class RepositoryContractTests(unittest.TestCase):
                         self.assertTrue((path.parent / target).exists())
         example = tomllib.loads((REPO / 'config.local.example.toml').read_text())
         self.assertTrue(example['paths']['data_root'])
-        self.assertEqual({p.name for p in (REPO / 'scripts').iterdir() if p.is_file()},
-                         {'__init__.py', 'read_config.py', 'project_runtime.py'})
+        self.assertEqual({p.name for p in (REPO / 'scripts').glob('*.py')},
+                         {'__init__.py', 'read_config.py', 'project_runtime.py', 'run_tests.py'})
+
 
 
 if __name__ == '__main__':

@@ -9,6 +9,13 @@ metadata:
 
 # Skill: `syllabify_lyrics`
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these local declarations.
+The ordinary script interfaces are documented below:
+
+- `syllabify_lyrics.py`: input `lyrics`; output `lyrics.json`; setting `language`.
+
 ## Purpose
 
 Turn `lyrics.txt` into a structured `lyrics.json` that downstream tools can align against a melody.
@@ -36,6 +43,9 @@ Optional config:
 3. Respect explicit hyphenation in the input (e.g., `Twin-kle`).
 4. If no explicit hyphens are present, apply a deterministic heuristic syllabifier.
 5. Emit `lyrics.json`.
+
+Token cleaning preserves Unicode letters. The heuristic is English-oriented;
+syllable boundaries in other languages still require review.
 
 ## Output
 

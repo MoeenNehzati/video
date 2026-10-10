@@ -10,6 +10,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 from scripts.project_runtime import add_config_argument, data_path, load_project, resource_path, tool_command
+
 from verification import artifact_file, component, check_frozen_messages, check_backing, check_child_events, load_auditor, require, sha, verify
 
 RATE = 48000
@@ -29,7 +30,11 @@ def normalize_pair(data, backing, meter, target):
     return data * gain, backing * gain, gain
 
 
-def render(folders, out, config, target=-18.3, ceiling=-1.5):
+def render(folders, out, config, target=-18.3, ceiling=-1.5, audio_out=None):
+    out = data_path(config, out, directory=True)
+    require(not out.exists() or not any(out.iterdir()), "Render report directory must be empty")
+    audio_out = data_path(config, audio_out or out / "audio", directory=True)
+    require(audio_out != out and not out.is_relative_to(audio_out), "Audio and report destinations must be separate")
     import numpy as np
     import soundfile as sf
     import pyloudnorm as pyln
@@ -42,7 +47,7 @@ def render(folders, out, config, target=-18.3, ceiling=-1.5):
     fonts = banks(resource_path(config, "soundfont_manifest"))
     credits = resource_path(config, "soundfont_credits")
     require(math.isfinite(target) and math.isfinite(ceiling) and ceiling <= 0, "Invalid loudness/peak targets")
-    require(not out.exists(), "Render output already exists; allocate a new version")
+    require(not (out / "verification.json").exists(), "Render report already exists; allocate a new version")
     jobs = []
     destinations = set()
     for folder in folders:
@@ -64,14 +69,16 @@ def render(folders, out, config, target=-18.3, ceiling=-1.5):
         check_backing(actual, auditor.read_midi(backing_path), channels["Original melody"])
         require(cfg["counter_library"] in fonts, "Missing supporting instrument sample library")
         require(cfg["room"] in ("studio", "hall", "chamber"), "Unsupported room")
-        destination = data_path(config, out / cfg["stem"] / cfg["id"], directory=True)
-        require(destination.is_relative_to(out) and destination not in destinations, "Unsafe/duplicate render destination")
+        destination = audio_out / cfg["stem"] / cfg["id"]
+        require(not destination.exists(), "Render destination already exists")
+        require(destination not in destinations, "Duplicate render destination")
         destinations.add(destination)
         for suffix in ("", "_backing"):
             for ext in (".wav", ".mp3"):
                 artifact_file(config, destination, cfg["filename"] + suffix + ext)
         jobs.append((folder, cfg, verification, mid, backing_path, channels, destination))
     require(jobs, "No arrangements supplied")
+    out.mkdir(parents=True, exist_ok=True)
     synth = CounterRenderer(fonts, library)
     meter = pyln.Meter(RATE)
     results = []
@@ -111,7 +118,9 @@ def render(folders, out, config, target=-18.3, ceiling=-1.5):
                           backing={**outputs["_backing"], "midi_sha256": sha(backing_path), "frames": len(backing), "gain_policy": "Same gain as full mix"},
                           child_plan_sha256=cfg["child_plan_sha256"], human_listening_review="pending", vocals="user_supplied",
                           libraries={key: {"sha256": value["sha256"], "credits": value["credits"]} for key, value in fonts.items()})
-            (destination / "render_log.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+            log = out / cfg["stem"] / cfg["id"] / "render_log.json"
+            log.parent.mkdir(parents=True, exist_ok=True)
+            log.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
             results.append(report)
     finally:
         synth.close()
@@ -123,13 +132,17 @@ def main():
     add_config_argument(parser)
     parser.add_argument("folders", help="JSON list of arrangement directories")
     parser.add_argument("--out-dir", required=True)
+    parser.add_argument("--audio-dir", help="Separate audio bundle root; defaults to out-dir/audio")
     parser.add_argument("--target-lufs", type=float, default=-18.3)
     parser.add_argument("--peak-ceiling", type=float, default=-1.5)
     args = parser.parse_args()
     config = load_project(args.config_root)
     listing = data_path(config, args.folders, must_exist=True)
-    folders = [data_path(config, value, must_exist=True, directory=True) for value in json.loads(listing.read_text(encoding="utf-8"))]
-    render(folders, data_path(config, args.out_dir, directory=True), config, args.target_lufs, args.peak_ceiling)
+    values = json.loads(listing.read_text(encoding="utf-8"))
+    require(isinstance(values, list) and values and all(isinstance(value, str) for value in values), "Expected nonempty folder list")
+    folders = [data_path(config, value, must_exist=True, directory=True) for value in values]
+    require(len(set(folders)) == len(folders), "Duplicate arrangement folder")
+    render(folders, args.out_dir, config, args.target_lufs, args.peak_ceiling, args.audio_dir)
 
 
 if __name__ == "__main__":

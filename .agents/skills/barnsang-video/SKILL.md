@@ -5,12 +5,35 @@ description: Make an animated children's music video from its reviewed score and
 
 # Children's song video
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with the declarations
+below for `barnsang-video`. Use the ordinary script interfaces documented below.
+
+- Flow instructions: inputs `storyboard`, `image_0001`, `image_0002`, etc., in
+  storyboard order; output instruction text; optional setting `clips`.
+  Image paths in the storyboard resolve relative to `paths.data_root`.
+  A complete Flow kit additionally contains the referenced images.
+- Assembly: inputs `song_config`, `clips`, `audio` and every `clip_NNNN` in clip-map
+  order; outputs `audio`, `film`, `timeline`; resources `ffmpeg`, `ffprobe`.
+  Clip paths in the map resolve relative to `paths.data_root`, not the map's
+  directory. Settings are the complete assembly-settings JSON documented below.
+  Prepared audio depends on `song_config` and source `audio`; film depends on all
+  declared assembly inputs and prepared audio; timeline depends on all those
+  inputs, prepared audio and film. The timeline contains paths to source audio,
+  every clip, prepared audio and film; these references must remain usable.
+- Image/edit and Flow handoffs consume prompts, settings, character/continuity
+  references and existing project context; outputs include images/request records
+  or individual clip takes with the actual generation/handoff identity.
+  The image/edit script routes remain disabled. A manual handoff is a separate
+  operation, not an enabled image or video API.
+
 Read the project's accepted story, arrangement, visual choices and review records
 before continuing. Keep decisions and generated files under `paths.data_root`;
 never restart accepted work merely because this is a new session. The user supplies
 taste and final approval. [Adoption notes](../../../docs/skill-adoption.md) describe
 execution boundaries; [artifact contracts](../../../docs/artifact-contracts.md)
-describe the pending ledger integration.
+describe the deliverable requirements.
 
 Use the repo environment's Python (`env/bin/python` on POSIX,
 `env/Scripts/python.exe` on Windows). Commands below use `python` for that interpreter.
@@ -36,7 +59,7 @@ Configure external commands through `[tools.ffmpeg].command` and
   Except at an explicit scene change or time jump, a clip's last image is the next
   clip's first image. Use natural movement, without morphing or transition effects.
 - Keep a Flow handoff containing only the selected current pictures and one
-  instructions file. Archive earlier revisions elsewhere in project data. Never
+  instructions file. Never
   change a picture under an existing filename inside an existing Flow project;
   use a new descriptive filename or a new project.
 
@@ -50,7 +73,8 @@ Configure external commands through `[tools.ffmpeg].command` and
    and change only the next story action. Review each result before using it as a
    predecessor. Check anatomy, floating objects and clothing transferred between
    characters; repair defects with targeted edits.
-4. Run `scripts/write_flow_instructions.py` to produce the Flow handoff. Review its
+4. Run `scripts/write_flow_instructions.py` to produce the instruction text, then
+   include it and the referenced images in the Flow handoff. Review its
    filename-to-picture mapping before generation. The user generates each clip in
    Flow using the specified START/END images, duration, aspect ratio and chosen model.
    This remains a manual workflow; no untested video API is advertised.
@@ -66,17 +90,19 @@ Configure external commands through `[tools.ffmpeg].command` and
    timing against the actual vocal recording. Listen and watch the assembled result;
    successful encoding does not establish quality or audiovisual alignment.
 
+The image-generation/edit examples are reference-only; check current route
+availability through artifact-bookkeeping before execution.
+
 ```text
 python .agents/skills/barnsang-video/scripts/gen_image.py --model MODEL --quality QUALITY --size SIZE --prompt song/character-prompt.txt --output song/character.png
 python .agents/skills/barnsang-video/scripts/gen_edit.py --model MODEL --quality QUALITY --size SIZE --prompt song/frame2-prompt.txt --reference song/frame1.png --reference song/character.png --output song/frame2.png
-python .agents/skills/barnsang-video/scripts/write_flow_instructions.py --storyboard song/storyboard.json --output song/flow-kit/INSTRUCTIONS.txt
-python .agents/skills/barnsang-video/scripts/assemble_flow.py --song-config song/assembly.json --clips song/selected-clips.json --audio song/accompaniment.wav --output song/film.mp4 --output-audio song/prepared-audio.wav --timeline song/timeline.json
+python .agents/skills/barnsang-video/scripts/write_flow_instructions.py --storyboard song/storyboard.json --output INSTRUCTIONS.txt
+python .agents/skills/barnsang-video/scripts/assemble_flow.py --song-config song/assembly.json --clips song/selected-clips.json --audio song/accompaniment.wav --output film.mp4 --output-audio prepared-audio.wav --timeline timeline.json
 ```
 
 Image scripts require `OPENAI_API_KEY`, never print it, and create an adjacent
 `<output>.json` request record. Use `--input-fidelity high` for editing only when the
-chosen model supports it. Validate prompts/references before paid generation. All
-outputs must be new paths; keep previous versions while revising. `--clips ID ...`
+chosen model supports it. Validate prompts/references before paid generation. `--clips ID ...`
 on the handoff command selects particular clips for regeneration.
 
 ## Run-file contracts

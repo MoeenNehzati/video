@@ -4,16 +4,18 @@ This audit records the contracts of the collaborator's three retained skills.
 Their musical and visual methods remain the baseline; older repo implementations
 are not being merged into them. The later [artifact ledger plan](artifact-ledger-plan.md)
 records the agreed global, append-only history design and supersedes the earlier
-per-artifact-manifest recommendation. The agreed directory structure and ledger remain unimplemented; the workflow
-requirements below still apply.
+per-artifact-manifest recommendation. The ledger is implemented, with partial
+producer integration documented in [usage](artifact-ledger-usage.md) and the
+[entrypoint inventory](artifact-ledger-entrypoints.md); the workflow requirements below
+still apply.
 
 Before pipeline work, resolve configuration with `env/bin/python -m scripts.read_config`.
 Use its `paths.data_root` and pass explicit paths to tools. Machine settings belong
 in `config.local.toml`; shared artifact references must survive different local
 Dropbox mount paths. Code lives in the repo, media and project data in Dropbox.
-Preserve existing organization until the ledger migration is implemented. Current
-Python entrypoints validate explicit artifact paths under the configured root;
-this does not yet record dependencies or revisions.
+Preserve existing organization; migration is not automatic. Managed operations
+record exact dependencies and immutable revisions, while unavailable entrypoints
+stop before production. Path validation alone does not provide that provenance.
 
 ## 1. Source scores to reviewed MusicXML
 
@@ -98,9 +100,9 @@ partly synchronized outputs and validate files/hashes before reuse. Cross-machin
 paths must resolve against configuration. A searchable catalogue can be derived;
 it need not be the only durable record of artifact relationships.
 
-The global ledger will hold authoritative dependency and change records; the
-catalogue will derive current and historical views from its events. Per-artifact
-sidecars are no longer the proposed authority. The directory layout must support
+The global ledger holds authoritative dependency and change records; the
+catalogue derives current and historical views from its events. Per-artifact
+sidecars are not authoritative. The directory layout supports
 ordinary browsing without being the only record of ancestry. Compare layouts
 against the branched examples in the [plan](artifact-ledger-plan.md) before changing
 any Dropbox artifacts.
@@ -119,8 +121,8 @@ before production execution. Java compilation and the chosen sample banks requir
 real toolchain validation. Initial pitched-arrangement creation and final
 recorded-vocal alignment/mixing remain open capabilities.
 
-The next storage task is the [ledger implementation](artifact-ledger-plan.md),
-including multiple XML/arrangement/render alternatives, relocated roots, stale
-hashes and concurrent updates. Synthetic tests establish code integration, not
-musical or end-to-end production acceptance. This cleanup does not migrate Dropbox
-artifacts or create its proposed ledger layout.
+The [ledger implementation](artifact-ledger-usage.md) supports multiple
+XML/arrangement/render alternatives, relocated roots, stale hashes and concurrent
+updates. Producer adapter coverage remains partial and final interactive acceptance
+is blocked. Synthetic tests establish code integration, not musical or end-to-end
+production acceptance. Existing Dropbox artifacts are not migrated automatically.

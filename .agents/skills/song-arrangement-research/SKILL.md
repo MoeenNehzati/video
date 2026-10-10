@@ -5,6 +5,60 @@ description: Research a song's background, approved lyrics and documented record
 
 # Song arrangement research
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these declarations
+and the ordinary CLI interfaces below:
+
+- Brief compilation consumes brief/research JSON, `source_xml`, and the baseline's
+  `parameters.json` plus its named MIDI; produces `execution_plan.json` and
+  `PROMPT.md`. Source, baseline and research hashes must match. Paths in JSON
+  resolve under configured `paths.data_root` unless absolute. Brief `output_root`
+  is destination metadata validated for containment, not a consumed input; native
+  execution selects its actual destination with explicit `--output-root`.
+- Native execution consumes each plan, its sibling `PROMPT.md`, research, source
+  XML/MIDI, baseline parameters/MIDI, `input.properties`, `chords.tsv`, `melody.tsv`,
+  `upper.tsv`, `tracks.tsv`, `native_reload_verified.txt`, plus `bass.tsv` for
+  trio/chamber and `strings.tsv` for chamber. Parameters identify the source files.
+  Outputs under `--output-root/song_id/variant_id` are native project/mix,
+  MIDI/backing MIDI, parameters, copied prompt/tables, participation and native
+  verification reports, plus the explicit folder manifest. Native creation
+  precedes frozen MIDI and `verification.json`. Native, MIDI and verification
+  require independent revisions with those dependencies; a complete reusable
+  folder bundle depends on all three, and the folder manifest refers to that
+  bundle. `--scratch` is a new private
+  compiler/preferences directory. Resources are Java/Javac, the toolkit jar,
+  the complete rhythms directory and external MIDI auditor; Python needs mido.
+- Rendering consumes the folder-list JSON, each listed folder's parameters, MIDI,
+  backing MIDI, tracks and native reload report, and parameters' source XML/MIDI,
+  baseline MIDI and child plan. Folder-list and parameter paths follow the same
+  data-root rule. Outputs are audio/credits under `--audio-dir` (or `out-dir/audio`)
+  and `verification.json` plus per-variant render logs under `--out-dir`; reports
+  depend on their audio. Resources are the MIDI auditor, FluidSynth library,
+  FFmpeg, soundfont manifest and every bank it names, and sample credits; relative
+  bank paths resolve beside the manifest. Settings are target LUFS, peak ceiling,
+  room and instrument routing; Python needs mido, NumPy, SoundFile, pyloudnorm,
+  SciPy. Missing mapped samples fail; guide/backing share gain and frame count.
+- Listening delivery consumes each render report plus its audio (full/backing
+  WAV/MP3, credits), arrangement parameters, native project/mix, full/backing MIDI,
+  prompt and participation text. Produces one portable bundle containing copies,
+  HTML, catalogues and parameter logs; resource is `listening_page.html`, Python
+  needs SoundFile. Report folder paths use the data-root rule; generated catalogue
+  links resolve relative to the page and remain inside the delivery bundle.
+- Browser checks consume reports, their referenced full/backing WAV/MP3/MIDI and
+  native project/mix, plus the complete delivered page and linked files. Output
+  is the explicit JSON report; `--scratch` holds private browser preferences.
+  Resources are Chromium with its data/font/plugin closure, Playwright and
+  SoundFile. No profile override or remote page links; actual human listening
+  remains a separate review.
+- Manual research, baseline creation and GUI edits declare inspected references,
+  prompts, source files and exact returned deliverables before those actions.
+  Tools/models, settings and external effects belong to the chosen stage.
+
+All stages use resolved project configuration, ordinary explicit paths and reject
+existing deliverables. Persistent plans, parameters and reports contain dependency
+paths and hash checks; retained references must remain usable after publication.
+
 ## Repository execution
 
 Read [adoption notes](../../../docs/skill-adoption.md) and
@@ -22,7 +76,7 @@ Turn song-specific evidence into concrete musical decisions and reproducible arr
 
 ## Establish the source and scope
 
-Read project AGENTS.md, current context/history and user decisions. Identify the exact approved score, MIDI melody, chord timing, baseline arrangement and output directory. Preserve source hashes. Keep existing full chord accompaniment, bass movement and beat when adding motifs unless the user requests a thinner arrangement. Allocate new version names without overwriting earlier work unless revision is authorized.
+Read project AGENTS.md, current context/history and user decisions. Identify the exact approved score, MIDI melody, chord timing, baseline arrangement. Preserve source hashes. Keep existing full chord accompaniment, bass movement and beat when adding motifs unless the user requests a thinner arrangement.
 
 Resolve age and use context when material; otherwise record assumptions. For the default children's workflow, record an age range and keep supporting details subordinate to the melody. User will add vocals: do not synthesize or recruit singers. Keep the guide melody separate and deliver an accompaniment-only export alongside the instrumental listening preview.
 
@@ -54,17 +108,15 @@ Verify source immutability; original melody/chord/meter/tempo; intended baseline
 From the repository root, replace the illustrative data-relative arguments:
 
 ```text
-python .agents/skills/song-arrangement-research/scripts/compile_brief.py song/arrangement_brief.json song/research.json --out song/compiled
-python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py song/compiled/execution_plan.json --out song/variant_folders.json
-python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py song/variant_folders.json --out-dir song/render-comparison
-python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py song/render-comparison/verification.json --out-dir song/listening
-python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py song/render-comparison/verification.json --page-dir song/listening --out song/delivery_checks.json
+python .agents/skills/song-arrangement-research/scripts/compile_brief.py song/arrangement_brief.json song/research.json --out compiled
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py song/compiled/execution_plan.json --out variant_folders.json --output-root variants --scratch scratch/native
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py song/variant_folders.json --out-dir render-comparison
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py song/render-comparison/verification.json --out-dir listening
+python .agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py song/render-comparison/verification.json --page-dir song/listening --out delivery_checks.json --scratch scratch/browser
 ```
 
-Use new output locations; these commands refuse existing delivery directories or
-reports. All support `--config-root` when configuration is in another checkout.
-`ChildExperiment.java` is compiled from source into a temporary directory on each
+All commands support `--config-root` when configuration is in another checkout.
+`ChildExperiment.java` is compiled from source into the explicit scratch directory on each
 execution. No compiled classes or external software belong in this repository.
 `verification.py` preserves the source/event checks; `sample_renderer.py` provides
 sample routing and rendering; `listening_page.html` is the reusable page template.
-The bookkeeping ledger is separate planned work; these commands do not register it.

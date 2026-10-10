@@ -10,10 +10,10 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
+
 from scripts.project_runtime import resource_path
 
-import numpy as np
 
 
 def _load_json(path: Path) -> dict:
@@ -73,6 +73,7 @@ def _load_nishiren_language_map(nishiren_root: Path) -> dict[str, int]:
 
 
 def _load_nishiren_embedding(path: Path, hidden: int) -> np.ndarray:
+    import numpy as np
     try:
         arr = np.load(path, allow_pickle=False).astype(np.float32).reshape(-1)
         if arr.size == hidden:
@@ -118,7 +119,7 @@ def _word_to_phones(word: str, lex: dict[str, list[str]]) -> list[str]:
     return phones
 
 
-def _preflight_models(root: Path, style: str) -> None:
+def _preflight_models(root: Path, style: str) -> list[str]:
     required = [
         "dsdur/linguistic.onnx", "dsdur/dur.onnx", "dsdur/phonemes.json", "dsdur/languages.json",
         "dsmain/acoustic.onnx", "dsmain/phonemes.json", "dsmain/languages.json", f"dsmain/{style}.emb",
@@ -130,10 +131,65 @@ def _preflight_models(root: Path, style: str) -> None:
             required += [f"{group}/linguistic.onnx", f"{group}/{model}.onnx",
                          f"{group}/phonemes.json", f"{group}/languages.json"]
     missing = [str(root / name) for name in required if not (root / name).is_file()]
-    if not list((root / "dsvocoder").glob("*.onnx")):
+    vocoders = sorted((root / "dsvocoder").glob("*.onnx"))
+    if not vocoders:
         missing.append(str(root / "dsvocoder/*.onnx"))
     if missing:
         raise ValueError("Missing Nishiren resources: " + ", ".join(missing))
+    required.append(vocoders[0].relative_to(root).as_posix())
+    for group in ("dsdur", "dspitch", "dsvariance"):
+        embedding = root / group / f"{style}.emb"
+        if embedding.is_file() and (group == "dsdur" or (root / group).exists()):
+            required.append(embedding.relative_to(root).as_posix())
+    return sorted(set(required))
+
+
+def _tensor_locations(message):
+    if message.DESCRIPTOR.full_name == "onnx.TensorProto" and message.external_data:
+        fields = {item.key: item.value for item in message.external_data}
+        if len(fields) != len(message.external_data) or set(fields) - {"location", "offset", "length", "checksum"}:
+            raise ValueError("Unsupported or duplicate ONNX external-data fields")
+        if not fields.get("location"):
+            raise ValueError("ONNX external tensor data needs a location")
+        yield fields["location"]
+    for field, value in message.ListFields():
+        if field.message_type is not None:
+            children = [value] if hasattr(value, "ListFields") else (value.values() if hasattr(value, "values") else value)
+            for child in children:
+                yield from _tensor_locations(child)
+
+
+def resource_file(root, name):
+    path = Path(name)
+    if path.is_absolute() or "\\" in name or ":" in name or any(part in {"", ".", ".."} for part in name.split("/")):
+        raise ValueError("Unsafe model resource path")
+    root = Path(root).resolve()
+    candidate = root / path
+    if any(parent.is_symlink() for parent in (candidate, *candidate.parents) if parent != root and parent.is_relative_to(root)):
+        raise ValueError("Unsafe symbolic link in model resource")
+    resolved = candidate.resolve()
+    if not resolved.is_relative_to(root):
+        raise ValueError("Unsafe external tensor data path")
+    return resolved
+
+
+def model_files(root, style):
+    files = set(_preflight_models(root, style))
+    try:
+        import onnx
+    except ImportError as exc:
+        raise ValueError("ONNX model-reference validation requires requirements/requirements-vocals.txt; install it only for requested synthesis") from exc
+    for name in sorted(files):
+        model_path = resource_file(root, name)
+        if model_path.suffix == ".onnx":
+            # Decode metadata only; native inference must never discover a live external path.
+            model = onnx.load(model_path, load_external_data=False)
+            for location in _tensor_locations(model):
+                external = resource_file(model_path.parent, location)
+                if not external.is_file():
+                    raise ValueError(f"Missing external ONNX tensor data: {location}")
+                files.add(external.relative_to(root).as_posix())
+    return sorted(files)
 
 
 def _run_nishiren_onnx(
@@ -152,6 +208,10 @@ def _run_nishiren_onnx(
     steps: int,
     lexicon: dict[str, list[str]],
 ) -> dict:
+    for path in (out_wav, log_path, debug_out):
+        if path is not None:
+            fresh_output(path)
+    import numpy as np
     os.environ.setdefault("ORT_LOG_SEVERITY_LEVEL", "3")
     import onnxruntime as ort  # type: ignore[import-not-found]
     import soundfile as sf  # type: ignore[import-not-found]
@@ -473,24 +533,36 @@ def main() -> None:
     ap.add_argument("--nishiren-gender", type=float, default=0.0)
     ap.add_argument("--nishiren-steps", type=int, default=30)
     ap.add_argument("--sample-rate", type=int, default=44100)
+    ap.add_argument("--nishiren-root", type=Path)
+    ap.add_argument("--pronunciation-lexicon", type=Path)
     add_config_argument(ap)
     args = ap.parse_args()
     config = load_project(args.config_root)
-    source = data_path(config, args.vocal_events_json, must_exist=True)
-    output = data_path(config, args.out)
-    debug = data_path(config, args.debug_out)
-    log = data_path(config, args.log)
-    if len({source, output, debug, log}) != 4:
-        raise ValueError("Input, WAV, debug, and log paths must be distinct")
-    nishiren_root = resource_path(config, "nishiren_root", directory=True)
+    args.vocal_events_json = data_path(config, args.vocal_events_json, must_exist=True)
+    for name in ("out", "debug_out", "log"):
+        setattr(args, name, data_path(config, getattr(args, name)))
+    args.nishiren_root = args.nishiren_root or resource_path(config, "nishiren_root", directory=True)
+    if args.pronunciation_lexicon:
+        args.pronunciation_lexicon = data_path(config, args.pronunciation_lexicon, must_exist=True)
+    elif config.get("resources", {}).get("pronunciation_lexicon"):
+        args.pronunciation_lexicon = resource_path(config, "pronunciation_lexicon")
+    produce(args)
+
+
+def produce(args):
+    source, output = Path(args.vocal_events_json), Path(args.out)
+    debug, log = Path(args.debug_out), Path(args.log)
+    inputs = [source, *([args.pronunciation_lexicon] if args.pronunciation_lexicon else [])]
+    destinations = [fresh_output(path, inputs=inputs) for path in (output, debug, log)]
+    if len(set(destinations)) != 3:
+        raise ValueError("WAV, debug and log files must be distinct")
     if Path(args.nishiren_style).name != args.nishiren_style or "\\" in args.nishiren_style:
         raise ValueError("Nishiren style must be a single embedding name")
-    _preflight_models(nishiren_root, args.nishiren_style)
-    lexicon = {}
-    if config.get("resources", {}).get("pronunciation_lexicon"):
-        lexicon = _load_json(resource_path(config, "pronunciation_lexicon"))
-        if not isinstance(lexicon, dict):
-            raise ValueError("pronunciation_lexicon must be a JSON object of word to phoneme list")
+    nishiren_root = Path(args.nishiren_root)
+    model_files(nishiren_root, args.nishiren_style)
+    lexicon = _load_json(Path(args.pronunciation_lexicon)) if args.pronunciation_lexicon else {}
+    if not isinstance(lexicon, dict):
+        raise ValueError("pronunciation_lexicon must be a JSON object of word to phoneme list")
     payload = _load_json(source)
     tempo = float(payload["global"]["tempo_bpm"])
     events = payload["vocal_events"]

@@ -52,6 +52,7 @@ for the selected resources and is copied to each rendered delivery.
   position and mobile layout using the configured browser. Human listening stays
   pending until actually performed.
 
-All project inputs/outputs use configured data-root paths. Failed generation may
-leave partial outputs; inspect them and allocate a fresh version before retrying.
-There is no transaction or ledger integration in this cleanup.
+The skill's Bookkeeping block declares stage inputs, outputs and resources. The
+[current entrypoint inventory](../../../../docs/artifact-ledger-entrypoints.md) records
+which execution routes are supported. Script interfaces are ordinary explicit
+paths; native execution and browser checks require new `--scratch` directories.

@@ -14,4 +14,7 @@ soundfile==0.13.1
 requests==2.34.2
 playwright>=1.50,<2
 
+# Managed Python runtime dependency metadata.
+packaging>=24,<27
+
 # Optional Nishiren synthesis: requirements-vocals.txt (not part of default setup).

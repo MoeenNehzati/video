@@ -17,3 +17,6 @@ Desktop.ini
 
 .claude/settings.json
 **/__pycache__/
+
+# Reproducible repository audit reports and build intermediates
+_build/

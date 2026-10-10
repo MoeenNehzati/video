@@ -9,6 +9,15 @@ metadata:
 
 # Skill 3: `plan_and_align_vocals`
 
+## Bookkeeping
+
+Use [artifact-bookkeeping](../artifact-bookkeeping/SKILL.md) with these local declarations.
+The ordinary script interfaces are documented below:
+
+- `plan_and_align_vocals.py`: inputs `music_analysis_json`, `lyrics_json`, `score`;
+  output `vocal_events.json`; setting `cue`; Python resource `music21`.
+- The analysis provenance must identify the supplied score revision and file.
+
 ## Purpose
 
 Convert `music_analysis.json` + `lyrics.json` into `vocal_events.json`, the central representation for downstream singing synthesis.

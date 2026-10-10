@@ -3,24 +3,27 @@ import argparse
 import csv
 import json
 import os
+import shutil
 from pathlib import Path
 import sys
 from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[5]))
 from scripts.project_runtime import add_config_argument, data_path, load_project
+
 from verification import component, require
 from check_delivery import check_files
 
 
 def publish(report_paths, out, config):
-    require(not out.exists(), "Listening output already exists; allocate a new version")
+    out = data_path(config, out, directory=True)
+    require(not out.exists() or not any(out.iterdir()), "Listening output must be empty")
     reports = [row for path in report_paths for row in json.loads(path.read_text(encoding="utf-8"))]
     require(reports, "Empty render reports")
     check_files(reports, config)
-    songs, catalogue, logs = {}, [], []
+    songs, catalogue, logs, copies = {}, [], [], []
     seen = set()
-    for result in reports:
+    for index, result in enumerate(reports, 1):
         folder = data_path(config, result["folder"], must_exist=True, directory=True)
         arrangement = data_path(config, result["arrangement_folder"], must_exist=True, directory=True)
         cfg = json.loads((arrangement / "parameters.json").read_text(encoding="utf-8"))
@@ -28,6 +31,16 @@ def publish(report_paths, out, config):
         component(cfg["id"])
         component(cfg["filename"])
         require(cfg["filename"] == result["filename"], "Render and arrangement filenames differ")
+        audio_output = out / "assets" / f"r{index:04d}" / "audio"
+        arrangement_output = audio_output.parent / "arrangement"
+        for source, target, names in (
+                (folder, audio_output, [cfg["filename"] + suffix for suffix in (".wav", ".mp3", "_backing.wav", "_backing.mp3")] + ["CREDITS.md"]),
+                (arrangement, arrangement_output, [cfg["filename"] + suffix for suffix in (".mid", ".sng", ".mix", "_backing.mid")] + ["parameters.json", "ARRANGEMENT_PROMPT.md", "participation.md"])):
+            for name in names:
+                original = data_path(config, source / name, must_exist=True)
+                require(not original.is_relative_to(out), "Delivery output aliases an input")
+                copies.append((original, target / name))
+        folder, arrangement = audio_output, arrangement_output
         identity = (cfg["stem"], cfg["id"])
         require(identity not in seen, "Repeated song/version; publish each render comparison separately")
         seen.add(identity)
@@ -59,7 +72,11 @@ def publish(report_paths, out, config):
                           "meter": cfg["meter"], "lufs": result["final_lufs"], "wav": files["wav"], "mp3": files["mp3"], "parameters": files["log"]})
     template = Path(__file__).with_name("listening_page.html").read_text(encoding="utf-8")
     data = json.dumps(songs, ensure_ascii=False).replace("<", "\\u003c")
-    out.mkdir(parents=True)
+    out.mkdir(parents=True, exist_ok=True)
+    for source, destination in copies:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with destination.open("xb") as stream, source.open("rb") as original:
+            shutil.copyfileobj(original, stream)
     for path, text in logs:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
@@ -78,7 +95,8 @@ def main():
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args()
     config = load_project(args.config_root)
-    publish([data_path(config, value, must_exist=True) for value in args.reports], data_path(config, args.out_dir, directory=True), config)
+    publish([data_path(config, value, must_exist=True) for value in args.reports],
+            data_path(config, args.out_dir, directory=True), config)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@ import tempfile
 import unittest
 
 
-REPO = Path(__file__).resolve().parents[1]
+
+REPO = Path(__file__).resolve().parents[4]
 COMPILER = REPO / ".agents/skills/song-arrangement-research/scripts/compile_brief.py"
 
 
@@ -93,6 +94,22 @@ class ImportedBriefTests(unittest.TestCase):
             self.assertIn("test_song", prompt)
             self.assertIn("01_simple", prompt)
             self.assertEqual({path: path.read_bytes() for path in inputs}, original)
+
+    def test_existing_destination_and_input_alias_are_preserved(self):
+        for alias in (False, True):
+            with self.subTest(alias=alias), tempfile.TemporaryDirectory(prefix="brief å space ") as directory:
+                work=Path(directory)
+                inputs=self.make_inputs(work)
+                source,midi,parameters,research,brief=inputs
+                out=brief if alias else work/"compiled"
+                if not alias:
+                    out.mkdir(); (out/"PROMPT.md").write_text("original")
+                before={path:path.read_bytes() for path in inputs}
+                result=subprocess.run([sys.executable,str(COMPILER),str(brief),str(research),
+                    "--out",str(out),"--config-root",str(work)],text=True,capture_output=True)
+                self.assertNotEqual(result.returncode,0)
+                self.assertEqual({path:path.read_bytes() for path in before},before)
+                if not alias: self.assertEqual((out/"PROMPT.md").read_text(),"original")
 
     def test_rejects_stale_inputs_and_invalid_events_before_writing_outputs(self):
         for invalid in ("source_changed", "midi_changed", "event_out_of_bounds",

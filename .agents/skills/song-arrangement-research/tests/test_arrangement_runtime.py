@@ -10,13 +10,14 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
+
 from unittest.mock import patch
 
 import mido
 import numpy as np
 import soundfile as sf
 
-REPO = Path(__file__).resolve().parents[1]
+REPO = Path(__file__).resolve().parents[4]
 ADAPTER = REPO / ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments"
 sys.path.insert(0, str(ADAPTER))
 
@@ -165,7 +166,7 @@ class ArrangementRuntimeTests(unittest.TestCase):
             for manifest in (output, expected, expected / "folders.json"):
                 with self.subTest(manifest=manifest), patch.object(execute, "load_auditor"), patch.object(execute, "tool_command", return_value=[sys.executable]), patch.object(execute, "resource_path", return_value=root), patch.object(execute, "compiler_module", return_value=SimpleNamespace(validate_brief=lambda *args: plan)), patch.object(execute, "verify", return_value=(base, {})), patch.object(execute, "frozen_midis", return_value=(None, None)), patch.object(execute, "compile_java") as compile_java:
                     with self.assertRaisesRegex(ValueError, "separate from variant"):
-                        execute.execute([planpath], manifest, self.config(root))
+                        execute.execute([planpath], manifest, self.config(root), runtime={"java": [sys.executable]})
                     compile_java.assert_not_called()
                     self.assertFalse(output.exists())
 
@@ -187,7 +188,7 @@ class ArrangementRuntimeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory, patch.object(execute.subprocess, "run") as run:
             root = Path(directory)
             with self.assertRaisesRegex(ValueError, "resources.midi_audit"):
-                execute.execute([], root / "folders.json", self.config(root))
+                execute.execute([], root / "folders.json", self.config(root), runtime={"java": [sys.executable]})
             self.assertEqual(list(root.iterdir()), [])
             run.assert_not_called()
 
@@ -202,7 +203,7 @@ class ArrangementRuntimeTests(unittest.TestCase):
             recorder = root / "compiler.py"
             recorder.write_text("import json, pathlib, sys\na=sys.argv[1:]\np=pathlib.Path(a[a.index('-d')+1])\n(p/'ChildExperiment.class').write_bytes(b'stub')\n(p/'args.json').write_text(json.dumps(a))\n")
             cfg = {**self.config(root), "resources": {"jjazzlab_toolkit": str(jar)}, "tools": {"javac": {"command": [sys.executable, str(recorder)]}}}
-            classpath = execute.compile_java(cfg, build)
+            classpath = execute.compile_java(cfg, build, {"javac": [sys.executable, str(recorder)], "environment": dict(os.environ)}, root / "manifest.json")
             args = json.loads((build / "args.json").read_text())
             self.assertEqual(classpath, os.pathsep.join((str(build), str(jar))))
             self.assertIn("-proc:full", args)
@@ -254,9 +255,10 @@ class ArrangementRuntimeTests(unittest.TestCase):
                     parent = arrangement if ext == "mid" else folder
                     row["backing"][("midi" if ext == "mid" else ext) + "_sha256"] = digest(parent / (filename + "_backing." + ext))
                 reports.append(row)
-            report = root / "verification.json"
+            (root / "scratch").mkdir()
+            report = root / "scratch/verification.json"
             report.write_text(json.dumps(reports))
-            out = root / "listening"
+            out = root / "outputs/listening"
             publisher.publish([report], out, self.config(root))
             catalogue = json.loads((out / "catalogue.json").read_text())
             self.assertEqual(set(catalogue), {"alpha", "beta"})

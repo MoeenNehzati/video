@@ -3,38 +3,24 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import datetime, timezone
+import json
 import re
-import subprocess
-import threading
 import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-import tempfile
 
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
-from scripts.project_runtime import add_config_argument, data_path, load_project
-from scripts.project_runtime import tool_command
+from scripts.project_runtime import add_config_argument, data_path, fresh_output, load_project
+
 
 _DUCKDUCKGO_BLOCKED = False
-_CONVERT_LOCK = threading.Lock()
-
-
-def _slug(s: str) -> str:
-    # Normalize and strip diacritics, then keep a conservative filename alphabet.
-    s = s.strip().replace(" ", "_")
-    s = unicodedata.normalize("NFKD", s)
-    s = "".join(ch for ch in s if not unicodedata.combining(ch))
-    s = s.replace("å", "a").replace("ä", "a").replace("ö", "o").replace("Å", "A").replace("Ä", "A").replace("Ö", "O")
-    s = re.sub(r"[^A-Za-z0-9_\\-]+", "", s)
-    s = re.sub(r"_+", "_", s).strip("_")
-    return s or "untitled"
 
 
 def _normalize_for_match(s: str) -> str:
@@ -184,7 +170,8 @@ def _read_rows(csv_path: Path) -> list[Row]:
     return rows
 
 
-def _download(url: str, out_path: Path, timeout_sec: float = 60.0) -> None:
+def _download(url: str, out_path: Path, timeout_sec: float = 60.0) -> dict:
+    out_path = fresh_output(out_path)
     req = urllib.request.Request(
         url,
         headers={
@@ -196,6 +183,9 @@ def _download(url: str, out_path: Path, timeout_sec: float = 60.0) -> None:
         payload = resp.read()
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_bytes(payload)
+        return {'requested_url': url, 'final_url': resp.geturl() if hasattr(resp, 'geturl') else url,
+                'retrieved_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+                'size_bytes': len(payload)}
 
 
 def _nonempty(path: Path) -> bool:
@@ -355,25 +345,6 @@ def _strip_html_to_text(html: str) -> str:
     text = unicodedata.normalize("NFKC", text)
     text = re.sub(r"[ \\t\\r\\f\\v]+", " ", text)
     text = re.sub(r"\\n{3,}", "\n\n", text)
-    return text.strip()
-
-
-def _download_text(url: str, timeout_sec: float = 60.0) -> str:
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (compatible; CodexCLI/1.0; +https://openai.com/)",
-            "Accept": "text/html,text/plain,*/*",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=timeout_sec) as resp:  # nosec - expected for controlled URLs
-        raw = resp.read()
-        try:
-            text = raw.decode("utf-8")
-        except UnicodeDecodeError:
-            text = raw.decode("latin-1", errors="ignore")
-    if "<html" in text.lower():
-        return _strip_html_to_text(text)
     return text.strip()
 
 
@@ -597,484 +568,100 @@ def _lyrics_quality_fix(text: str, title: str) -> tuple[bool, str, list[str]]:
     return True, t2.strip() + "\n", notes
 
 
-def _artifact_path(config: dict, value: Path, protected: tuple[Path, ...] = ()) -> Path:
-    path = data_path(config, value)
-    if path in protected:
-        raise ValueError(f"Artifact output would replace a protected input/report: {path}")
-    return path
-
-
-def _audiveris_export_pdf_to_mxl(
-    audiveris_cmd: list[str],
-    pdf_path: Path,
-    out_dir: Path,
-    log_dir: Path,
-    config: dict,
-    protected: tuple[Path, ...],
-) -> tuple[Path | None, Path]:
-    out_dir = data_path(config, out_dir, directory=True)
-    log_dir = data_path(config, log_dir, directory=True)
-    protected = (*protected, pdf_path)
-    log_path = _artifact_path(config, log_dir / f"{pdf_path.stem}.audiveris.log", protected)
-    # The tool writes in isolation: validate every discovered output before
-    # publishing MXL and other OMR byproducts into the managed data directory.
-    with tempfile.TemporaryDirectory(prefix="audiveris-export-") as directory:
-        staged = Path(directory)
-        captured = staged / "command.log"
-        generated = staged / "generated"
-        generated.mkdir()
-        succeeded = True
-        with captured.open("wb") as logf:
-            try:
-                subprocess.run(
-                    [*audiveris_cmd, "-batch", "-export", "-output", str(generated), str(pdf_path)],
-                    stdout=logf, stderr=subprocess.STDOUT, check=True,
-                )
-            except subprocess.CalledProcessError:
-                succeeded = False
-        files = []
-        for source in generated.rglob("*"):
-            if source.is_symlink():
-                raise ValueError("Audiveris produced a symbolic link; cannot publish it")
-            if source.is_file():
-                target = _artifact_path(config, out_dir / source.relative_to(generated), (*protected, log_path))
-                files.append((source, target))
-        if len({target for _, target in files}) != len(files):
-            raise ValueError("Audiveris outputs resolve to the same target")
-        # Validate the conventional result even when the tool failed to create it.
-        mxl_path = _artifact_path(config, out_dir / f"{pdf_path.stem}.mxl", (*protected, log_path))
-        for source, target in files:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(source.read_bytes())
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        log_path.write_bytes(captured.read_bytes())
-    return (mxl_path if succeeded and _nonempty(mxl_path) else None), log_path
-
-
-def _musescore_export(command: list[str], source: Path, output: Path) -> tuple[bool, str]:
-    """Export by extension; publish only a successful, nonempty conversion."""
-    if source.resolve() == output.resolve():
-        raise ValueError("MuseScore output must not replace its input")
-    with tempfile.TemporaryDirectory(prefix="score-export-") as directory:
-        staged = Path(directory) / output.name
-        try:
-            subprocess.run(
-                [*command, "-o", str(staged), str(source)],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=True,
-            )
-        except (OSError, subprocess.CalledProcessError) as exc:
-            return False, str(getattr(exc, "stdout", None) or exc).strip()
-        if not _nonempty(staged):
-            return False, "MuseScore returned success without a nonempty output file"
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_bytes(staged.read_bytes())
-    return True, ""
-
-
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("csv_file", type=Path)
-    ap.add_argument("--sheets-dir", type=Path, required=True)
-    ap.add_argument("--xml-dir", type=Path, required=True)
-    ap.add_argument("--midi-dir", type=Path, required=True)
-    ap.add_argument("--lyrics-dir", type=Path, required=True)
-    ap.add_argument("--build-dir", type=Path, required=True)
-    ap.add_argument("--report", type=Path, required=True)
-    ap.add_argument(
-        "--search-direct",
-        action="store_true",
-        help="Search the web for direct MusicXML/MXL/MSCZ/MIDI URLs for each song title (best-effort).",
-    )
-    ap.add_argument(
-        "--no-pdf",
-        action="store_true",
-        help="When searching direct sources, skip downloading PDFs entirely (XML/MIDI only).",
-    )
-    ap.add_argument("--max-direct-candidates", type=int, default=5)
-    ap.add_argument(
-        "--no-convert",
-        action="store_true",
-        help="Do not attempt format conversions (MuseScore PDF/MIDI/MusicXML exports, Audiveris PDF→MXL).",
-    )
-    ap.add_argument(
-        "--xml-only",
-        action="store_true",
-        help="Only count outputs as successful if we end up with MusicXML/MXL (direct or converted).",
-    )
-    ap.add_argument(
-        "--convert-pdf-to-mxl",
-        action="store_true",
-        help="If we fall back to PDFs, also try Audiveris to export MXL into the explicit build directory (ignored when --no-convert).",
-    )
-    ap.add_argument(
-        "--no-lyrics",
-        action="store_true",
-        help="Do not attempt lyrics search/download.",
-    )
-    ap.add_argument(
-        "--jobs",
-        type=int,
-        default=8,
-        help="Max concurrent per-song workers for network-bound steps (downloads/lyrics). Conversions are serialized.",
-    )
-    ap.add_argument("--force", action="store_true", help="Re-download/overwrite even if outputs already exist.")
-    ap.add_argument(
-        "--verify-downloads",
-        action="store_true",
-        help="Best-effort check that a downloaded file looks like the intended format and contains title tokens (warning-only).",
-    )
-    add_config_argument(ap)
-    args = ap.parse_args()
+def main(argv=None):
+    parser = argparse.ArgumentParser(description='Bounded catalogue discovery, source download, and lyric extraction')
+    commands = parser.add_subparsers(dest='operation', required=True)
+    catalogue = commands.add_parser('catalogue')
+    catalogue.add_argument('csv_file', type=Path)
+    catalogue.add_argument('--out', type=Path, required=True)
+    catalogue.add_argument('--search-direct', action='store_true')
+    catalogue.add_argument('--search-lyrics', action='store_true')
+    catalogue.add_argument('--no-pdf', action='store_true')
+    catalogue.add_argument('--max-direct-candidates', type=int, default=5)
+    download = commands.add_parser('download')
+    download.add_argument('url')
+    download.add_argument('--out', type=Path, required=True)
+    download.add_argument('--receipt', type=Path, required=True)
+    download.add_argument('--title', required=True)
+    download.add_argument('--verify-downloads', action='store_true')
+    extract = commands.add_parser('extract')
+    extract.add_argument('raw', type=Path)
+    extract.add_argument('--url', required=True)
+    extract.add_argument('--title', required=True)
+    extract.add_argument('--out', type=Path, required=True)
+    for command in (catalogue, download, extract):
+        add_config_argument(command)
+    args = parser.parse_args(argv)
     config = load_project(args.config_root)
-    args.csv_file = data_path(config, args.csv_file, must_exist=True)
-    for name in ("sheets_dir", "xml_dir", "midi_dir", "lyrics_dir", "build_dir"):
-        setattr(args, name, data_path(config, getattr(args, name), directory=True))
-    args.report = data_path(config, args.report)
-    if args.report == args.csv_file:
-        raise ValueError("Report output must not replace the catalogue input")
-
-    def artifact_path(value):
-        return _artifact_path(config, value, (args.csv_file, args.report))
-    # All requested tools are validated before downloads, reports or directories.
-    musescore_cmd = tool_command(config, "musescore") if not args.no_convert else None
-    audiveris_cmd = (tool_command(config, "audiveris")
-                     if args.convert_pdf_to_mxl and not args.no_convert else None)
-
-    rows = _read_rows(args.csv_file)
-    if not rows:
-        raise SystemExit(f"No usable rows found in {args.csv_file}")
-
-    report_lines: list[str] = []
-    report_lines.append("# DOWNLOAD_REPORT\n")
-    report_lines.append(f"CSV: `{args.csv_file}`\n")
-
-    processed = 0
-    found = 0
-    skipped = 0
-    converted = 0
-    convert_failed = 0
-
-    # Derived directories need the same checks as explicit CLI paths: a child
-    # can be an existing symlink even when its parent is inside data_root.
-    build_xml_dir = data_path(config, args.build_dir / "xml", directory=True)
-    build_midi_dir = data_path(config, args.build_dir / "midi", directory=True)
-    build_sheets_dir = data_path(config, args.build_dir / "sheets", directory=True)
-    build_xml_logs_dir = data_path(config, build_xml_dir / "logs", directory=True)
-
-    # Group rows by song number so multiple sources per song can be listed in the CSV.
-    by_song: dict[str, list[Row]] = {}
-    for row in rows:
-        by_song.setdefault(row.number, []).append(row)
-
-    def _process_song(number: str, song_rows: list[Row]) -> tuple[str, list[str], int, int, int, int]:
-        # Returns: (number, report_section_lines, found_delta, skipped_delta, converted_delta, convert_failed_delta)
-        local_found = 0
-        local_skipped = 0
-        local_converted = 0
-        local_convert_failed = 0
-
-        title = song_rows[0].title
-        status = song_rows[0].status
-        composer_or_origin = song_rows[0].composer_or_origin
-
-        lines: list[str] = []
-        lines.append(f"## Song #{number}: {title}\n")
-
-        if status.upper().startswith("SKYDDAD"):
-            local_skipped += 1
-            lines.append("Status: SKIPPED (SKYDDAD)\n")
-            return number, lines, local_found, local_skipped, local_converted, local_convert_failed
-
-        # Everything below is the prior per-song logic, but writing into `lines` and local counters.
-        candidates: list[tuple[str, str, str]] = []  # (fmt, url, source)
-        if args.search_direct:
-            for fmt, url in _candidate_urls_for_song(title, max(1, int(args.max_direct_candidates))):
-                if args.no_pdf and fmt.upper() == "PDF":
-                    continue
-                candidates.append((fmt, url, "duckduckgo"))
-
-        for r in sorted(song_rows, key=lambda rr: _format_priority(rr.fmt)):
-            if args.no_pdf and r.fmt.upper() == "PDF":
-                continue
-            candidates.append((r.fmt.strip().upper(), r.url, r.source))
-
-        seen: set[str] = set()
-        deduped: list[tuple[str, str, str]] = []
-        for fmt, url, src in candidates:
-            if url in seen:
-                continue
-            seen.add(url)
-            deduped.append((fmt, url, src))
-
-        if not deduped:
-            lines.append("Status: NOT FOUND\n")
-            lines.append("Search notes:\n")
-            lines.append("- No eligible candidates.\n")
-            return number, lines, local_found, local_skipped, local_converted, local_convert_failed
-
-        deduped.sort(key=lambda t: _format_priority(t[0]))
-        lines.append("Tried candidates (in priority order):\n")
-        for fmt, url, src in deduped:
-            lines.append(f"- {fmt} | {src} | {url}\n")
-
-        lines.append("\nGoal per song: PDF sheet + MusicXML/MXL + MIDI + lyrics.\n")
-        lines.append("Priority: obtain MusicXML or MIDI first; then export the rest from it.\n")
-
-        song_slug = _slug(title)
-        canonical_musicxml = artifact_path(build_xml_dir / f"{number}_{song_slug}.musicxml")
-        canonical_midi = artifact_path(build_midi_dir / f"{number}_{song_slug}.mid")
-        canonical_pdf = artifact_path(build_sheets_dir / f"{number}_{song_slug}.pdf")
-        canonical_lyrics = artifact_path(args.lyrics_dir / f"{number}_{song_slug}.txt")
-
-        warnings: list[str] = []
-        have_xml_or_midi = False
-
-        lines.append("\nStep 1: Download XML/MIDI (preferred)\n")
-        primary_kind = ""
-        primary_path: Path | None = None
-        for fmt, url, src in [t for t in deduped if t[0].upper() in {"MUSICXML", "XML", "MXL", "MSCZ", "MIDI", "MID"}]:
-            ext_guess = {
-                "MIDI": "mid",
-                "MID": "mid",
-                "MXL": "mxl",
-                "MSCZ": "mscz",
-                "MUSICXML": "musicxml",
-                "XML": "musicxml",
-            }.get(fmt.upper(), "scripts")
-            base = f"{number}_{song_slug}_{_slug(src)}"
-            out_dir = args.midi_dir if fmt.upper() in {"MIDI", "MID"} else args.xml_dir
-            out_path = artifact_path(out_dir / f"{base}.{ext_guess}")
-            try:
-                if not args.force and _nonempty(out_path):
-                    primary_kind = fmt.upper()
-                    primary_path = out_path
-                    have_xml_or_midi = True
-                    lines.append(f"- Already have `{out_path}` (skipped download)\n")
-                    break
-                _download(url, out_path)
-                local_found += 1
-                primary_kind = fmt.upper()
-                primary_path = out_path
-                have_xml_or_midi = True
-                lines.append(f"- Downloaded `{out_path}` | Source: {url} | Format: {fmt}\n")
-                if args.verify_downloads:
-                    for w in _verify_downloaded_file(out_path, title):
-                        warnings.append(f"{out_path.name}: {w}")
-                break
-            except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
-                lines.append(f"- FAILED {fmt} {url}: {type(e).__name__}: {e}\n")
-
-        lines.append("\nStep 2: Export remaining formats from primary (best-effort)\n")
-        xml_for_exports: Path | None = None
-        if primary_path is not None and not args.no_convert:
-            with _CONVERT_LOCK:
-                if primary_kind in {"MIDI", "MID"}:
-                    if not args.force and _nonempty(canonical_musicxml):
-                        have_xml_or_midi = True
-                        xml_for_exports = canonical_musicxml
-                        lines.append(f"- Already have `{canonical_musicxml}` (skipped conversion)\n")
-                    else:
-                        ok, msg = _musescore_export(musescore_cmd, primary_path, canonical_musicxml)
-                        if ok:
-                            have_xml_or_midi = True
-                            xml_for_exports = canonical_musicxml
-                            lines.append(f"- Derived `{canonical_musicxml}` | Engine: configured MuseScore | Input: `{primary_path}`\n")
-                        else:
-                            warnings.append(f"MIDI→MusicXML failed: {msg}")
-                            lines.append(f"- MIDI→MusicXML FAILED: {msg}\n")
-                else:
-                    xml_for_exports = primary_path
-                    if not args.force and _nonempty(canonical_midi):
-                        lines.append(f"- Already have `{canonical_midi}` (skipped conversion)\n")
-                    else:
-                        ok, msg = _musescore_export(musescore_cmd, xml_for_exports, canonical_midi)
-                        if ok:
-                            lines.append(f"- Derived `{canonical_midi}` | Engine: configured MuseScore | Input: `{xml_for_exports}`\n")
-                        else:
-                            warnings.append(f"MusicXML→MIDI failed: {msg}")
-                            lines.append(f"- MusicXML→MIDI FAILED: {msg}\n")
-
-                if xml_for_exports is not None:
-                    if not args.force and _nonempty(canonical_pdf):
-                        lines.append(f"- Already have `{canonical_pdf}` (skipped conversion)\n")
-                    else:
-                        ok, msg = _musescore_export(musescore_cmd, xml_for_exports, canonical_pdf)
-                        if ok:
-                            lines.append(f"- Derived `{canonical_pdf}` | Engine: configured MuseScore | Input: `{xml_for_exports}`\n")
-                        else:
-                            warnings.append(f"MusicXML→PDF failed: {msg}")
-                            lines.append(f"- MusicXML→PDF FAILED: {msg}\n")
-
-        lines.append("\nStep 3: If primary conversion failed, try downloading missing formats separately\n")
-        if primary_path is not None:
-            if not canonical_musicxml.exists():
-                lines.append("- Missing MusicXML/MXL after conversion; trying separate download.\n\n")
-            if not canonical_pdf.exists():
-                lines.append("- Missing PDF sheet after conversion; trying separate download.\n\n")
-        else:
-            lines.append("- No XML/MIDI downloaded.\n\n")
-
-        lines.append("Fallback: Download PDF sheets\n\n")
-        if not have_xml_or_midi and not args.no_pdf:
-            lines.append("Step 1 did not yield XML/MIDI. Trying PDF candidates.\n")
-            pdf_downloaded = False
-            for fmt, url, src in [t for t in deduped if t[0].upper() == "PDF"]:
-                base = f"{number}_{song_slug}_{_slug(src)}"
-                out_path = artifact_path(args.sheets_dir / f"{base}.pdf")
-                try:
-                    if not args.force and _nonempty(out_path):
-                        lines.append(f"- Already have `{out_path}` (skipped download)\n")
-                        pdf_downloaded = True
-                        break
-                    _download(url, out_path)
-                    local_found += 1
-                    lines.append(f"- Downloaded `{out_path}` | Source: {url} | Format: PDF\n")
-                    pdf_downloaded = True
-                    if args.verify_downloads:
-                        for w in _verify_downloaded_file(out_path, title):
-                            warnings.append(f"{out_path.name}: {w}")
-                    if args.convert_pdf_to_mxl and (audiveris_cmd is not None) and not args.no_convert:
-                        with _CONVERT_LOCK:
-                            mxl_path, log_path = _audiveris_export_pdf_to_mxl(
-                                audiveris_cmd=audiveris_cmd,
-                                pdf_path=out_path,
-                                out_dir=build_xml_dir,
-                                log_dir=build_xml_logs_dir,
-                                config=config, protected=(args.csv_file, args.report),
-                            )
-                        if mxl_path is not None:
-                            local_converted += 1
-                            lines.append(f"- Exported MusicXML `{mxl_path}` | Engine: audiveris | Log: `{log_path}`\n")
-                        else:
-                            local_convert_failed += 1
-                            warnings.append(f"PDF→MXL failed; see log {log_path}")
-                            lines.append(f"- MusicXML export FAILED | Log: `{log_path}`\n")
-                    break
-                except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
-                    lines.append(f"- FAILED PDF {url}: {type(e).__name__}: {e}\n")
-            if not pdf_downloaded:
-                warnings.append("No MIDI/XML found and no PDF downloaded; moving on to next song.")
-
-        lines.append("\nStep 4: Lyrics\n")
-        if not args.no_lyrics:
-            if not args.force and _nonempty(canonical_lyrics):
-                lines.append(f"- Already have `{canonical_lyrics}` (skipped download)\n")
+    inputs = [data_path(config, getattr(args, name), must_exist=True)
+              for name in ('csv_file', 'raw') if hasattr(args, name)]
+    output = fresh_output(data_path(config, args.out), inputs=inputs)
+    if args.operation == 'catalogue':
+        if args.max_direct_candidates < 1:
+            raise ValueError('max-direct-candidates must be positive')
+        rows = _read_rows(inputs[0])
+        if not rows:
+            raise ValueError('No usable catalogue rows')
+        grouped = {}
+        for row in rows:
+            grouped.setdefault(row.number, []).append(row)
+        result = []
+        for number, song_rows in grouped.items():
+            row = song_rows[0]
+            item = {'number': number, 'title': row.title, 'license_evidence': row.status,
+                    'license_verification': 'Catalogue claim; not independently verified'}
+            if row.status.upper().startswith('SKYDDAD'):
+                item['skipped'] = 'SKYDDAD'
             else:
-                lyric_downloaded = False
-                primary_lyric_urls = _candidate_lyric_urls_for_song(title)
-                for lyric_url in primary_lyric_urls[:6]:
-                    try:
-                        timeout = 20.0 if lyric_url.endswith("?action=raw") else 25.0
-                        text = _download_text(lyric_url, timeout_sec=timeout)
-                        if lyric_url.endswith("?action=raw") and "wiki" in lyric_url:
-                            text = _strip_mediawiki_markup(text)
-                        ok, fixed, notes = _lyrics_quality_fix(text, title)
-                        if not ok:
-                            raise ValueError("; ".join(notes))
-                        canonical_lyrics.parent.mkdir(parents=True, exist_ok=True)
-                        canonical_lyrics.write_text(fixed, encoding="utf-8")
-                        local_found += 1
-                        note_s = f" | Notes: {', '.join(notes)}" if notes else ""
-                        lines.append(f"- Downloaded `{canonical_lyrics}` | Source: {lyric_url}{note_s}\n")
-                        lyric_downloaded = True
-                        break
-                    except Exception as e:
-                        lines.append(f"- Lyrics FAILED {lyric_url}: {type(e).__name__}: {e}\n")
-
-                if not lyric_downloaded:
-                    lyric_urls: list[str] = []
-                    queries = [
-                        f"\"{title}\" sångtext",
-                        f"\"{title}\" text",
-                        f"\"{title}\" lyrics",
-                        f"\"{title}\" {composer_or_origin} sångtext" if composer_or_origin else "",
-                    ]
-                    queries = [q for q in queries if q]
-                    for q in queries:
-                        lyric_urls.extend(_search_duckduckgo_urls(q, max_results=5))
-                    lyric_urls = _dedupe_preserve_order([u for u in lyric_urls if u.startswith(("http://", "https://"))])
-                    if not lyric_urls:
-                        if _DUCKDUCKGO_BLOCKED:
-                            warnings.append(
-                                "DuckDuckGo search appears blocked (HTTP 403/429); lyric search may be incomplete."
-                            )
-                            lines.append("- No lyric URLs found (DuckDuckGo blocked).\n")
-                        else:
-                            warnings.append("No lyric URLs found via search.")
-                            lines.append("- No lyric URLs found via search.\n")
-                    else:
-                        for lyric_url in lyric_urls[:6]:
-                            try:
-                                timeout = 20.0 if lyric_url.endswith("?action=raw") else 25.0
-                                text = _download_text(lyric_url, timeout_sec=timeout)
-                                if lyric_url.endswith("?action=raw") and "wiki" in lyric_url:
-                                    text = _strip_mediawiki_markup(text)
-                                ok, fixed, notes = _lyrics_quality_fix(text, title)
-                                if not ok:
-                                    raise ValueError("; ".join(notes))
-                                canonical_lyrics.parent.mkdir(parents=True, exist_ok=True)
-                                canonical_lyrics.write_text(fixed, encoding="utf-8")
-                                local_found += 1
-                                note_s = f" | Notes: {', '.join(notes)}" if notes else ""
-                                lines.append(f"- Downloaded `{canonical_lyrics}` | Source: {lyric_url}{note_s}\n")
-                                lyric_downloaded = True
-                                break
-                            except Exception as e:
-                                lines.append(f"- Lyrics FAILED {lyric_url}: {type(e).__name__}: {e}\n")
-                        if not lyric_downloaded:
-                            warnings.append("Lyrics download failed for all tried URLs.")
-        else:
-            lines.append("- Skipped (`--no-lyrics`).\n")
-
-        if warnings:
-            lines.append("\nWarnings:\n")
-            for w in warnings:
-                lines.append(f"- {w}\n")
-
-        have_xml = (
-            primary_kind in {"MUSICXML", "XML", "MXL"}
-            or canonical_musicxml.exists()
-            or any(data_path(config, path, must_exist=True) for path in build_xml_dir.glob(f"{number}_{song_slug}.*") if path.is_file())
-            or any(data_path(config, path, must_exist=True) for path in args.xml_dir.glob(f"{number}_{song_slug}_*.*") if path.is_file())
-        )
-        if args.xml_only:
-            lines.append("\nStatus: FOUND\n" if have_xml else "\nStatus: NOT FOUND\n")
-        else:
-            lines.append("\nStatus: FOUND\n" if (primary_path is not None) else "\nStatus: NOT FOUND\n")
-
-        return number, lines, local_found, local_skipped, local_converted, local_convert_failed
-
-    song_items = sorted(by_song.items(), key=lambda kv: kv[0])
-    processed = len(song_items)
-    max_workers = max(1, int(args.jobs))
-    results: dict[str, tuple[list[str], int, int, int, int]] = {}
-
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        futs = {ex.submit(_process_song, number, song_rows): number for number, song_rows in song_items}
-        for fut in as_completed(futs):
-            number = futs[fut]
-            n, lines, f_delta, s_delta, c_delta, cf_delta = fut.result()
-            results[n] = (lines, f_delta, s_delta, c_delta, cf_delta)
-
-    for number, _song_rows in song_items:
-        lines, f_delta, s_delta, c_delta, cf_delta = results[number]
-        report_lines.extend(lines)
-        found += f_delta
-        skipped += s_delta
-        converted += c_delta
-        convert_failed += cf_delta
-
-    report_lines.append("\n---\n")
-    report_lines.append(f"Total songs processed: {processed}\n")
-    report_lines.append(f"Total successful downloads/outputs: {found}\n")
-    report_lines.append(f"Songs skipped (SKYDDAD): {skipped}\n")
-    if args.convert_pdf_to_mxl and not args.no_convert:
-        report_lines.append(f"PDF→MXL exported: {converted}\n")
-        report_lines.append(f"PDF→MXL failed: {convert_failed}\n")
-
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text("\n".join(report_lines).rstrip() + "\n", encoding="utf-8")
+                candidates = ([(fmt, url, 'duckduckgo') for fmt, url in
+                               _candidate_urls_for_song(row.title, args.max_direct_candidates)] if args.search_direct else [])
+                candidates += [(r.fmt, r.url, r.source) for r in song_rows]
+                seen = set()
+                item['sources'] = []
+                for fmt, url, source in sorted(candidates, key=lambda value: _format_priority(value[0])):
+                    fmt = fmt.upper()
+                    if url in seen or (fmt == 'PDF' and args.no_pdf) or fmt not in {'MUSICXML','XML','MXL','MSCZ','MIDI','MID','PDF'}:
+                        continue
+                    seen.add(url)
+                    item['sources'].append({'format': fmt, 'url': url, 'source': source})
+                item['lyric_urls'] = _candidate_lyric_urls_for_song(row.title)[:6]
+                if args.search_lyrics:
+                    queries = [f'"{row.title}" sångtext', f'"{row.title}" text', f'"{row.title}" lyrics']
+                    if row.composer_or_origin:
+                        queries.append(f'"{row.title}" {row.composer_or_origin} sångtext')
+                    item['lyric_urls'] += _dedupe_preserve_order([url for query in queries for url in
+                        _search_duckduckgo_urls(query, max_results=5) if url.startswith(('http://','https://'))])[:6]
+            result.append(item)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    elif args.operation == 'download':
+        receipt = fresh_output(data_path(config, args.receipt), inputs=[output])
+        if receipt == output:
+            raise ValueError('Source and receipt destinations must differ')
+        value = _download(args.url, output)
+        if not _nonempty(output):
+            raise ValueError('Downloaded source is empty')
+        value['title'] = args.title
+        value['original_name'] = urllib.parse.unquote(urllib.parse.urlparse(args.url).path.rsplit('/', 1)[-1])
+        value['warnings'] = _verify_downloaded_file(output, args.title) if args.verify_downloads else []
+        receipt.parent.mkdir(parents=True, exist_ok=True)
+        receipt.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    else:
+        payload = inputs[0].read_bytes()
+        try:
+            text = payload.decode('utf-8')
+        except UnicodeDecodeError:
+            text = payload.decode('latin-1', errors='ignore')
+        text = _strip_html_to_text(text) if '<html' in text.lower() else text.strip()
+        if args.url.endswith('?action=raw') and 'wiki' in args.url:
+            text = _strip_mediawiki_markup(text)
+        ok, fixed, notes = _lyrics_quality_fix(text, args.title)
+        if not ok:
+            raise ValueError('; '.join(notes))
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(fixed, encoding='utf-8')
+        print(json.dumps({'notes': notes}, ensure_ascii=False))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

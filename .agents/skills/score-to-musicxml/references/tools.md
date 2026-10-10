@@ -4,11 +4,22 @@ Reuse project environments and installed applications. The helper dependencies a
 
 ## Bundled helpers
 
-- scripts/slope_grid.py SOURCE SEEDS_JSON OUTPUT_DIRECTORY writes geometry.json, source strips, slope-aware overlays and flattened derivatives. Source pixels remain unchanged.
+These are domain arguments for artifact-bookkeeping to execute using this skill's
+Bookkeeping block.
+
+- scripts/slope_grid.py SOURCE SEEDS_JSON OUTPUT_BUNDLE writes geometry.json, source strips, slope-aware overlays and flattened derivatives. Source pixels remain unchanged.
 - scripts/validate.py is the import-only helper supplying audit(path, schema_path, expected) and canonical(path). schema/musicxml.xsd includes the bundled xml.xsd and xlink.xsd; provenance is in schema/SOURCE.txt.
 - scripts/verify_score.py SCORE [--expectations JSON] [--reference JSON --reviewed-sha256 HASH] [--output REPORT] runs XSD/structural checks and, when supplied, a frozen canonical comparison. A successful result is not a source-fidelity certificate. Counts use a {"counts": {...}} object; partial-measure exceptions follow the validator's supported contract.
+- scripts/render_pdf.py PDF --out PAGES renders all PDF pages at 150 dpi with the pinned `pdftoppm` resource. Its outputs are 1–256 PNG pages and `RENDER.log`.
 
 The validator is a starting point, not a universal notation verifier. Extend checks for new supported notation with targeted examples (e.g. ties, tuplets, repeats, alternate endings) and source review. Do not weaken checks simply to make a score pass.
+
+`canonical()` and structural `audit(..., schema_path=None)` use only the standard
+library; XSD validation loads `lxml`.
+Canonical snapshots include an explicit whole-measure-rest marker (`rest@measure=yes`);
+older snapshots containing these rests need renewed review, not silent replacement.
+Other engraving details still require visual comparison. MIDI checks must include
+the endpoint and trailing silent measures, not just note attacks and releases.
 
 ## OMR
 
@@ -38,10 +49,11 @@ Printed chord labels are part of the reviewed reference: preserve `kind@text` an
 
 ## Geometry command
 
-`python .agents/skills/score-to-musicxml/scripts/slope_grid.py song/source.png song/seeds.json song/geometry`
+`env/bin/python .agents/skills/score-to-musicxml/scripts/slope_grid.py song/source.png song/seeds.json geometry`
 
-All three arguments are explicit paths under `paths.data_root`. The output directory
-must be new or empty. The 1600-pixel seed coordinate contract is described in
+The geometry operation consumes the source and seeds and outputs a `geometry`
+bundle. The 1600-pixel seed coordinate contract is described in
 [workflow.md](workflow.md); inspect generated overlays before using the measurements.
-The verifier's optional report path must also be new. Its exit status is nonzero
-when structural, canonical or reviewed-file hash checks fail.
+For a persisted verification report, specify `--output verification.json`.
+Stdout-only verification produces no report artifact.
+Its exit status is nonzero when structural, canonical or reviewed-file hash checks fail.

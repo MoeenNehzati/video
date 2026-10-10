@@ -41,9 +41,11 @@ and validate containment beneath `paths.data_root`. External executable argument
 lists and resources come from local TOML; missing prerequisites stop the stage.
 Artifacts include JSON, prompts, reports and song builders, not just binary media.
 
-This enforces a path boundary, not provenance or revision history. It does not
-sandbox arbitrary third-party software. The [ledger plan](artifact-ledger-plan.md)
-is a separate task. Existing shared-data folders and files were not migrated.
+Path validation alone does not record provenance or revision history. The
+[implemented ledger](artifact-ledger-usage.md) adds those records through managed
+operations; [adapter coverage](artifact-ledger-entrypoints.md) remains partial. It does
+not sandbox arbitrary third-party software. Existing shared-data folders and
+files were not migrated.
 Legacy execution payloads can still contain absolute paths and must be regenerated
 or validated on another machine.
 

@@ -9,9 +9,9 @@
       "source": "score-to-musicxml/SKILL.md",
       "source_sha256": "c46d26cd17a0d64269d951ac0d31e9e5dc80f867b283eb8662706c618a62e9a3",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained musical workflow with managed I/O; fresh-agent validation requires exact inspected geometry files, justified tolerance changes, and captured helper code or managed checks for persisted manual reviews. Centralized bookkeeping policy; retained local operation declarations and musical/visual methods. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/score-to-musicxml/SKILL.md",
-      "current_sha256": "d4430ef4b60d3a5125c8367078adeb13b1777b580c27ecdcb8b850e92153919d"
+      "current_sha256": "2e8ab2908b30e249ab81010fc35fda0577aa0b067b94a07ff075079a87f32fe2"
     },
     {
       "source": "score-to-musicxml/agents/openai.yaml",
@@ -30,7 +30,7 @@
         {
           "destination": ".agents/skills/score-to-musicxml/SKILL.md",
           "usage": "General review/hash/editorial-scope instructions, with collection state excluded",
-          "current_sha256": "d4430ef4b60d3a5125c8367078adeb13b1777b580c27ecdcb8b850e92153919d"
+          "current_sha256": "2e8ab2908b30e249ab81010fc35fda0577aa0b067b94a07ff075079a87f32fe2"
         }
       ]
     },
@@ -38,9 +38,9 @@
       "source": "score-to-musicxml/references/tools.md",
       "source_sha256": "95880a7dc37281b528159a5ed7b639713ac74ed12f5d2667550c38862bc612fe",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Documented managed execution, exact review-code capture, schema dependency boundary, rest notation and trailing-silence limits found in live validation. Aligned execution examples and references with centralized bookkeeping.",
       "destination": ".agents/skills/score-to-musicxml/references/tools.md",
-      "current_sha256": "7d88b3290f0c3cb54391a8d06a712ab22692f3557ca618440e7b5b11f41edfbd"
+      "current_sha256": "a1f6f26a05cf832ac85353e920056dbb1ee44e40785e7d5d4e187be48b2956ba"
     },
     {
       "source": "score-to-musicxml/references/workflow.md",
@@ -92,33 +92,33 @@
       "source": "score-to-musicxml/scripts/slope_grid.py",
       "source_sha256": "5a098cbcc03934ff19ff9e27b107cd413d2c641f849f2feee161656ef9784099",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/score-to-musicxml/scripts/slope_grid.py",
-      "current_sha256": "8c35ede39bd05fb0cf1f15af2779997f1dd4e6a15a83f7b5bf795a180363cd2f"
+      "current_sha256": "5ea1d38f8cc4553eb721f1b01f3efef5e0e58d38b9d43ca207dd9f17f84d8e85"
     },
     {
       "source": "score-to-musicxml/scripts/validate.py",
       "source_sha256": "0d6e7e02f63697c96f422e2fe63c0b50519fdc771cc5c4a4c230ad740f2caed9",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Preserved validator/canonical methods; load lxml only for XSD validation so standard-library canonical review has no unused package dependency. Compare the explicit whole-measure-rest flag without changing duration semantics.",
       "destination": ".agents/skills/score-to-musicxml/scripts/validate.py",
-      "current_sha256": "1764ca9abd8bcd1c555e94f8fa774441e3ad404f08e22a425f59d44d03835d0d"
+      "current_sha256": "8448b16f849fb35dbde01186d7a4eed113a3f10bc1ac2e2472071c83295ff2d1"
     },
     {
       "source": "score-to-musicxml/scripts/verify_score.py",
       "source_sha256": "bf47ad9f1d0e13e778711ded40987cee0ee79dc9bbb89ff961e41fad4a6b5e8f",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/score-to-musicxml/scripts/verify_score.py",
-      "current_sha256": "08f09557683b687acc9340438be353b6a5c7f31b61e8d951ddbadadde4ba9717"
+      "current_sha256": "ff8d9882d77aa290c9e4de1436dbdd5e6c74937c6f4e508d732865f40b40b921"
     },
     {
       "source": "song-arrangement-research/SKILL.md",
       "source_sha256": "1f53fab1764956fe191dc30e3de1e388496581f85ca22c6b2f64ae8771705351",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Centralized bookkeeping policy; retained local operation declarations and musical/visual methods. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/SKILL.md",
-      "current_sha256": "cebd738c9e699101726edaa004ae59ff5873ced99f2444ec621dc181bc18e6db"
+      "current_sha256": "98b65119c34391d44da1e472c639cf5720ed0a5210cf26c2b4128dba101eb078"
     },
     {
       "source": "song-arrangement-research/adapter_code/README.md",
@@ -216,9 +216,9 @@
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/ChildExperiment.java",
       "source_sha256": "d71e9815214bb509068deccec25121c6c8d22fe31ee7294aaf928718c89a8e2c",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ChildExperiment.java",
-      "current_sha256": "71b52d21537882fc66371af5f3f35097493d144488415140b7bbef6e5409bf76"
+      "current_sha256": "306b141ca7a8ec01306fd42526cbf8de9f64e7d76fe4d6f877f556b18a97f62b"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/CountermelodyExperiment.java",
@@ -290,9 +290,9 @@
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/check_delivery.py",
       "source_sha256": "2ed0262103a59ad20796c862471f019674dba4e0a81af811bc77f891b12b98a1",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/check_delivery.py",
-      "current_sha256": "a82b993703ee0725ec4164edea92daef6191912ca077c245040711809b780833"
+      "current_sha256": "3cf2bd3e84fc990bcc6353e982a2f1fefc1ab846cb67975d61a8d5e150d2ba90"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/child_folders.json",
@@ -334,9 +334,9 @@
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/execute_child_plans.py",
       "source_sha256": "1e5d2eac1ed1a7c8e14d9a359ba04843f8fd0cd2618c50a5f79be2ca2e717bcf",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/execute_child_plans.py",
-      "current_sha256": "5d6a354fe231876ddaaca05edfdbd592e8b31892452e3a3444117dca3d4a4497"
+      "current_sha256": "f03aac7dd190fa0485437f6361e4018d136569988f0a11671f138c684d6d69c1"
     },
     {
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/folders.json",
@@ -408,9 +408,9 @@
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/publish_experiments.py",
       "source_sha256": "4b021e930714c7c89e12dab1feff88f3b1de71af50096f43912eb9be3cf710d7",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/publish_experiments.py",
-      "current_sha256": "364da67c4a0070ee5126a08498b3f4413a491686b674bb6b81944ece28d8e31f",
+      "current_sha256": "2ef0448c5e12c625018c8880b3cd69d50d07539b9bdac39f7099b6c4914c53a7",
       "extractions": [
         {
           "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/listening_page.html",
@@ -423,9 +423,9 @@
       "source": "song-arrangement-research/adapter_code/jjazzlab_experiments/render_child_versions.py",
       "source_sha256": "3b55de8a4bc7ac4d49d846abb8302b184fadaa43a052c130bfc3fa1ba8eadb39",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/render_child_versions.py",
-      "current_sha256": "56b9139e932709b3c68936809fad8872c617278aafb22d3323c908ddbe8e2766",
+      "current_sha256": "db079fd811218d6d9ce9d3910ef92ba2159091374828a3977ac6054c963062d8",
       "extractions": [
         {
           "destination": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/verification.py",
@@ -516,33 +516,33 @@
       "source": "song-arrangement-research/references/barnsang-adapter.md",
       "source_sha256": "e6d34742ec8040ab5f5639e414bac8bc1b09541db5d2c99c2dd9e260b3a1e4b1",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Aligned execution examples and references with centralized bookkeeping. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/references/barnsang-adapter.md",
-      "current_sha256": "83ac967fe695fdbedf881b4623c0c68f5c6bd83690e75ef9ee97750d0c0d3d9e"
+      "current_sha256": "556ade97ebc80eac3dc47d1d48c1ef613261a8ed16a08579b749fb8d42c6f3f5"
     },
     {
       "source": "song-arrangement-research/references/brief-contract.md",
       "source_sha256": "e81a548d122c79ac991a3dafb8802c13b3e17bd48f9b63e55e762dc97b1482bf",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Aligned execution examples and references with centralized bookkeeping. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/references/brief-contract.md",
-      "current_sha256": "c46e56f62edb3f231642a3130e064f986eeae9b9b651ba67ab6c34114c9d50dd"
+      "current_sha256": "eaa1dba60d4881a90b42c06e9872b6b35a21711e1dd4aa0f6b1e66784d9844bb"
     },
     {
       "source": "song-arrangement-research/scripts/compile_brief.py",
       "source_sha256": "c9c5863c62aa0c168e547b0841eecbc1fad74f88e5dd3a8ed490a745c3e2b21b",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
-      "current_sha256": "a0551936c31c6695aae3653c9e52efb9a0e90d4d598e4ddb91057094fa8693a3"
+      "current_sha256": "fcc08a9ffe586fab4d96c5d48a971c5c9db46046060cbc181e253f8cb885017f"
     },
     {
       "source": "barnsang-video/SKILL.md",
       "source_sha256": "17c337f3abfe73184275163c389f286e7589a3142c36afc4eb8acda1c4119443",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Centralized bookkeeping policy; retained local operation declarations and musical/visual methods. Aligned execution examples and references with centralized bookkeeping. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/barnsang-video/SKILL.md",
-      "current_sha256": "93009a56e285373ce0d8f015d8a8e7d168e8b32b1a206f590f201ddc6fd02afa"
+      "current_sha256": "01394028b0d55ce7c516094f5b5baf70c339a8f866dbbbc610574ce91121e01e"
     },
     {
       "source": "barnsang-video/examples/ekorrn/INSTRUCTIONS.txt",
@@ -578,9 +578,9 @@
       "source": "barnsang-video/scripts/assemble_flow.py",
       "source_sha256": "3dfc591aa8365eebbc834b90113310f7a9e93dcbd5acc9c5802dc620dcf73fc5",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/barnsang-video/scripts/assemble_flow.py",
-      "current_sha256": "a72a748edaa2c88933e1961630596c40a20a3fa44860063d81aec083e83a3f28"
+      "current_sha256": "f74591337c41dbcccf3ee3752fe3946281aa40b90b2c1db28c67c4eb66f358a1"
     },
     {
       "source": "barnsang-video/scripts/build_animatic.py",
@@ -592,17 +592,17 @@
       "source": "barnsang-video/scripts/gen_edit.py",
       "source_sha256": "869a424ae09d870f33af66c5c48d176fc2055b4f99fe58e4737a6c191e11da31",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/barnsang-video/scripts/gen_edit.py",
-      "current_sha256": "24ee8c59224b828fd6d909d8c731018e41a0c5c6d7a92e1ebe5c7bd2e1a08508"
+      "current_sha256": "8c97e22ac504b45081c7e5a46b7a39532d0cd0ef8c50d66e1bc908c6867b5d9a"
     },
     {
       "source": "barnsang-video/scripts/gen_image.py",
       "source_sha256": "8bbed3e288acf5b4dd488f70f6ac28f0dd6bf4db12ecea2f1513d18f38bd7fd8",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/barnsang-video/scripts/gen_image.py",
-      "current_sha256": "b865089403776e66178d7e38edb82c9934655c3ecdf4569a2d4d3180db775dfb"
+      "current_sha256": "274a163ec7b1444a5d2489619a8d791bcec2fb722c3e7a392c747164f844f293"
     },
     {
       "source": "barnsang-video/scripts/gen_video.py",
@@ -632,9 +632,9 @@
       "source": "barnsang-video/scripts/write_flow_instructions.py",
       "source_sha256": "73338edeb8597facfb04f58dd2d484469112c5ce4b200c9cb61ce9a601760891",
       "status": "adapted",
-      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state.",
+      "reason": "Retained workflow logic with portable explicit I/O, configuration or removal of historical state. Decoupled ordinary domain execution from central bookkeeping.",
       "destination": ".agents/skills/barnsang-video/scripts/write_flow_instructions.py",
-      "current_sha256": "a13d85aec14b0fd8c88b9c9a69131da663e73b178c110269311e53d37e3913a6"
+      "current_sha256": "074d5281e82c85b6027ba6aa12ca53d16699e53a07f5fee17c6cf2c646ff0b48"
     },
     {
       "source": "jjazzlab/CREDITS.md",
@@ -648,7 +648,7 @@
       "status": "adapted",
       "reason": "JJazzLab setup retained within the consolidated non-Python requirements/installations guide; verified paths belong in local TOML.",
       "destination": "requirements/requirements.md",
-      "current_sha256": "9ede97459ed18525c15bbebd8550579d170dca0c90cf974f9b87e82ce97adace"
+      "current_sha256": "09e849ffd4152dfc761deea6b4351313b98905d5a90638468e3965b51b1c8c96"
     },
     {
       "source": "jjazzlab/library_metadata/bass/download.json",
@@ -1233,6 +1233,31 @@
       "usage": "analyze_music imports analyze_score and its musical helpers."
     },
     {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/artifact_ledger.py",
+      "owner": "artifact-bookkeeping",
+      "usage": "Artifact bookkeeping skill public lifecycle, immutable history, resource snapshots, fresh-host revision preflight, publication recovery, queries and CLI."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_execution.py",
+      "owner": "artifact-bookkeeping",
+      "usage": "Central snapshot, execution and publication support for artifact-bookkeeping"
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_python.py",
+      "owner": "artifact-bookkeeping",
+      "usage": "Central snapshot, execution and publication support for artifact-bookkeeping"
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_replay.py",
+      "owner": "artifact-bookkeeping",
+      "usage": "Central snapshot, execution and publication support for artifact-bookkeeping"
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_tools.py",
+      "owner": "artifact-bookkeeping",
+      "usage": "Central snapshot, execution and publication support for artifact-bookkeeping"
+    },
+    {
       "path": ".agents/skills/barnsang-video/scripts/assemble_flow.py",
       "owner": "barnsang-video",
       "usage": "Skill assembly CLI applies supplied clip groups, timings and audio settings."
@@ -1253,6 +1278,11 @@
       "usage": "Skill handoff CLI formats explicit storyboard into Flow instructions."
     },
     {
+      "path": ".agents/skills/download-scores/scripts/convert_score.py",
+      "owner": "download-scores",
+      "usage": "Explicit score conversion domain CLI"
+    },
+    {
       "path": ".agents/skills/download-scores/scripts/download_scores.py",
       "owner": "download-scores",
       "usage": "Optional acquisition CLI calls its search/download/conversion/lyrics helpers."
@@ -1263,6 +1293,11 @@
       "usage": "Optional vocal-planning CLI calls retained selection and alignment helpers."
     },
     {
+      "path": ".agents/skills/score-to-musicxml/scripts/render_pdf.py",
+      "owner": "score-to-musicxml",
+      "usage": "Managed PDF page rendering for persisted visual reviews; pins PDF, executed code and the reviewed Poppler resource."
+    },
+    {
       "path": ".agents/skills/score-to-musicxml/scripts/slope_grid.py",
       "owner": "score-to-musicxml",
       "usage": "Skill geometry step calls process -> fit_staff/robust_line/evaluate/diatonic_pitch."
@@ -1270,12 +1305,17 @@
     {
       "path": ".agents/skills/score-to-musicxml/scripts/validate.py",
       "owner": "score-to-musicxml",
-      "usage": "verify_score imports audit and canonical, which call the retained score validation helpers."
+      "usage": "verify_score imports audit and canonical, which call the retained score validation helpers. Canonical comparison includes the whole-measure-rest flag."
     },
     {
       "path": ".agents/skills/score-to-musicxml/scripts/verify_score.py",
       "owner": "score-to-musicxml",
       "usage": "Skill score/schema/review verification CLI."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
+      "owner": "song-arrangement-research",
+      "usage": "Skill brief compilation CLI -> validate_brief."
     },
     {
       "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ChildExperiment.java",
@@ -1318,14 +1358,9 @@
       "usage": "Compiler-adjacent adapters import source/hash/event/backing checks and external auditor loading."
     },
     {
-      "path": ".agents/skills/song-arrangement-research/scripts/compile_brief.py",
-      "owner": "song-arrangement-research",
-      "usage": "Skill brief compilation CLI -> validate_brief."
-    },
-    {
       "path": ".agents/skills/syllabify_lyrics/scripts/lyrics_syllabify.py",
       "owner": "syllabify_lyrics",
-      "usage": "syllabify_lyrics imports reusable parsing/syllable helpers."
+      "usage": "syllabify_lyrics imports reusable parsing/syllable helpers. Local validation repair preserves Unicode lyric letters with NFC normalization; the syllable heuristic remains English-oriented. Non-English hints emit a review warning without changing syllable decisions."
     },
     {
       "path": ".agents/skills/syllabify_lyrics/scripts/syllabify_lyrics.py",
@@ -1340,7 +1375,7 @@
     {
       "path": "scripts/__init__.py",
       "owner": "all automated retained skills",
-      "usage": "Makes scripts an importable project package."
+      "usage": "Makes scripts an importable shared Python package."
     },
     {
       "path": "scripts/project_runtime.py",
@@ -1351,6 +1386,83 @@
       "path": "scripts/read_config.py",
       "owner": "all automated retained skills",
       "usage": "All automated skill CLIs load shared/local TOML through project_runtime; AGENTS.md also uses -m scripts.read_config for startup and --run to supply configuration in child environments."
+    },
+    {
+      "path": "scripts/run_tests.py",
+      "owner": "all retained skills",
+      "usage": "Run repository integration checks and each skill-owned test suite."
+    }
+  ],
+  "implementation_sources": [
+    {
+      "path": ".agents/skills/artifact-bookkeeping/SKILL.md",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/schema/event.schema.json",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/artifact_ledger.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; fresh-host revision preflight added after live validation reproduced missing projection authority."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_browser.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_conversion.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_delivery.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_jjazz.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_producer.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_python.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/song-arrangement-research/scripts/jjazzlab_experiments/ledger_render.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_replay.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from the collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/artifact-bookkeeping/scripts/ledger_tools.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/barnsang-video/scripts/ledger_video.py",
+      "owner": "artifact-bookkeeping",
+      "origin": "Original project implementation of docs/artifact-ledger-plan.md; not imported from collaborator bundle."
+    },
+    {
+      "path": ".agents/skills/score-to-musicxml/scripts/render_pdf.py",
+      "owner": "score-to-musicxml",
+      "origin": "Original bounded review adapter added after validation found unrecorded installed PDF tools."
     }
   ]
 }

@@ -86,13 +86,15 @@ def main(argv=None):
     args = p.parse_args(argv)
     config = load_project(args.config_root)
     source = data_path(config, args.storyboard, must_exist=True)
-    out = data_path(config, args.output)
-    if out == source or out.exists():
-        raise ValueError("Choose a new instructions output path")
-    text = format_instructions(json.loads(source.read_text(encoding="utf-8-sig")), config, args.clips)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(text, encoding="utf-8")
-    print(out)
+    output = data_path(config, args.output)
+    if output.exists():
+        raise ValueError("Instructions output already exists; choose a new output")
+    story = json.loads(source.read_text(encoding="utf-8-sig"))
+    text = format_instructions(story, config, args.clips)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open('x', encoding='utf-8') as stream:
+        stream.write(text)
+    print(output)
 
 
 if __name__ == "__main__":

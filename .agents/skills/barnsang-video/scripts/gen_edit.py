@@ -17,6 +17,7 @@ def main(argv=None):
     p.add_argument("--input-fidelity", choices=["high", "low"],
                    help="Set only for models that support this option")
     args = p.parse_args(argv)
+    raise ValueError('Image editing is disabled: reference-image and remote request/image bundle support is not implemented')
     config, out, metadata, prompt, key = prepare(args)
     refs = [data_path(config, ref, must_exist=True) for ref in args.reference]
     data = {"model": args.model, "quality": args.quality, "size": args.size,

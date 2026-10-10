@@ -36,10 +36,21 @@ public class ChildExperiment {
     public void markForStartupRefresh(boolean b){}
     public boolean isMarkedForStartupRefresh(){return false;}
   }
+  static void requireNewOutputs(Path directory) throws Exception {
+    Path actual=directory.toAbsolutePath().normalize();
+    if(!actual.toRealPath().equals(actual))throw new IOException("Indirect output directory");
+    Properties p=new Properties();try(var reader=Files.newBufferedReader(actual.resolve("input.properties"))){p.load(reader);}
+    String stem=p.getProperty("filename");
+    if(stem==null || stem.isBlank() || stem.contains("/") || stem.contains("\\") || stem.equals(".") || stem.equals(".."))throw new IOException("Unsafe filename");
+    for(String name:new String[]{stem+".mid",stem+".mid.tmp",stem+".sng",stem+".mix","raw_import_chords.tsv","verified_chords.tsv","midi_export_adjustments.txt","generation.txt","native_reload_verified.txt"})
+      if(Files.exists(actual.resolve(name)))throw new IOException("Output already exists: "+name);
+  }
   public static void main(String[] args) throws Exception {
     try {
       System.setProperty("java.util.logging.SimpleFormatter.format","%4$s %3$s %5$s%n");
       Locale.setDefault(Locale.ENGLISH);
+      if(args.length<2)throw new IOException("No output directories");
+      for(int i=1;i<args.length;i++)requireNewOutputs(Path.of(args[i]));
       File rhythms=new File(args[0]);if(!rhythms.isDirectory())throw new IOException("Missing rhythms directory");
       RhythmDirsLocator.getDefault().setUserRhythmsDirectory(rhythms);
       var db=RhythmDatabase.getSharedInstance();
@@ -49,6 +60,7 @@ public class ChildExperiment {
   }
 
   static void generate(RhythmDatabase db,Path dir)throws Exception {
+    requireNewOutputs(dir);
     Properties p=new Properties();try(var reader=Files.newBufferedReader(dir.resolve("input.properties"))){p.load(reader);}
     var song=new MusicXMLFileReader(new File(p.getProperty("xml"))).readSong();
     song.setName(p.getProperty("title"));song.setTempo(Integer.parseInt(p.getProperty("tempo")));

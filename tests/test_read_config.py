@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from uuid import uuid4
 from unittest.mock import patch
 
 
@@ -18,6 +19,29 @@ SPEC.loader.exec_module(READER)
 
 
 class ReadConfigTests(unittest.TestCase):
+    def test_bookkeeping_identity_and_private_resource_cache(self):
+        root, data, work = self.environment_fixture()
+        local = root / 'config.local.toml'
+        host = str(uuid4())
+        valid = '[bookkeeping]\nactor_id = "fixture"\nhost_id = ' + json.dumps(host) + '\n'
+        local.write_text(valid + '[paths]\nresource_cache = ' + json.dumps(str(work / 'cache')) + '\n')
+        self.assertEqual(READER.load_config(root)['bookkeeping']['host_id'], host)
+        for actor, identifier in (('', host), ('fixture', 'host-name'),
+                                  ('fixture', host.upper()),
+                                  ('fixture', '00000000-0000-1000-8000-000000000000')):
+            local.write_text('[bookkeeping]\nactor_id = ' + json.dumps(actor)
+                             + '\nhost_id = ' + json.dumps(identifier) + '\n')
+            with self.subTest(actor=actor, host=identifier), self.assertRaisesRegex(ValueError, 'bookkeeping'):
+                READER.load_config(root)
+        blocker = work / 'ordinary-file'
+        blocker.write_text('not a directory')
+        for cache in ('relative', str(data), str(data / 'cache'), str(work), str(REPO / 'cache'),
+                      str(blocker), str(blocker / 'cache')):
+            local.write_text(valid + '[paths]\nresource_cache = ' + json.dumps(cache) + '\n')
+            with self.subTest(cache=cache), self.assertRaisesRegex(ValueError, 'resource_cache'):
+                READER.load_config(root)
+        self.assertFalse((work / 'cache').exists(), 'Configuration validation must not create caches')
+
     def environment_fixture(self):
         temporary = tempfile.TemporaryDirectory(prefix="command config ")
         self.addCleanup(temporary.cleanup)

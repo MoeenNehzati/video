@@ -25,10 +25,71 @@ It never edits either file. The shared defaults contain no machine paths.
    outside the checkout. Record verified paths and observed versions in local TOML.
    Missing model/sample choices require an explicit selection; do not
    substitute arbitrary ones. API credentials come from environment variables.
-5. Invoke the skill's canonical Python script with explicit inputs and outputs.
+5. Configure bookkeeping as described below, then use the selected skill's managed
+   entrypoint with exact registered inputs and declared outputs. Read
+   [artifact bookkeeping usage](artifact-ledger-usage.md) before producing files.
    Its preflight checks the settings it uses. `--config-root DIR` selects another
    directory containing `config.toml` and an optional `config.local.toml`; by default
    configuration comes from the code checkout regardless of working directory.
+
+## Artifact bookkeeping
+
+Managed production requires `[bookkeeping]` with a nonempty `actor_id` label and
+a lowercase UUIDv4 `host_id`. The actor attributes a collaborator; it is not
+authentication. Generate the host ID once per machine, preserve it in local TOML,
+and do not copy another host's ID. For example, obtain a fresh value with
+`env/bin/python -c "import uuid; print(uuid.uuid4())"`, then merge it into the
+existing local file. Neither identity belongs in shared defaults. The reader
+validates a present bookkeeping table; inspection/configuration setup can proceed
+without that table, while the ledger rejects missing managed-production identity.
+
+Resource-consuming operations also require `paths.resource_cache`: an absolute
+local directory outside both the repository and synchronized data root, with no
+containing/contained relationship to either. Missing cache directories may be
+created by resource preparation. Keep installed tools, sample libraries and models
+in their existing external locations. The resource adapter copies the declared
+consumed files into a private verified snapshot; it must never hardlink a mutable
+installation or silently substitute newer bytes. A descriptor in the ledger does
+not prove that its historical resource bytes are locally available.
+
+Native tool descriptors record the entrypoint, loader when applicable, and
+library directories. Preparation verifies dependency closure for every declared
+ELF file, including supplied runtime-loaded libraries. Origin-relative
+RPATH/RUNPATH are allowed only within the snapshot. Application resources such as
+JDK modules, browser fonts/plugins, OCR data and soundfonts still require a reviewed
+complete manifest; ELF linkage cannot discover them. Tool execution uses a private
+profile. A valid executable path in local TOML is setup information, not proof that
+this application's complete resource closure has been qualified.
+
+Python-package adapters additionally require `resources.python_packages` to name
+the active environment's installed package directory. Discover it with
+`env/bin/python -c "import sysconfig; print(sysconfig.get_path('purelib'))"` and
+record the interpreter version under `resource_versions.python_packages`. This
+source directory is the deliberate exception to external-resource placement:
+the project's existing `env/` stays reusable. Consumed distribution files and
+their declared package dependencies are copied into the external private cache;
+the producer runs from those copies with isolated import paths. Interpreter,
+standard library and operating-system libraries remain the recorded platform
+boundary, not a copied or sandboxed operating system.
+
+Choose a short cache root. Every fully expanded resource path must be shorter
+than 240 characters, including run identifiers and package-internal filenames.
+The observed music21 dependency manifest needs a cache root of at most 41
+characters; other versions may impose a tighter limit. Preflight checks the
+actual manifest before copying. Do not shorten package filenames or omit files
+to evade this limit.
+
+Optional synthesis still needs a selected compatible Nishiren model and the
+packages in `requirements/requirements-vocals.txt`, including the ONNX decoder.
+The implemented adapter and mock tests do not establish those live prerequisites.
+Do not install optional vocal packages for unrelated stages.
+
+Keep existing data organization intact. Bookkeeping writes only newly prepared
+operations and explicitly imported files; setup does not scan and migrate the
+shared root. Machine caches and publication/view journals are namespaced by
+`host_id`; immutable ledger events and history live under `paths.data_root`.
+`scripts.read_config --run` only supplies configuration: it does not make arbitrary
+external commands managed. Use the bookkeeping lifecycle and declared adapters.
 
 When a required setting is absent, first inspect existing local settings and
 available installations, reuse confirmed paths, and ask only for information
@@ -105,7 +166,7 @@ when installing or repairing missing prerequisites. That guide includes toolkit/
 voicebank files. A successful config read verifies the data root, not every
 optional installation or musical quality.
 
-Run `env/bin/python -m unittest discover -s tests -v` for synthetic checks.
+Run `env/bin/python scripts/run_tests.py` for synthetic checks.
 Those tests create their own TOML and data fixtures; they must not depend on this
 machine's local configuration, production assets, credentials or model installs.
 Linux fixture checks do not certify external Windows/macOS toolchains.
